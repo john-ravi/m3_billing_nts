@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:m3_billing_nts/home.dart';
-import 'package:m3_billing_nts/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -130,7 +129,7 @@ void createUserInDB(User user, BuildContext context) async {
     var bodyJson = json.decode(httpResponse.body);
     //  print(responseBody);
 
-    switch (bodyJson.response.toString()) {
+    switch (bodyJson.response) {
       case "UserCreated":
         {
           Navigator.push(
@@ -154,7 +153,7 @@ Future<http.Response> putUserOnDb(User user) async {
     "page": "createRegisteredUser",
     "user_name": user.username.toString(),
     "email_id": user.email.toString(),
-    "mobile_number=": user.mobile,
+    "mobile_number": user.mobile,
     "user_password": user.password,
     "aadhar_card": user.aadharCard
   });
@@ -173,6 +172,6 @@ s(BuildContext context, String value) {
       style: TextStyle(fontFamily: 'Georgia'),
     )));
   } on Exception catch (e) {
-    // TODO
+    print("printing Exception $e");
   }
 }
