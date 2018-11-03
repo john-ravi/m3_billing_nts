@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1042896970319",
+    "firebase_url": "https://m3-billing-fireauth.firebaseio.com",
+    "project_id": "m3-billing-fireauth",
+    "storage_bucket": "m3-billing-fireauth.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1042896970319:android:064794a80214f373",
+        "android_client_info": {
+          "package_name": "billing.m3.m3billingnts"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1042896970319-k6l8v8l34qnt9p415jt5hhs536ift29m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "billing.m3.m3billingnts",
+            "certificate_hash": "5c6285cc6bfe31b15c2dce90a70627514123f514"
+          }
+        },
+        {
+          "client_id": "1042896970319-nom1qn7rerl7q537r7kqv0t5q9tj8an9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZxVjCwjh0qjEQqiLd49ZRPveLyVhenwM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1042896970319-nom1qn7rerl7q537r7kqv0t5q9tj8an9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -7,6 +7,11 @@ import 'package:http/http.dart' as http;
 
 import 'user.dart';
 
+import 'package:firebase_auth/firebase_auth.dart';
+
+final FirebaseAuth _auth = FirebaseAuth.instance;
+
+
 String commonUrl = "http://149.248.0.189:8080/billing/";
 String testingUrl = "http://18.191.190.195/billing/?page=";
 String zeroUrl = "http://johnravi.000webhostapp.com/?page=";
@@ -43,9 +48,9 @@ Future<bool> isLoggedIn() async {
 }
 
 Future<String> getuserMobile() async {
-  SharedPreferences pref = await SharedPreferences.getInstance();
 
-  return pref.getString('uid');
+
+  return _auth.currentUser().then((fireUser) => fireUser.phoneNumber);
 }
 
 Future<String> getuserName() async {
@@ -127,13 +132,13 @@ void createUserInDB(User user, BuildContext context) async {
   /** Creating User in database*/
   await putUserOnDb(user).then((httpResponse) {
     var bodyJson = json.decode(httpResponse.body);
-    //  print(responseBody);
+      print(bodyJson.toString());
 
-    switch (bodyJson.response) {
+    switch (json.decode(bodyJson.response)) {
       case "UserCreated":
         {
-          Navigator.push(
-              context, new MaterialPageRoute(builder: (context) => new Home()));
+          print("Success -- User Created on Database");
+
           break;
         }
       case "FailedUserCreation":

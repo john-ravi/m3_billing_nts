@@ -216,10 +216,10 @@ class MyAppState extends State<MyApp> {
                                               removeloader();
 
                                               switch (                                                  numberResponse['response']) {
-                                                case 'failed':
+                                                case 'User_Mobile_Absent':
                                                   {
                                                     s(context,
-                                                        "Mobile not registered");
+                                                        "Mobile Number Not Registered, Please Check the number");
                                                     break;
                                                   }
                                                 case 'passwordSuccess':
@@ -249,23 +249,6 @@ class MyAppState extends State<MyApp> {
                                               }
                                             });
 
-/*                                            getjsondata(
-                                                    jsonvalue:
-                                                        'login?mobile=${mobile.text}&password=${password.text}')
-                                                .then((loginjson) {
-                                              removeloader();
-                                              var registerResponseJson =
-                                                  json.decode(loginjson.body);
-                                              if (registerResponseJson['status']
-                                                      .toString() ==
-                                                  'success') {
-                                              } else {
-                                                s(
-                                                    context,
-                                                    registerResponseJson[
-                                                        'msg']);
-                                              }
-                                            });*/
                                           }
                                         },
                                         color: primarycolor,
