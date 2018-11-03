@@ -383,9 +383,8 @@ class ForgotPasswordState extends State<ForgotPassword> {
         passwordsMatch = true;
       });
 
-      if (controllerOTP.text != null ||
-          controllerOTP.text.length <
-              6) {
+      if (controllerOTP.text != null) {
+        print(controllerOTP.text);
         s(context,
             "Please Check The OTP");
       } else {
