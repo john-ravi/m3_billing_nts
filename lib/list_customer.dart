@@ -4,7 +4,7 @@ import 'colorspage.dart';
 import 'create_customer.dart';
 import 'home.dart';
 import 'colorspage.dart';
-
+import 'user.dart';
 
 class ListCustomers extends StatefulWidget {
   @override
@@ -15,6 +15,10 @@ class ListCustomers extends StatefulWidget {
 }
 
 class ListCustomerState extends State<ListCustomers> {
+
+  List<User> listUsers = new List();
+
+
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(

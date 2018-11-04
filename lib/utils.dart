@@ -126,6 +126,36 @@ Future<http.Response> tryCatchNetwork(String userUrl) async {
   return httpResponse;
 }
 
+void changeUserPassword(String mobile, String password) async {
+  print("Change User Password");
+
+  var uri = Uri.http(authority, unencodedPath, {
+    "page": "changePassword",
+    "mobile_number": mobile,
+    "user_password": password
+  });
+
+  d(uri);
+  http.Response httpChngPaswdRespnse = await http.get(uri);
+  var body = json.decode(httpChngPaswdRespnse.body);
+  print(body.toString());
+  var bodyResponse = json.decode(body);
+  if(bodyResponse.toString().compareTo("Password_Changed") == 0){
+    print("Passwrd Changed");
+  } else {
+    print("Paswrd chnae failed");
+  }
+
+
+}
+
+bool isEmail(String em) {
+  String p =
+      r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+  RegExp regExp = new RegExp(p);
+  return regExp.hasMatch(em);
+}
+
 void createUserInDB(User user, BuildContext context) async {
   print("Create User");
 

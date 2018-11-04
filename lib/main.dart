@@ -237,7 +237,6 @@ class MyAppState extends State<MyApp> {
                                                   {
                                                     s(context,
                                                         "Incorrect Password");
-
                                                     break;
                                                   }
 

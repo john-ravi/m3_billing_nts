@@ -23,10 +23,11 @@ class ForgotPasswordState extends State<ForgotPassword> {
   String testPhoneNumber;
   BuildContext _scaffoldContext;
 
+bool firePhoneVerified = false;
   bool passwordsMatch;
   final _ScaffoldKey = GlobalKey<ScaffoldState>();
 
-  TextEditingController mobileNo = new TextEditingController();
+  TextEditingController controllerMobileNo = new TextEditingController();
   TextEditingController controllerPassword = new TextEditingController();
   TextEditingController controllerRenterPass = new TextEditingController();
   TextEditingController controllerOTP = new TextEditingController();
@@ -46,6 +47,7 @@ class ForgotPasswordState extends State<ForgotPassword> {
     final PhoneVerificationCompleted verificationCompleted =
         (FirebaseUser user) {
       setState(() {
+        firePhoneVerified = true;
         _message =
             Future<String>.value('signInWithPhoneNumber auto succeeded: $user');
         print("signInWithPhoneNumber auto succeeded: $user" + "\nGOING TO JOME PAGE");
@@ -78,7 +80,7 @@ class ForgotPasswordState extends State<ForgotPassword> {
       print("OTP Auto Retrieval failed");
     };
 
-    var phoneNumber = "+91" + mobileNo.text;
+    var phoneNumber = "+91" + controllerMobileNo.text;
     await _auth.verifyPhoneNumber(
         phoneNumber: phoneNumber,
         timeout: const Duration(seconds: 7),
@@ -89,25 +91,39 @@ class ForgotPasswordState extends State<ForgotPassword> {
   }
 
   Future<String> _testSignInWithPhoneNumber(String smsCode) async {
-    final FirebaseUser user = await _auth.signInWithPhoneNumber(
-      verificationId: verificationId,
-      smsCode: smsCode,
-    );
 
-    final FirebaseUser currentUser = await _auth.currentUser();
-    assert(user.uid == currentUser.uid);
-    if(user.uid == currentUser.uid){
-      print("Going to Home Screen from _signin");
-      Navigator.push(
-          context,
-          new MaterialPageRoute(
-              builder: (context) =>
-              new Home()));
+    FirebaseUser currentUser;
+
+    if (firePhoneVerified) {
+      currentUser = await _auth.currentUser();
+      gotoHome();
+    } else {
+      final FirebaseUser user = await _auth.signInWithPhoneNumber(
+        verificationId: verificationId,
+        smsCode: smsCode,
+      );
+
+      currentUser = await _auth.currentUser();
+      assert(user.uid == currentUser.uid);
+      if(user.uid == currentUser.uid){
+
+        print("Going to Home Screen from _signin");
+        gotoHome();
+      }
+
     }
+    return 'signInWithPhoneNumber succeeded: $currentUser';
+  }
+
+  void gotoHome() {
 
 
-
-    return 'signInWithPhoneNumber succeeded: $user';
+    changeUserPassword(controllerMobileNo.text, controllerPassword.text);
+    Navigator.push(
+        context,
+        new MaterialPageRoute(
+            builder: (context) =>
+            new Home()));
   }
 
   @override
@@ -126,7 +142,7 @@ class ForgotPasswordState extends State<ForgotPassword> {
       print("From Focu Listener");
       if(!myFocusNode.hasFocus){
         print("Foucs LOST");
-        if(mobileNo.text.length != 10){
+        if(controllerMobileNo.text.length != 10){
           s(_scaffoldContext, "Please Check Mobile Number");
         } else {
           _testVerifyPhoneNumber(context);
@@ -170,7 +186,7 @@ class ForgotPasswordState extends State<ForgotPassword> {
                    child: new Stack(
                      children: <Widget>[
                        Container(
-                         height: 400.0,
+                         height: 500.00,
                          margin: EdgeInsets.only(right: 10.0, left: 10.0),
                          child: new Card(
                            elevation: 6.0,
@@ -189,7 +205,7 @@ class ForgotPasswordState extends State<ForgotPassword> {
                                  margin: EdgeInsets.only(
                                      top: 10.0, right: 10.0, left: 10.0),
                                  child: TextFormField(
-                                   controller: mobileNo,
+                                   controller: controllerMobileNo,
                                    focusNode: myFocusNode,
                                    autofocus: true,
                                    maxLength: 10,
@@ -366,7 +382,7 @@ class ForgotPasswordState extends State<ForgotPassword> {
   }
 
   void checkBeforeSignIn(BuildContext context) {
-    if(mobileNo.text.length != 10){
+    if(controllerMobileNo.text.length != 10){
       s(context, "Please Check Mobile Number");
     }
     else if(controllerPassword.text.length < 6) {
@@ -378,23 +394,17 @@ class ForgotPasswordState extends State<ForgotPassword> {
         0) {
       s(context,
           "Passwords Not Match, Please Check");
-    } else {
-      setState(() {
-        passwordsMatch = true;
-      });
-
-      if (controllerOTP.text != null) {
+    } else if (controllerOTP.text.length == 0) {
         print(controllerOTP.text);
         s(context,
             "Please Check The OTP");
-      } else {
+      } else { /** Goto Home page*/
         print(_testSignInWithPhoneNumber(
             controllerOTP.text));
       }
 
 
-
     }
   }
 
-}
+

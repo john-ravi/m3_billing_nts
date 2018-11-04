@@ -3,6 +3,12 @@ import 'colorspage.dart';
 import 'home.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+import 'utils.dart';
+import 'customers.dart';
+import 'customer.dart';
+
+import 'appConstants.dart';
+
 class CreateCustomer extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -12,6 +18,15 @@ class CreateCustomer extends StatefulWidget {
 }
 
 class CreateCustomerState extends State<CreateCustomer> {
+
+  TextEditingController controllerName = new TextEditingController();
+  TextEditingController ctrlMobile = new TextEditingController();
+  TextEditingController ctrlMail = new TextEditingController();
+  TextEditingController ctrlGST = new TextEditingController();
+  TextEditingController ctrlAddress = new TextEditingController();
+  TextEditingController ctrlCity = new TextEditingController();
+  TextEditingController ctrlState = new TextEditingController();
+  TextEditingController ctrlPincode = new TextEditingController();
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
@@ -43,22 +58,23 @@ class CreateCustomerState extends State<CreateCustomer> {
             SingleChildScrollView(
               child: new Center(
                 child: SizedBox(
-                  height: 510.0,
+                  height: 550.0,
                   child: Stack(
                     children: <Widget>[
                       Container(
-                        height: 500.0,
+                        height: 540.0,
                         child: Card(
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8.0)),
                           elevation: 6.0,
                           margin: EdgeInsets.all(10.0),
-                          child: new Column(
+                          child: new ListView(
                             children: <Widget>[
                               Container(
                                 margin: EdgeInsets.only(
                                     top: 10.0, right: 10.0, left: 10.0),
                                 child: TextFormField(
+                                  controller: controllerName,
                                   decoration: new InputDecoration(
                                     contentPadding: EdgeInsets.all(10.0),
                                     border: OutlineInputBorder(
@@ -80,6 +96,7 @@ class CreateCustomerState extends State<CreateCustomer> {
                                 margin: EdgeInsets.only(
                                     top: 10.0, right: 10.0, left: 10.0),
                                 child: TextFormField(
+                                  controller: ctrlMobile,
                                   decoration: new InputDecoration(
                                     contentPadding: EdgeInsets.all(10.0),
                                     border: OutlineInputBorder(
@@ -98,19 +115,20 @@ class CreateCustomerState extends State<CreateCustomer> {
                                 ),
                               ),
                               Container(
-                                alignment: Alignment.bottomLeft,
+                                                                alignment: Alignment.bottomLeft,
                                 margin: EdgeInsets.only(
                                     top: 10.0, right: 10.0, left: 10.0),
                                 child: Text('Other Info (Optional)',
                                     style: TextStyle(
                                         fontSize: 16.0,
-                                        
+
                                         color: Colors.black)),
                               ),
                               Container(
                                 margin: EdgeInsets.only(
                                     top: 10.0, right: 10.0, left: 10.0),
                                 child: TextFormField(
+                                  controller: ctrlMail,
                                   decoration: new InputDecoration(
                                     contentPadding: EdgeInsets.all(10.0),
                                     border: OutlineInputBorder(
@@ -132,6 +150,7 @@ class CreateCustomerState extends State<CreateCustomer> {
                                 margin: EdgeInsets.only(
                                     top: 10.0, right: 10.0, left: 10.0),
                                 child: TextFormField(
+                                  controller: ctrlGST,
                                   decoration: new InputDecoration(
                                     contentPadding: EdgeInsets.all(10.0),
                                     border: OutlineInputBorder(
@@ -156,13 +175,14 @@ class CreateCustomerState extends State<CreateCustomer> {
                                 child: Text('Address Details (Optional)',
                                     style: TextStyle(
                                         fontSize: 16.0,
-                                        
+
                                         color: Colors.black)),
                               ),
                               Container(
                                 margin: EdgeInsets.only(
                                     top: 10.0, right: 10.0, left: 10.0),
                                 child: TextFormField(
+                                  controller: ctrlAddress,
                                   decoration: new InputDecoration(
                                     contentPadding: EdgeInsets.all(10.0),
                                     border: OutlineInputBorder(
@@ -184,6 +204,7 @@ class CreateCustomerState extends State<CreateCustomer> {
                                 margin: EdgeInsets.only(
                                     top: 10.0, right: 10.0, left: 10.0),
                                 child: TextFormField(
+                                  controller: ctrlCity,
                                   decoration: new InputDecoration(
                                     contentPadding: EdgeInsets.all(10.0),
                                     border: OutlineInputBorder(
@@ -205,6 +226,7 @@ class CreateCustomerState extends State<CreateCustomer> {
                                 margin: EdgeInsets.only(
                                     top: 10.0, right: 10.0, left: 10.0),
                                 child: TextFormField(
+                                  controller: ctrlState,
                                   decoration: new InputDecoration(
                                     contentPadding: EdgeInsets.all(10.0),
                                     border: OutlineInputBorder(
@@ -226,6 +248,7 @@ class CreateCustomerState extends State<CreateCustomer> {
                                 margin: EdgeInsets.only(
                                     top: 10.0, right: 10.0, left: 10.0),
                                 child: TextFormField(
+                                  controller: ctrlPincode,
                                   decoration: new InputDecoration(
                                     contentPadding: EdgeInsets.all(10.0),
                                     border: OutlineInputBorder(
@@ -243,32 +266,68 @@ class CreateCustomerState extends State<CreateCustomer> {
                                   keyboardType: TextInputType.number,
                                 ),
                               ),
+                              Container(
+                                alignment: Alignment.bottomCenter,
+                                margin: EdgeInsets.only(top: 24.0),
+                                child: ConstrainedBox(
+                                  constraints: new BoxConstraints(minWidth: 250.0),
+                                  child: new RaisedButton(
+                                    onPressed: () {
+                                      if (controllerName.text.length < 2) {
+                                        print(
+                                            "Customer name should be atleast two letters");
+                                      } else if (ctrlMobile.text.length != 10) {
+                                        print("Mobile should be 10 Digits");
+                                      } else if (ctrlMail.text.length > 0) {
+                                        if (!isEmail(ctrlMail.text)) {
+                                          print(
+                                              "Please enter a valid email id");
+                                        }
+                                      }
+                                      else if (ctrlGST.text.length > 0) {
+                                        if (!ctrlGST.text.startsWith("GSTIN") ||
+                                            !ctrlGST.text.startsWith("gstin")) {
+                                          print("GST number starts with GSTIN");
+                                        }
+                                      }
+                                      else if(ctrlAddress.text.length <25){
+
+                                        print("Address should not cross 25 characters");
+                                      }else if(ctrlCity.text.length < 15){
+
+                                        print("City should not cross 15 characters");
+                                      }else if(ctrlState.text.length != 15){
+
+                                        print("City should not cross 15 characters");
+                                      } else {
+
+                                        
+                                        Map<String, String> map = new Map();
+/*                                        map[CUSTOMER_NAME] =
+                                        Customer.fromMap(map);*/
+                                        Navigator.push(
+                                            context,
+                                            new MaterialPageRoute(
+                                                builder: (context) => Customers()));
+
+                                      }
+                                    },
+                                    color: primarycolor,
+                                    shape: new RoundedRectangleBorder(
+                                        borderRadius: new BorderRadius.circular(30.0)),
+                                    child: new Text('CREATE CUSTOMER',
+                                        style: new TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16.0,
+                                        )),
+                                  ),
+                                ),
+                              ),
+
                             ],
                           ),
                         ),
                       ),
-                      Container(
-                        alignment: Alignment.bottomCenter,
-                        child: ConstrainedBox(
-                          constraints: new BoxConstraints(minWidth: 250.0),
-                          child: new RaisedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  new MaterialPageRoute(
-                                      builder: (context) => new Home()));
-                            },
-                            color: primarycolor,
-                            shape: new RoundedRectangleBorder(
-                                borderRadius: new BorderRadius.circular(30.0)),
-                            child: new Text('CREATE CUSTOMER',
-                                style: new TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16.0,
-                                    )),
-                          ),
-                        ),
-                      )
                     ],
                   ),
                 ),

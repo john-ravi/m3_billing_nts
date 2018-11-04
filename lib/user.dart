@@ -7,6 +7,7 @@ class User {
   String username;
 
 
+
   User(this.businessName, this.username, this.mobile, this.email, this.password,
       this.aadharCard);
 
