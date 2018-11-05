@@ -11,7 +11,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
-
 String commonUrl = "http://149.248.0.189:8080/billing/";
 String testingUrl = "http://18.191.190.195/billing/?page=";
 String zeroUrl = "http://johnravi.000webhostapp.com/?page=";
@@ -48,8 +47,6 @@ Future<bool> isLoggedIn() async {
 }
 
 Future<String> getuserMobile() async {
-
-
   return _auth.currentUser().then((fireUser) => fireUser.phoneNumber);
 }
 
@@ -75,7 +72,6 @@ Future<String> createprefsuser(
   print("Pref Created for $mobile");
   return mobile;
 }
-
 
 Future<bool> clearlogin() async {
   SharedPreferences pref = await SharedPreferences.getInstance();
@@ -140,13 +136,11 @@ void changeUserPassword(String mobile, String password) async {
   var body = json.decode(httpChngPaswdRespnse.body);
   print(body.toString());
   var bodyResponse = json.decode(body);
-  if(bodyResponse.toString().compareTo("Password_Changed") == 0){
+  if (bodyResponse.toString().compareTo("Password_Changed") == 0) {
     print("Passwrd Changed");
   } else {
     print("Paswrd chnae failed");
   }
-
-
 }
 
 bool isEmail(String em) {
@@ -162,7 +156,7 @@ void createUserInDB(User user, BuildContext context) async {
   /** Creating User in database*/
   await putUserOnDb(user).then((httpResponse) {
     var bodyJson = json.decode(httpResponse.body);
-      print(bodyJson.toString());
+    print(bodyJson.toString());
 
     switch (json.decode(bodyJson.response)) {
       case "UserCreated":
@@ -210,3 +204,38 @@ s(BuildContext context, String value) {
     print("printing Exception $e");
   }
 }
+
+Future<List<String>> getStates() async {
+  var uri = Uri.http(authority, unencodedPath, {
+    "page": "getStates",
+  });
+
+  d(uri);
+  http.Response registerUserResponse = await http.get(uri);
+
+  if (registerUserResponse.statusCode == 200) {
+    // If the call to the server was successful, parse the JSON
+    var decodedBody = json.decode(registerUserResponse.body);
+    if (decodedBody['response'].toString().compareTo("success") == 0) {
+      var mapStateId = <String, Object>{};
+
+      print(decodedBody.toString());
+      List statesTableList = decodedBody["body"];
+
+      statesTableList.forEach((row) => {
+            //mapStateId[row["state_name"]] = mapStateId[row["state_id"]];
+          });
+      return statesTableList;
+//    return Post.fromJson(json.decode(response.body));
+    } else {
+      // If that call was not successful, throw an error.
+      var list = new List<String>();
+      list.add("States Failed to Load, Please Check Network");
+      return list;
+    }
+  }
+
+  return null;
+}
+
+Future<List<String>> getCitiesUtils() async {}
