@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'colorspage.dart';
 import 'home.dart';
 import 'register.dart';
@@ -80,7 +81,9 @@ class MyAppState extends State<MyApp> {
                                       constraints:
                                           new BoxConstraints(minWidth: 250.0),
                                       child: new RaisedButton(
-                                        onPressed: (){onLoginPressed(context);},
+                                        onPressed: () {
+                                          onLoginPressed(context);
+                                        },
                                         color: primarycolor,
                                         shape: new RoundedRectangleBorder(
                                             borderRadius:
@@ -133,113 +136,100 @@ class MyAppState extends State<MyApp> {
 
   Column buildColumn(BuildContext context) {
     return Column(
-                                      children: <Widget>[
-                                        new Container(
-                                          alignment: Alignment.center,
-                                          margin: EdgeInsets.only(top: 10.0),
-                                          child: new Text(
-                                            'LOGIN',
-                                            style: TextStyle(
-                                                fontSize: 25.0,
-                                                color: secondarycolor),
-                                          ),
-                                        ),
-                                        new ListTile(
-                                          leading: const Icon(
-                                            Icons.phone_android,
-                                            color: secondarycolor,
-                                          ),
-                                          title: new TextFormField(
-                                            decoration: new InputDecoration(
-                                              hintText:
-                                                  'Please Enter Mobile Number',
-                                              hintStyle: TextStyle(),
-                                              labelText:
-                                                  '10 Digits Mobile No Requried',
-                                              labelStyle: TextStyle(),
-                                            ),
-                                            controller: mobile,
-                                            keyboardType:
-                                                TextInputType.number,
-                                          ),
-                                        ),
-                                        new ListTile(
-                                          leading: const Icon(
-                                            Icons.lock,
-                                            color: secondarycolor,
-                                          ),
-                                          title: new TextFormField(
-                                            decoration: new InputDecoration(
-                                              hintText: 'Enter Your Password',
-                                              hintStyle: TextStyle(),
-                                              labelText:
-                                                  'Enter Your Password',
-                                              labelStyle: TextStyle(),
-                                            ),
-                                            controller: password,
-                                            keyboardType: TextInputType.text,
-                                            obscureText: true,
-                                          ),
-                                        ),
-                                        Container(
-                                          width: 140.0,
-                                          margin: EdgeInsets.only(
-                                              top: 20.0, bottom: 15.0),
-                                          child: InkWell(
-                                            onTap: () {
-                                              Navigator.push(
-                                                  context,
-                                                  new MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          new ForgotPassword()));
-                                            },
-                                            child: Center(
-                                              child: Text(
-                                                "Forgot Password?",
-                                                style: TextStyle(
-                                                    color: secondarycolor,
-                                                    fontSize: 16.0),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        Container(
-                                          margin: EdgeInsets.only(top: 10.0),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: <Widget>[
-                                              Container(
-                                                child: Text(
-                                                  'New To M3 ? ',
-                                                  style: TextStyle(
-                                                      fontSize: 16.0,
-                                                      color: Colors.black),
-                                                ),
-                                              ),
-                                              InkWell(
-                                                onTap: () {
-                                                  Navigator.push(
-                                                      context,
-                                                      new MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              new Register()));
-                                                },
-                                                child: Container(
-                                                  child: Text(
-                                                    'Sign Up',
-                                                    style: TextStyle(
-                                                        fontSize: 16.0,
-                                                        color:
-                                                            secondarycolor),
-                                                  ),
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        )
-                                      ],
-                                    );
+      children: <Widget>[
+        new Container(
+          alignment: Alignment.center,
+          margin: EdgeInsets.only(top: 10.0),
+          child: new Text(
+            'LOGIN',
+            style: TextStyle(fontSize: 25.0, color: secondarycolor),
+          ),
+        ),
+        new ListTile(
+          leading: const Icon(
+            Icons.phone_android,
+            color: secondarycolor,
+          ),
+          title: new TextFormField(
+            decoration: new InputDecoration(
+              hintText: 'Please Enter Mobile Number',
+              hintStyle: TextStyle(),
+              labelText: '10 Digits Mobile No Requried',
+              labelStyle: TextStyle(),
+            ),
+            controller: mobile,
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              WhitelistingTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(10),
+            ],
+          ),
+        ),
+        new ListTile(
+          leading: const Icon(
+            Icons.lock,
+            color: secondarycolor,
+          ),
+          title: new TextFormField(
+            decoration: new InputDecoration(
+              hintText: 'Enter Your Password',
+              hintStyle: TextStyle(),
+              labelText: 'Enter Your Password',
+              labelStyle: TextStyle(),
+            ),
+            controller: password,
+            keyboardType: TextInputType.text,
+            obscureText: true,
+          ),
+        ),
+        Container(
+          width: 140.0,
+          margin: EdgeInsets.only(top: 20.0, bottom: 15.0),
+          child: InkWell(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  new MaterialPageRoute(
+                      builder: (context) => new ForgotPassword()));
+            },
+            child: Center(
+              child: Text(
+                "Forgot Password?",
+                style: TextStyle(color: secondarycolor, fontSize: 16.0),
+              ),
+            ),
+          ),
+        ),
+        Container(
+          margin: EdgeInsets.only(top: 10.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                child: Text(
+                  'New To M3 ? ',
+                  style: TextStyle(fontSize: 16.0, color: Colors.black),
+                ),
+              ),
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      new MaterialPageRoute(
+                          builder: (context) => new Register()));
+                },
+                child: Container(
+                  child: Text(
+                    'Sign Up',
+                    style: TextStyle(fontSize: 16.0, color: secondarycolor),
+                  ),
+                ),
+              )
+            ],
+          ),
+        )
+      ],
+    );
   }
 
   void onLoginPressed(BuildContext context) async {
@@ -299,10 +289,8 @@ class MyAppState extends State<MyApp> {
     }
   }
 
-
   void gotoHome(BuildContext context) {
-    Navigator.push(context,
-        new MaterialPageRoute(builder: (context) => new Home()));
+    Navigator.push(
+        context, new MaterialPageRoute(builder: (context) => new Home()));
   }
 }
-

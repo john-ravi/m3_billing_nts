@@ -31,7 +31,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
-
 class Home extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -45,20 +44,14 @@ class HomeState extends State<Home> {
   User user;
   String userMobile;
 
-  Future<bool> matchMobileWithLoggedInFire(){
-    _auth.currentUser().then((fireUser) => {
-
-
-    });
-
+  Future<bool> matchMobileWithLoggedInFire() {
+    _auth.currentUser().then((fireUser) => {});
   }
-
 
   @override
   void initState() {
-   // initMobile();
+    // initMobile();
     super.initState();
-
   }
 
   final List<Widget> homechildren = [
@@ -70,7 +63,7 @@ class HomeState extends State<Home> {
 
   initMobile() async {
     print("Init Mobile");
-    await getuserMobile().then((stringM) {
+    await getUserMobile().then((stringM) {
       if (stringM == null) {
         print("NULL Mobile");
         // initMobile();
@@ -155,8 +148,8 @@ class HomeState extends State<Home> {
                       FontAwesomeIcons.user,
                       color: secondarycolor,
                     ),
-                    title:
-                        Text('PROFILE', style: TextStyle(color: secondarycolor)))
+                    title: Text('PROFILE',
+                        style: TextStyle(color: secondarycolor)))
               ],
             ),
             drawer: Drawer(
@@ -171,34 +164,23 @@ class HomeState extends State<Home> {
                         children: <Widget>[
                           Container(
                             margin: EdgeInsets.only(top: 10.0),
-                            child:
-                                Icon(FontAwesomeIcons.user, color: Colors.white),
+                            child: Icon(FontAwesomeIcons.user,size: 48.0,
+                                color: Colors.white),
                           ),
                           Container(
                             margin: EdgeInsets.only(top: 10.0),
                             child: Text(
-                              'User Id - Mobile',
-                              style:
-                                  TextStyle(fontSize: 18.0, color: Colors.white),
+                              '',
+                              style: TextStyle(
+                                  fontSize: 18.0, color: Colors.white),
                             ),
                           ),
                           Container(
                             margin: EdgeInsets.only(top: 10.0),
-                            child: FutureBuilder(
-                              future: getuserMobile(),
-                              builder: (context, snapshot) {
-                                if (snapshot.hasData) {
-                                  return Text(snapshot.data.toString(),
-                                      style: TextStyle(
-                                          fontSize: 18.0, color: Colors.white));
-                                } else if (snapshot.hasError) {
-                                  return Text("${snapshot.error}");
-                                }
-
-                                // By default, show a loading spinner
-                                return CircularProgressIndicator();
-                              },
-                            ),
+                            child: Text(
+                                "",
+                                style: TextStyle(
+                                    fontSize: 18.0, color: Colors.white)),
                           ),
                         ],
                       ),
@@ -227,7 +209,7 @@ class HomeState extends State<Home> {
                       Navigator.push(
                           context,
                           new MaterialPageRoute(
-                              builder: (context) => new ListCustomers()));
+                              builder: (context) => new Customers()));
                     },
                   ),
                   new ListTile(

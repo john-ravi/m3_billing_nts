@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:m3_billing_nts/customer.dart';
 import 'colorspage.dart';
 import 'create_customer.dart';
 import 'home.dart';
 import 'colorspage.dart';
 import 'user.dart';
+import 'utils.dart';
 
-class ListCustomers extends StatefulWidget {
+class Customers extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
     ListCustomerState listcustomerState() => new ListCustomerState();
@@ -14,16 +16,27 @@ class ListCustomers extends StatefulWidget {
   }
 }
 
-class ListCustomerState extends State<ListCustomers> {
+class ListCustomerState extends State<Customers> {
 
-  List<User> listUsers = new List();
+  List<Customer> listCustomers = new List();
 
+  @override
+  void initState() {
+    getCustomers().then((onValue) {
+      print("Listing Customers \n ${onValue.toString()}");
+      setState(() {
+        listCustomers = onValue;
+
+      });
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
       theme: new ThemeData(
-        fontFamily: 'Georgia',
+          fontFamily: 'Georgia',
           primaryColor: Colors.black,
           accentColor: Colors.black,
           hintColor: Colors.black),
@@ -73,12 +86,12 @@ class ListCustomerState extends State<ListCustomers> {
                             prefixIcon: Icon(Icons.search),
                             hintText: 'Search Customer',
                             hintStyle: TextStyle(
-                                color: Colors.white,
-                                ),
+                              color: Colors.white,
+                            ),
                             labelText: 'Search Customer',
                             labelStyle: TextStyle(
-                                color: Colors.black,
-                                ),
+                              color: Colors.black,
+                            ),
                           ),
                           keyboardType: TextInputType.text,
                         ),
@@ -88,65 +101,65 @@ class ListCustomerState extends State<ListCustomers> {
                 ),
                 new SliverList(
                   delegate: new SliverChildBuilderDelegate(
-                      (BuildContext context, int index) {
-                    return GestureDetector(
-                      child: Container(
-                        margin: EdgeInsets.all(10.0),
-                        child: Card(
-                          elevation: 6.0,
-                          margin: EdgeInsets.all(4.0),
-                          child: Column(
-                            children: <Widget>[
-                              Table(
-                                children: [
-                                  TableRow(children: [
-                                    Container(
-                                      margin: EdgeInsets.only( top: 25.0,left: 5.0),
-                                      child: new Text(
-                                        'Customer Name ',
-                                        style: TextStyle(
-                                            fontSize: 14.0,
+                          (BuildContext context, int index) {
+                        return GestureDetector(
+                          child: Container(
+                            margin: EdgeInsets.all(10.0),
+                            child: Card(
+                              elevation: 6.0,
+                              margin: EdgeInsets.all(4.0),
+                              child: Column(
+                                children: <Widget>[
+                                  Table(
+                                    children: [
+                                      TableRow(children: [
+                                        Container(
+                                          margin: EdgeInsets.only( top: 25.0,left: 5.0),
+                                          child: new Text(
+                                            'Customer Name ',
+                                            style: TextStyle(
+                                              fontSize: 14.0,
                                             ),
-                                      ),
-                                    ),
-                                    Container(
-                                     margin: EdgeInsets.only( top: 25.0,left: 5.0),
-                                      child: new Text(
-                                        ' : M3$index',
-                                        style: TextStyle(
-                                            fontSize: 14.0,
+                                          ),
+                                        ),
+                                        Container(
+                                          margin: EdgeInsets.only( top: 25.0,left: 5.0),
+                                          child: new Text(
+                                            listCustomers.elementAt(index).customer_name,
+                                            style: TextStyle(
+                                              fontSize: 14.0,
                                             ),
-                                      ),
-                                    ),
-                                  ]),
-                                  TableRow(children: [
-                                    Container(
-                                      margin: EdgeInsets.only( top: 10.0,left: 5.0, bottom: 25.0),
-                                      child: new Text(
-                                        'Mobile Number ',
-                                        style: TextStyle(
-                                            fontSize: 14.0,
+                                          ),
+                                        ),
+                                      ]),
+                                      TableRow(children: [
+                                        Container(
+                                          margin: EdgeInsets.only( top: 10.0,left: 5.0, bottom: 25.0),
+                                          child: new Text(
+                                            'Mobile Number ',
+                                            style: TextStyle(
+                                              fontSize: 14.0,
                                             ),
-                                      ),
-                                    ),
-                                    Container(
-                                      margin: EdgeInsets.only( top: 10.0,left: 5.0, bottom: 25.0),
-                                      child: new Text(
-                                        ' : 1234567890',
-                                        style: TextStyle(
-                                            fontSize: 14.0,
+                                          ),
+                                        ),
+                                        Container(
+                                          margin: EdgeInsets.only( top: 10.0,left: 5.0, bottom: 25.0),
+                                          child: new Text(
+                                            listCustomers.elementAt(index).contact_number,
+                                            style: TextStyle(
+                                              fontSize: 14.0,
                                             ),
-                                      ),
-                                    ),
-                                  ]),
+                                          ),
+                                        ),
+                                      ]),
+                                    ],
+                                  ),
                                 ],
                               ),
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
-                    );
-                  }, childCount: 20),
+                        );
+                      }, childCount: listCustomers.length),
                 )
               ],
             ),

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:m3_billing_nts/customer.dart';
 import 'package:m3_billing_nts/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -46,8 +47,13 @@ Future<bool> isLoggedIn() async {
   return pref.getBool('LoggedIn');
 }
 
-Future<String> getuserMobile() async {
-  return _auth.currentUser().then((fireUser) => fireUser.phoneNumber);
+Future<String> getUserMobile() async {
+  if (_auth != null) {
+    if (_auth.currentUser() != null)
+      return _auth.currentUser().then((fireUser) => fireUser.phoneNumber);
+  }
+
+  return "";
 }
 
 Future<String> getuserName() async {
@@ -116,7 +122,7 @@ Future<http.Response> tryCatchNetwork(String userUrl) async {
     httpResponse = await http.get(userUrl);
   } catch (e) {
     print("Check Network Connection $userUrl");
-    return null;
+    return httpResponse;
   }
 
   return httpResponse;
@@ -205,7 +211,7 @@ s(BuildContext context, String value) {
   }
 }
 
-Future<List<String>> getStates() async {
+Future<Map> getStates() async {
   var uri = Uri.http(authority, unencodedPath, {
     "page": "getStates",
   });
@@ -217,25 +223,100 @@ Future<List<String>> getStates() async {
     // If the call to the server was successful, parse the JSON
     var decodedBody = json.decode(registerUserResponse.body);
     if (decodedBody['response'].toString().compareTo("success") == 0) {
-      var mapStateId = <String, Object>{};
+      var mapStateToId = new Map();
 
-      print(decodedBody.toString());
+      print("decoded body \t" + decodedBody.toString());
       List statesTableList = decodedBody["body"];
 
-      statesTableList.forEach((row) => {
-            //mapStateId[row["state_name"]] = mapStateId[row["state_id"]];
-          });
-      return statesTableList;
+      print("List \t" + statesTableList.toString());
+
+      statesTableList.forEach((row) {
+        print("ROW \t" + row.toString());
+
+        mapStateToId[row["state_name"]] = row["state_id"];
+
+        print("Map as Whiole \t" + mapStateToId.toString());
+      });
+      return mapStateToId;
 //    return Post.fromJson(json.decode(response.body));
     } else {
-      // If that call was not successful, throw an error.
-      var list = new List<String>();
-      list.add("States Failed to Load, Please Check Network");
-      return list;
+      print("Couldn't fetch rows, please check");
     }
+  } else {
+    print("Error Fetching States, Check Network: In Utility");
   }
 
   return null;
 }
 
-Future<List<String>> getCitiesUtils() async {}
+Future<List<String>> getCitiesUtils(state_id) async {
+  var uri = Uri.http(
+      authority, unencodedPath, {"page": "getCities", "state_id": state_id});
+
+  d(uri);
+  http.Response registerUserResponse = await http.get(uri);
+  List<String> listCities = new List();
+
+  if (registerUserResponse.statusCode == 200) {
+    // If the call to the server was successful, parse the JSON
+    var decodedBody = json.decode(registerUserResponse.body);
+    if (decodedBody['response'].toString().compareTo("success") == 0) {
+      print("decoded body \t" + decodedBody.toString());
+      List objectCitiesList = decodedBody["body"];
+
+      print("List \t" + objectCitiesList.toString());
+
+      objectCitiesList.forEach((rowCityObject) {
+        print("ROW \t" + rowCityObject.toString());
+        listCities.add(rowCityObject["city_name"]);
+        print("Map as Whiole \t" + objectCitiesList.toString());
+      });
+    } else {
+      print("Couldn't fetch rows, please check");
+    }
+  } else {
+    print("Error Fetching States, Check Network: In Utility");
+  }
+
+  return listCities;
+}
+
+Future<List<Customer>> getCustomers() async {
+  print("Get Customers Called");
+  var uri = Uri.http(authority, unencodedPath, {"page": "getCustomers"});
+
+  d(uri);
+  http.Response registerUserResponse = await http.get(uri);
+  List<Customer> listCustomers = new List();
+
+  if (registerUserResponse.statusCode == 200) {
+    // If the call to the server was successful, parse the JSON
+    var decodedBody = json.decode(registerUserResponse.body);
+    if (decodedBody['response'].toString().compareTo("success") == 0) {
+      print("decoded body \t" + decodedBody.toString());
+      List objectCustomersList = decodedBody["body"];
+
+      print("List \t" + objectCustomersList.toString());
+
+      /** FOR EACH */
+      objectCustomersList.forEach((rowCustomerObject) {
+        print("ROW \t" + rowCustomerObject.toString());
+
+        Map customerMap = rowCustomerObject;
+
+        print("CustomerMap  ${customerMap.toString()}");
+
+
+        listCustomers.add(new Customer(customerMap["customer_name"], customerMap["contact_number"]));
+
+        print("List as Whiole \t" + listCustomers.toString());
+      });
+    } else {
+      print("Couldn't fetch rows, please check");
+    }
+  } else {
+    print("Error Fetching States, Check Network: In Utility");
+  }
+
+  return listCustomers;
+}

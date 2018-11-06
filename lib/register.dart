@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'colorspage.dart';
 import 'home.dart';
 import 'main.dart';
@@ -152,6 +153,10 @@ class RegisterState extends State<Register> {
                                             keyboardType: TextInputType.number,
                                             controller: mobile,
                                             maxLength: 10,
+                                            inputFormatters: [
+                                              WhitelistingTextInputFormatter.digitsOnly,
+                                              LengthLimitingTextInputFormatter(10),
+                                            ],
                                           ),
                                         ),
                                         new ListTile(
