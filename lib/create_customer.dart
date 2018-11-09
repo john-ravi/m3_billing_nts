@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -26,9 +27,9 @@ class CreateCustomerState extends State<CreateCustomer> {
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
 
   UserTest selectedUser;
-  String selectedState;
-  String selectedCity;
-  var states = new Map();
+  String selectedState = "";
+  String selectedCity = "";
+  var mapStates = new Map();
   var cities = new List();
 
   List<String> blankList = new List.filled(1, "");
@@ -71,16 +72,18 @@ class CreateCustomerState extends State<CreateCustomer> {
                     new MaterialPageRoute(builder: (context) => new Home()));
               }),
         ),
-        body: Stack(
-          children: <Widget>[
-            new Image.asset(
-              'assets/images/bg.png',
-              fit: BoxFit.cover,
-              width: double.infinity,
-            ),
-            buildSingleChildScrollView(context)
-          ],
-        ),
+        body: Builder(builder: (BuildContext context) {
+          return Stack(
+            children: <Widget>[
+              new Image.asset(
+                'assets/images/bg.png',
+                fit: BoxFit.cover,
+                width: double.infinity,
+              ),
+              buildSingleChildScrollView(context)
+            ],
+          );
+        }),
       ),
     );
   }
@@ -108,6 +111,7 @@ class CreateCustomerState extends State<CreateCustomer> {
                           margin: EdgeInsets.only(
                               top: 10.0, right: 10.0, left: 10.0),
                           child: TextFormField(
+                            textInputAction: TextInputAction.continueAction,
                             controller: controllerName,
                             decoration: new InputDecoration(
                               contentPadding: EdgeInsets.all(10.0),
@@ -123,13 +127,13 @@ class CreateCustomerState extends State<CreateCustomer> {
                               ),
                             ),
                             keyboardType: TextInputType.text,
-
                           ),
                         ),
                         Container(
                           margin: EdgeInsets.only(
                               top: 10.0, right: 10.0, left: 10.0),
                           child: TextFormField(
+                            textInputAction: TextInputAction.continueAction,
                             controller: ctrlMobile,
                             decoration: new InputDecoration(
                               contentPadding: EdgeInsets.all(10.0),
@@ -250,15 +254,16 @@ class CreateCustomerState extends State<CreateCustomer> {
                               margin: EdgeInsets.only(left: 10.0, right: 10.0),
                               child: new DropdownButton<String>(
                                 hint: new Text("Select State"),
-                                value: selectedState,
+                                value:
+                                    selectedState == "" ? null : selectedState,
                                 onChanged: (String newValue) {
                                   setState(() {
-                                    cities = blankList;
                                     selectedState = newValue;
+                                    selectedCity = "";
                                   });
                                   callGetCities(newValue);
                                 },
-                                items: states.keys.map((state) {
+                                items: mapStates.keys.map((state) {
                                   return new DropdownMenuItem<String>(
                                     value: state,
                                     child: Text(state),
@@ -285,8 +290,9 @@ class CreateCustomerState extends State<CreateCustomer> {
                               margin: EdgeInsets.only(left: 10.0, right: 10.0),
                               child: new DropdownButton<String>(
                                 hint: new Text("Select City"),
-                                value: selectedCity,
+                                value: selectedCity == "" ? null : selectedCity,
                                 onChanged: (String newValue) {
+                                  print("Printing Changed City $newValue");
                                   setState(() {
                                     selectedCity = newValue;
                                   });
@@ -334,12 +340,13 @@ class CreateCustomerState extends State<CreateCustomer> {
                             child: new RaisedButton(
                               onPressed: () {
                                 var name = controllerName.text;
-                                var mobile = controllerName.text;
-                                var email = controllerName.text;
-                                var gstNum = controllerName.text;
-                                var address = controllerName.text;
-                                var city = controllerName.text;
-                                //     var name = controllerName.text;
+                                var mobile = ctrlMobile.text;
+                                var email = ctrlMail.text;
+                                var gstNum = ctrlGST.text;
+                                var address = ctrlAddress.text;
+                                var city = ctrlCity.text;
+                                var state = ctrlState.text;
+                                var pincode = ctrlPincode.text;
                                 //     var name = controllerName.text;
                                 if (controllerName.text.length < 2) {
                                   print(
@@ -355,22 +362,15 @@ class CreateCustomerState extends State<CreateCustomer> {
                                       !ctrlGST.text.startsWith("gstin")) {
                                     print("GST number starts with GSTIN");
                                   }
-                                } else if (ctrlAddress.text.length < 25) {
+                                } else if (ctrlAddress.text.length > 35) {
                                   print(
-                                      "Address should not cross 25 characters");
-                                } else if (ctrlCity.text.length < 15) {
+                                      "Address should not cross 35 characters");
+                                } else if (ctrlCity.text.length > 15) {
                                   print("City should not cross 15 characters");
-                                } else if (ctrlState.text.length != 15) {
-                                  print("City should not cross 15 characters");
-                                } else if (ctrlPincode.text.length != 6) {
-                                  print("PINCODE has Six Numbers");
+                                } else if (ctrlState.text.length > 15) {
+                                  print("State should not cross 15 characters");
                                 } else {
-                                  createCustomer().then((_) {
-                                    Navigator.push(
-                                        context,
-                                        new MaterialPageRoute(
-                                            builder: (context) => Customers()));
-                                  });
+                                  checkIfCustomerExists(context);
                                 }
                               },
                               color: primarycolor,
@@ -397,29 +397,96 @@ class CreateCustomerState extends State<CreateCustomer> {
     );
   }
 
-  Future<void> createCustomer() async {
-    String stringToShow;
+  checkIfCustomerExists(BuildContext context) async {
+    /*
+customer_name
+contact_number
+email
+gst_number
+address*/
+
+    print("Mobile ${ctrlMobile.text}");
+
     var uri = new Uri.http("18.191.190.195", "/billing", {
-      "page": "createCustomer",
-      "customer_name": controllerName.text,
-      "mobile_number": ctrlMobile.text,
-      "email_id": ctrlMail.text,
-      "gst_number": ctrlGST.text,
-      "city": ctrlCity.text,
-      "state": ctrlState.text,
-      "pincode": ctrlPincode.text
+      "page": "checkCustomerMobile",
+      "contact_number": ctrlMobile.text,
     });
 
-    print("Printing URI \n $uri");
+    print("Checking If Customer Exists \n $uri");
     final response = await http.get(uri);
 
     if (response.statusCode == 200) {
       // If the call to the server was successful, parse the JSON
       var responseBody = json.decode(response.body);
       print(responseBody.toString());
-      
-      if(responseBody["response"].toString().compareTo("success") == 0){
-        s(_scaffoldKey.currentContext, "Customer Created as " + controllerName.text + " with Mobile " + ctrlMobile.text);
+
+      if (responseBody["response"].toString().compareTo("Mobile_Registered") ==
+          0) {
+        print("Customer Alredy Exists, Do you want create another customer with same mobile number?");
+        s(context,
+            "Customer Alredy Exists, Do you want create another customer with same mobile number?");
+
+        showDialog(
+          context: context,
+          builder: (context) => new AlertDialog(
+                title: new Text('Create New Customer!'),
+                content: new Text(
+                    'Customer Alredy Exists, Do you want create another customer with same mobile number?'),
+                actions: <Widget>[
+                  new FlatButton(
+                    onPressed: () => Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Customers())),
+                    child: new Text('No'),
+                  ),
+                  new FlatButton(
+                    onPressed: () {
+                      createCustomer(context);
+                      Navigator.of(context).pop();
+                    },
+                    child: new Text('Yes, Create New'),
+                  ),
+                ],
+              ),
+        );
+      } else {
+        print("Customer Mobile Not REgisted calling create ");
+        createCustomer(context);
+        s(_scaffoldKey.currentState.context, "Creating Customer");
+      }
+    } else {
+      // If that call was not successful, throw an error.
+      print("Failed to load post, Network Error");
+      throw Exception('Failed to load post, Network Error');
+    }
+  }
+
+  Future<void> createCustomer(BuildContext context) async {
+    var uri = new Uri.http("18.191.190.195", "/billing", {
+      "page": "createCustomer",
+      "customer_name": controllerName.text,
+      "mobile_number": ctrlMobile.text,
+      "email_id": ctrlMail.text,
+      "gst_number": ctrlGST.text,
+      "city": selectedCity,
+      "state": selectedState,
+      "pincode": ctrlPincode.text
+    });
+
+    print("Printing Create Customer URI \n $uri");
+    final response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      // If the call to the server was successful, parse the JSON
+      var responseBody = json.decode(response.body);
+      print(responseBody.toString());
+
+      if (responseBody["response"].toString().compareTo("success") == 0) {
+        s(
+            _scaffoldKey.currentState.context,
+            "Customer Created as " +
+                controllerName.text +
+                " with Mobile " +
+                ctrlMobile.text);
         controllerName.clear();
         ctrlMobile.clear();
         ctrlMail.clear();
@@ -429,38 +496,55 @@ class CreateCustomerState extends State<CreateCustomer> {
         ctrlCity.clear();
         ctrlPincode.clear();
       } else {
-        s(_scaffoldKey.currentContext, "Failed Adding Customer, Please Retry!");
+        s(_scaffoldKey.currentState.context,
+            "Failed Adding Customer, Please Retry!");
       }
-
-      //   return Post();
-//    return Post.fromJson(json.decode(response.body));
     } else {
       // If that call was not successful, throw an error.
-      throw Exception('Failed to load post');
+      throw Exception('Failed to load post, Network Error');
     }
+
+
+    Navigator.push(
+        context,
+        new MaterialPageRoute(
+            builder: (context) => Customers()));
   }
 
   callGetStates() async {
-    print("call get States");
-    var statesMap = await getStates();
-    setState(() {
-      print("Steeting state of States after returning");
-      states = statesMap;
-    });
+
+    try {
+      var statesMap = await getStates();
+      setState(() {
+            print("Steeting state of States after returning");
+            mapStates = statesMap;
+          });
+    } catch (e) {
+     // print(e);
+    }
   }
 
   void callGetCities(String newState) async {
-    showloader(context);
+    try {
+      showloader(context);
+      print("call get cities \n ${cities.toString()}");
 
-    var stateId = states[newState];
-    print("Call Get Citites for $newState with Id: $stateId");
+      // cities.clear();
+      var stateId = mapStates[newState];
+      print("Call Get Citites for $newState with Id: $stateId");
 
-    List citiesList = await getCitiesUtils(stateId);
-    setState(() {
-      print("Steeting state of States after returning");
-      cities = citiesList;
-    });
-    removeloader();
+      List citiesList = await getCitiesUtils(stateId);
+      setState(() {
+            print("Steeting state of States after returning");
+            cities = citiesList;
+
+            print("After get cities \n ${cities.toString()}");
+
+      });
+      removeloader();
+    } catch (e) {
+      print(e);
+    }
   }
 }
 
