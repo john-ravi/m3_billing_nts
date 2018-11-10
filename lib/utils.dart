@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:m3_billing_nts/customer.dart';
+import 'package:m3_billing_nts/customerWithId.dart';
 import 'package:m3_billing_nts/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -283,7 +284,7 @@ Future<List<String>> getCitiesUtils(state_id) async {
 
 Future<List<Customer>> getCustomers() async {
   print("Get Customers Called");
-  var uri = Uri.http(authority, unencodedPath, {"page": "getCustomers"});
+  var uri = Uri.http(authority, unencodedPath, {"page": "getCustomersAndMobile"});
 
   d(uri);
   http.Response registerUserResponse = await http.get(uri);
@@ -309,7 +310,7 @@ Future<List<Customer>> getCustomers() async {
 
         listCustomers.add(new Customer(customerMap["customer_name"], customerMap["contact_number"]));
 
-        print("List as Whiole \t" + listCustomers.toString());
+  //      print("List as Whiole \t" + listCustomers.toString());
       });
     } else {
       print("Couldn't fetch rows, please check");
@@ -319,4 +320,68 @@ Future<List<Customer>> getCustomers() async {
   }
 
   return listCustomers;
+}
+Future<List<CustomerWithId>> getCustomersWithId() async {
+  print("Get CustomersWITH ID Called");
+  var uri = Uri.http(authority, unencodedPath, {"page": "getCustomers"});
+
+  d(uri);
+  http.Response registerUserResponse = await http.get(uri);
+  List<CustomerWithId> listCustomers = new List();
+
+  if (registerUserResponse.statusCode == 200) {
+    // If the call to the server was successful, parse the JSON
+    var decodedBody = json.decode(registerUserResponse.body);
+    if (decodedBody['response'].toString().compareTo("success") == 0) {
+      print("decoded body \t" + decodedBody.toString());
+      List objectCustomersList = decodedBody["body"];
+
+      print("List \t" + objectCustomersList.toString());
+
+      /** FOR EACH */
+      objectCustomersList.forEach((rowCustomerObject) {
+        print("ROW \t" + rowCustomerObject.toString());
+
+        Map customerMap = rowCustomerObject;
+
+        print("CustomerMap  ${customerMap.toString()}");
+
+
+
+        listCustomers.add(CustomerWithId(customerMap["customer_name"], customerMap["contact_number"],
+         customerMap["id"]));
+
+  //      print("List as Whiole \t" + listCustomers.toString());
+      });
+    } else {
+      print("Couldn't fetch rows, please check");
+    }
+  } else {
+    print("Error Fetching States, Check Network: In Utility");
+  }
+        print("List as Whiole \t" + listCustomers.toString());
+
+  return listCustomers;
+}
+
+
+utilsCreateBill(String id, String amount, String status){
+  // id
+// invoice_number
+// customer_id
+// amount
+// status
+
+  var uri = Uri.http(authority, unencodedPath, {
+    "page": "createBill",
+    "customer_id": id,
+    "amount": amount,
+    "status": status
+  });
+
+  d(uri);
+  http.Response registerUserResponse = await http.get(uri);
+
+  return registerUserResponse;
+
 }

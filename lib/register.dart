@@ -153,6 +153,7 @@ class RegisterState extends State<Register> {
                                             keyboardType: TextInputType.number,
                                             controller: mobile,
                                             maxLength: 10,
+
                                             inputFormatters: [
                                               WhitelistingTextInputFormatter.digitsOnly,
                                               LengthLimitingTextInputFormatter(10),
@@ -236,11 +237,9 @@ class RegisterState extends State<Register> {
                                                     .text.isEmpty) {
                                                   s(context,
                                                       'Enter The Mobile Number');
-                                                } else if (mobile.text.length >
-                                                        10 ||
-                                                    mobile.text.length < 10) {
+                                                } else if (mobile.text.length != 10) {
                                                   s(context,
-                                                      'Please Check The Mobile Number');
+                                                      'Please enter 10 digit Mobile Number');
                                                 } else if (email.text.isEmpty) {
                                                   s(context,
                                                       'Enter The Email Id');

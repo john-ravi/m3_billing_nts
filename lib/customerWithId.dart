@@ -1,4 +1,4 @@
-class Customer {
+class CustomerWithId {
   String customer_name;
   String contact_number;
   String email = "";
@@ -9,17 +9,11 @@ class Customer {
   String pincode = "";
   String id = "";
 
-  Customer(this.customer_name, this.contact_number);
+  CustomerWithId(this.customer_name, this.contact_number, this.id);
 
 
-  Customer.includeId(String customer_name, contact_number, String id){
-    customer_name = customer_name;
-    contact_number = contact_number;
-    id = id;
 
-  }
-
-  Customer.fromMap(Map map) {
+  CustomerWithId.fromMap(Map map) {
 
     customer_name = map[customer_name];
     contact_number = map[contact_number];

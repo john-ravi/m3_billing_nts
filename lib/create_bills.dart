@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:m3_billing_nts/customer.dart';
+import 'package:m3_billing_nts/customerWithId.dart';
 import 'colorspage.dart';
 import 'create_customer.dart';
 import 'home.dart';
@@ -9,27 +12,34 @@ import 'colorspage.dart';
 import 'user.dart';
 import 'utils.dart';
 
-class Customers extends StatefulWidget {
+class CreateBill extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    ListCustomerState listcustomerState() => new ListCustomerState();
+    CreateBillState listcustomerState() => new CreateBillState();
     return listcustomerState();
   }
 }
 
-class ListCustomerState extends State<Customers> {
+class CreateBillState extends State<CreateBill> {
   String title = "Loading Customers";
+  String status;
 
-  List<Customer> listCustomers = new List();
-  List<Customer> finalCustomers = new List();
+  List<String> statuslist = new List<String>();
+
+  CustomerWithId selectedCustomer = null;
+
+  List<CustomerWithId> listCustomers = new List();
+  List<CustomerWithId> finalCustomers = new List();
 
   TextEditingController controllerSearch = new TextEditingController();
   FocusNode focusNodeSearch = new FocusNode();
 
-  List<Customer> _searchList;
+  List<CustomerWithId> _searchList;
   bool _isSearching;
 
-  ListCustomerState() {
+  TextEditingController contrlAmount = new TextEditingController();
+
+  CreateBillState() {
     controllerSearch.addListener(() {
       if (controllerSearch.text.isEmpty) {
         setState(() {
@@ -45,12 +55,14 @@ class ListCustomerState extends State<Customers> {
 
   @override
   void initState() {
+    statuslist.addAll(['PAID', 'UNPAID']);
+
     _isSearching = false;
-    getCustomers().then((onValue) {
+    getCustomersWithId().then((onValue) {
       _searchList = new List();
       print("Listing Customers \n ${onValue.toString()}");
       setState(() {
-        title = "Customers";
+        title = "Create Bill";
         listCustomers = onValue;
         finalCustomers = listCustomers;
       });
@@ -85,16 +97,6 @@ class ListCustomerState extends State<Customers> {
                     new MaterialPageRoute(builder: (context) => new Home()));
               }),
         ),
-        floatingActionButton: FloatingActionButton(
-          child: new Icon(Icons.add),
-          backgroundColor: secondarycolor,
-          onPressed: () {
-            Navigator.push(
-                context,
-                new MaterialPageRoute(
-                    builder: (context) => new CreateCustomer()));
-          },
-        ),
         body: Stack(
           fit: StackFit.expand,
           children: <Widget>[
@@ -117,20 +119,16 @@ class ListCustomerState extends State<Customers> {
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0)),
                             prefixIcon: Icon(Icons.search),
-                            hintText: 'Search Customer mobile',
+                            hintText: 'Search Customer',
                             hintStyle: TextStyle(
                               color: Colors.white,
                             ),
-                            labelText: 'Search Customer mobile',
+                            labelText: 'Search Customer',
                             labelStyle: TextStyle(
                               color: Colors.black,
                             ),
                           ),
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            WhitelistingTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(10),
-                          ],
+                          keyboardType: TextInputType.text,
                           controller: controllerSearch,
                           focusNode: focusNodeSearch,
                         ),
@@ -140,7 +138,7 @@ class ListCustomerState extends State<Customers> {
                 ),
                 buildSliverListDefault(),
               ],
-            ),
+            )
           ],
         ),
       ),
@@ -152,6 +150,12 @@ class ListCustomerState extends State<Customers> {
       delegate:
           new SliverChildBuilderDelegate((BuildContext context, int index) {
         return GestureDetector(
+          onTap: () {
+            setState(() {
+              selectedCustomer = finalCustomers[index];
+            });
+            alertForCreateBill();
+          },
           child: Container(
             margin: EdgeInsets.all(10.0),
             child: Card(
@@ -219,7 +223,7 @@ class ListCustomerState extends State<Customers> {
     if (_isSearching != null) {
       var mobile = controllerSearch.text;
       for (int i = 0; i < listCustomers.length; i++) {
-        if (listCustomers[i].contact_number.contains(mobile)) {
+        if (listCustomers[i].customer_name.contains(mobile)) {
           _searchList.add(listCustomers[i]);
         }
       }
@@ -227,4 +231,100 @@ class ListCustomerState extends State<Customers> {
     }
   }
 
+  void alertForCreateBill() {
+    showDialog(
+      context: context,
+      builder: (context) => new AlertDialog(
+            title: new Text('Create Bill'),
+            content: buildAlertBody(),
+            actions: <Widget>[
+              new FlatButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: new Text('No'),
+              ),
+              new FlatButton(
+                onPressed: () => createBillOnCustomer(),
+                child: new Text('Yes'),
+              ),
+            ],
+          ),
+    );
+  }
+
+  Widget buildAlertBody() {
+    return Container(
+      height: 160.0,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Container(
+            margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
+            child: Text('${selectedCustomer.customer_name}'),
+          ),
+          Container(
+            margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
+            child: TextFormField(
+              controller: contrlAmount,
+              decoration: new InputDecoration(
+                contentPadding: EdgeInsets.all(10.0),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5.0)),
+                hintText: 'Enter Amount',
+                hintStyle: TextStyle(
+                  color: Colors.white,
+                ),
+                labelText: 'Enter Amount',
+                labelStyle: TextStyle(
+                  color: Colors.black,
+                ),
+              ),
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                WhitelistingTextInputFormatter.digitsOnly,
+              ],
+            ),
+          ),
+          new Container(
+            padding: EdgeInsets.all(7.0),
+            margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
+            width: double.infinity,
+            decoration: new BoxDecoration(
+                borderRadius: new BorderRadius.circular(5.0),
+                border: new Border.all(color: Colors.black)),
+            child: DropdownButtonHideUnderline(
+              child: ButtonTheme(
+                child: new DropdownButton<String>(
+                  isDense: true,
+                  hint: new Text("Select Paid Status"),
+                  value: status,
+                  onChanged: (String newValue) {
+                    setState(() {
+                      status = newValue;
+                    });
+                  },
+                  items: statuslist.map((String map) {
+                    return new DropdownMenuItem<String>(
+                      value: map,
+                      child: new Text(
+                        map,
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  createBillOnCustomer() {
+    var amount = contrlAmount.text;
+    if(amount.isEmpty){
+      s(context, "Please Enter Bill Amount");
+    } else {
+      utilsCreateBill(selectedCustomer.id, amount, status);
+    }
+  }
 }

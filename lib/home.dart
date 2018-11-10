@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'allbills.dart';
 import 'colorspage.dart';
-import 'create_bill.dart';
+import 'create_bills.dart';
 import 'create_catergory.dart';
 import 'create_item.dart';
 import 'groups.dart';
@@ -119,38 +119,7 @@ class HomeState extends State<Home> {
               type: BottomNavigationBarType.fixed,
               onTap: onTabTapped,
               currentIndex: homeIndex,
-              items: [
-                BottomNavigationBarItem(
-                    icon: Icon(
-                      FontAwesomeIcons.calendar,
-                      color: secondarycolor,
-                    ),
-                    title: Text(
-                      'CALENDER',
-                      style: TextStyle(color: secondarycolor),
-                    )),
-                BottomNavigationBarItem(
-                    icon: Icon(
-                      FontAwesomeIcons.moneyBill,
-                      color: secondarycolor,
-                    ),
-                    title:
-                        Text('BILLS', style: TextStyle(color: secondarycolor))),
-                BottomNavigationBarItem(
-                    icon: Icon(
-                      FontAwesomeIcons.hotel,
-                      color: secondarycolor,
-                    ),
-                    title: Text('VACATION',
-                        style: TextStyle(color: secondarycolor))),
-                BottomNavigationBarItem(
-                    icon: Icon(
-                      FontAwesomeIcons.user,
-                      color: secondarycolor,
-                    ),
-                    title: Text('PROFILE',
-                        style: TextStyle(color: secondarycolor)))
-              ],
+              items: itemsBottomNavigation(),
             ),
             drawer: Drawer(
               child: new ListView(
@@ -401,5 +370,40 @@ class HomeState extends State<Home> {
             body: homechildren[homeIndex],
           )),
     );
+  }
+
+  List<BottomNavigationBarItem> itemsBottomNavigation() {
+  return [
+              BottomNavigationBarItem(
+                  icon: Icon(
+                    FontAwesomeIcons.calendar,
+                    color: secondarycolor,
+                  ),
+                  title: Text(
+                    'CALENDER',
+                    style: TextStyle(color: secondarycolor),
+                  )),
+              BottomNavigationBarItem(
+                  icon: Icon(
+                    FontAwesomeIcons.moneyBill,
+                    color: secondarycolor,
+                  ),
+                  title:
+                      Text('BILLS', style: TextStyle(color: secondarycolor))),
+              BottomNavigationBarItem(
+                  icon: Icon(
+                    FontAwesomeIcons.hotel,
+                    color: secondarycolor,
+                  ),
+                  title: Text('VACATION',
+                      style: TextStyle(color: secondarycolor))),
+              BottomNavigationBarItem(
+                  icon: Icon(
+                    FontAwesomeIcons.user,
+                    color: secondarycolor,
+                  ),
+                  title: Text('PROFILE',
+                      style: TextStyle(color: secondarycolor)))
+            ];
   }
 }

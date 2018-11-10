@@ -19,7 +19,7 @@ class MyApp extends StatefulWidget {
 }
 
 class MyAppState extends State<MyApp> {
-  bool manualOverRide = false;
+  bool manualOverRide = true;
 
   bool isEmail(String em) {
     String p =
