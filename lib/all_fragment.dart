@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:m3_billing_nts/bills_model.dart';
 import 'allbilladapter.dart';
 
 class AllFragments extends StatefulWidget {
+  List<Bills> listBills;
+  AllFragments(this.listBills);
+
+
+
   @override
   State<StatefulWidget> createState() {
     AllFragmentsState allFragmentsState() => new AllFragmentsState();
@@ -27,10 +33,10 @@ class AllFragmentsState extends State<AllFragments> {
                   width: double.infinity,
                 ),
                 ListView.builder(
-                  itemCount: 20,
+                  itemCount: widget.listBills.length,
                   itemBuilder: (BuildContext context, int index) {
                     return new GestureDetector(
-                      child: AllAdapter(index),
+                      child: AllAdapter(widget.listBills[index]),
                     );
                   },
                 )

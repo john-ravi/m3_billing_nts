@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:m3_billing_nts/bills_model.dart';
 import 'package:m3_billing_nts/customer.dart';
 import 'package:m3_billing_nts/customerWithId.dart';
 import 'package:m3_billing_nts/home.dart';
@@ -212,6 +213,64 @@ s(BuildContext context, String value) {
   }
 }
 
+void showSnack(String string, GlobalKey<ScaffoldState> keyScaffold) {
+  var snackbar = new SnackBar(content: new Text(string));
+  keyScaffold.currentState.showSnackBar(snackbar);
+}
+
+Future<List<Bills>> getBills() async {
+  List<Bills> bills = new List();
+
+  var uri = Uri.http(authority, unencodedPath, {
+    "page": "getBills",
+  });
+
+  d(uri);
+  http.Response registerUserResponse = await http.get(uri);
+
+  if (registerUserResponse.statusCode == 200) {
+    // If the call to the server was successful, parse the JSON
+    var decodedBody = json.decode(registerUserResponse.body);
+    if (decodedBody['response'].toString().compareTo("success") == 0) {
+      var mapStateToId = new Map();
+
+      print("decoded body \t" + decodedBody.toString());
+      List billsDecoded = decodedBody["body"];
+
+      print("List \t" + bills.toString());
+
+      billsDecoded.forEach((rowCustomerObject) {
+        print("ROW \t" + rowCustomerObject.toString());
+
+        Map billsMap = rowCustomerObject;
+
+        print("CustomerMap  ${billsMap.toString()}");
+/*
+* 
+Full texts	
+invoice_number
+amount
+status
+customer_name
+* */
+
+        bills.add(Bills(billsMap["invoice_number"], billsMap["amount"],
+            billsMap["status"], billsMap["customer_name"]));
+
+        print("List as Whiole \t" + bills.toString());
+      });
+
+//    return Post.fromJson(json.decode(response.body));
+    } else {
+      print("Couldn't fetch rows, please check");
+    }
+  } else {
+    print("Error Fetching States, Check Network: In Utility");
+  }
+
+  return bills;
+}
+
 Future<Map> getStates() async {
   var uri = Uri.http(authority, unencodedPath, {
     "page": "getStates",
@@ -284,7 +343,8 @@ Future<List<String>> getCitiesUtils(state_id) async {
 
 Future<List<Customer>> getCustomers() async {
   print("Get Customers Called");
-  var uri = Uri.http(authority, unencodedPath, {"page": "getCustomersAndMobile"});
+  var uri =
+      Uri.http(authority, unencodedPath, {"page": "getCustomersAndMobile"});
 
   d(uri);
   http.Response registerUserResponse = await http.get(uri);
@@ -307,10 +367,10 @@ Future<List<Customer>> getCustomers() async {
 
         print("CustomerMap  ${customerMap.toString()}");
 
+        listCustomers.add(new Customer(
+            customerMap["customer_name"], customerMap["contact_number"]));
 
-        listCustomers.add(new Customer(customerMap["customer_name"], customerMap["contact_number"]));
-
-  //      print("List as Whiole \t" + listCustomers.toString());
+        //      print("List as Whiole \t" + listCustomers.toString());
       });
     } else {
       print("Couldn't fetch rows, please check");
@@ -321,6 +381,7 @@ Future<List<Customer>> getCustomers() async {
 
   return listCustomers;
 }
+
 Future<List<CustomerWithId>> getCustomersWithId() async {
   print("Get CustomersWITH ID Called");
   var uri = Uri.http(authority, unencodedPath, {"page": "getCustomers"});
@@ -346,12 +407,10 @@ Future<List<CustomerWithId>> getCustomersWithId() async {
 
         print("CustomerMap  ${customerMap.toString()}");
 
+        listCustomers.add(CustomerWithId(customerMap["customer_name"],
+            customerMap["contact_number"], customerMap["id"]));
 
-
-        listCustomers.add(CustomerWithId(customerMap["customer_name"], customerMap["contact_number"],
-         customerMap["id"]));
-
-  //      print("List as Whiole \t" + listCustomers.toString());
+        //      print("List as Whiole \t" + listCustomers.toString());
       });
     } else {
       print("Couldn't fetch rows, please check");
@@ -359,13 +418,13 @@ Future<List<CustomerWithId>> getCustomersWithId() async {
   } else {
     print("Error Fetching States, Check Network: In Utility");
   }
-        print("List as Whiole \t" + listCustomers.toString());
+  print("List as Whiole \t" + listCustomers.toString());
 
   return listCustomers;
 }
 
-
-utilsCreateBill(String id, String amount, String status){
+Future<http.Response> utilsCreateBill(
+    String id, String amount, String status) async {
   // id
 // invoice_number
 // customer_id
@@ -383,5 +442,4 @@ utilsCreateBill(String id, String amount, String status){
   http.Response registerUserResponse = await http.get(uri);
 
   return registerUserResponse;
-
 }

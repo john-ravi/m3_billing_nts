@@ -63,7 +63,7 @@ class OrdersState extends State<Orders> with SingleTickerProviderStateMixin {
         ),
         body: TabBarView(
           controller: orderscontroller,
-          children: <Widget>[OrderFragments(), AllFragments(), AllFragments()],
+          children: <Widget>[OrderFragments(), /*AllFragments()*/null, /*AllFragments()*/],
         ),
       ),
     );

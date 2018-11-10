@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -30,6 +31,8 @@ class CreateBillState extends State<CreateBill> {
 
   List<CustomerWithId> listCustomers = new List();
   List<CustomerWithId> finalCustomers = new List();
+
+  GlobalKey<ScaffoldState> _keyScaffold = new GlobalKey<ScaffoldState>();
 
   TextEditingController controllerSearch = new TextEditingController();
   FocusNode focusNodeSearch = new FocusNode();
@@ -84,6 +87,7 @@ class CreateBillState extends State<CreateBill> {
           accentColor: Colors.black,
           hintColor: Colors.black),
       home: Scaffold(
+        key: _keyScaffold,
         resizeToAvoidBottomPadding: false,
         appBar: AppBar(
           elevation: 0.0,
@@ -239,7 +243,7 @@ class CreateBillState extends State<CreateBill> {
             content: buildAlertBody(),
             actions: <Widget>[
               new FlatButton(
-                onPressed: () => Navigator.of(context).pop(false),
+                onPressed: () => Navigator.of(context).pop(true),
                 child: new Text('No'),
               ),
               new FlatButton(
@@ -319,12 +323,34 @@ class CreateBillState extends State<CreateBill> {
     );
   }
 
-  createBillOnCustomer() {
+  createBillOnCustomer() async{
+
     var amount = contrlAmount.text;
     if(amount.isEmpty){
       s(context, "Please Enter Bill Amount");
     } else {
-      utilsCreateBill(selectedCustomer.id, amount, status);
+      showloader(context);
+      await utilsCreateBill(selectedCustomer.id, amount, status).then((responseBill) {
+        if (responseBill.statusCode == 200) {
+          // If the call to the server was successful, parse the JSON
+          var decodedBody = json.decode(responseBill.body);
+          print("response Body ${decodedBody.toString()}");
+          if (decodedBody['response'].toString().compareTo("success") == 0) {
+
+            var string = "Bill for $amount created on ${selectedCustomer.customer_name}";
+            showSnack(string, _keyScaffold);
+            Navigator.of(context).pop(true);
+
+          } else {
+            showSnack("Error Creating Bill", _keyScaffold);
+          }
+        } else {
+          print("Network Error ${responseBill.statusCode}");
+        }
+
+      });
+      removeloader();
     }
   }
+
 }

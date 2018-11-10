@@ -51,7 +51,7 @@ class BillFragmentState extends State<BillFragments>
         ),
         body: TabBarView(
           controller: allbillcontroller,
-          children: <Widget>[AllFragments(), AllFragments(), AllFragments()],
+          children: <Widget>[/*AllFragments()*/null, /*AllFragments()*/null, /*AllFragments()*/],
         ),
       ),
     );

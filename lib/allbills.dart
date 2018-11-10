@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:m3_billing_nts/all_fragment_paid.dart';
+import 'package:m3_billing_nts/all_fragment_unpaid.dart';
+import 'package:m3_billing_nts/bills_model.dart';
+import 'package:m3_billing_nts/utils.dart';
 import 'home.dart';
 import 'colorspage.dart';
 import 'all_fragment.dart';
@@ -15,9 +19,22 @@ class AllBills extends StatefulWidget {
 class AllBillState extends State<AllBills> with SingleTickerProviderStateMixin {
   TabController allbillcontroller;
 
+  List<Bills> listBills = new List();
+
   void initState() {
     super.initState();
+
+    callGetBills();
     allbillcontroller = new TabController(vsync: this, length: 3);
+  }
+
+  void callGetBills() async {
+    await getBills().then((listBillsPulled) {
+      print("Bills PULLED ALLBILLS \n ${listBillsPulled.toString()}");
+      setState(() {
+        listBills = listBillsPulled;
+      });
+    });
   }
 
   @override
@@ -29,16 +46,14 @@ class AllBillState extends State<AllBills> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-      theme: ThemeData(
-         fontFamily: 'Georgia'
-      ),
+      theme: ThemeData(fontFamily: 'Georgia'),
       home: new Scaffold(
         appBar: new AppBar(
           elevation: 0.0,
           title: Text('All Bills'),
           backgroundColor: secondarycolor,
           leading: new IconButton(
-                iconSize: 18.0,
+              iconSize: 18.0,
               icon: new Icon(FontAwesomeIcons.chevronLeft),
               onPressed: () {
                 Navigator.pushReplacement(context,
@@ -62,7 +77,11 @@ class AllBillState extends State<AllBills> with SingleTickerProviderStateMixin {
         ),
         body: TabBarView(
           controller: allbillcontroller,
-          children: <Widget>[AllFragments(), AllFragments(), AllFragments()],
+          children: <Widget>[
+            AllFragments(listBills),
+            AllFragmentsPaid(listBills),
+            AllFragmentsUnPaid(listBills)
+          ],
         ),
       ),
     );

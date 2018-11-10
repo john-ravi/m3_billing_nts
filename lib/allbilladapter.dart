@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:m3_billing_nts/bills_model.dart';
 
 class AllAdapter extends StatelessWidget {
-  final int index;
+  final Bills bill;
 
-  AllAdapter(this.index);
+  AllAdapter(this.bill);
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +25,7 @@ class AllAdapter extends StatelessWidget {
               Container(
                 margin: EdgeInsets.all(5.0),
                 child: new Text(
-                  ' : M3$index',
+                  ' : ${bill.customer_name}',
                   style: TextStyle(fontSize: 14.0),
                 ),
               ),
@@ -40,7 +41,7 @@ class AllAdapter extends StatelessWidget {
               Container(
                 margin: EdgeInsets.all(5.0),
                 child: new Text(
-                  ' : 123456$index',
+                  ' : ${bill.invoice_number}',
                   style: TextStyle(fontSize: 14.0),
                 ),
               ),
@@ -56,7 +57,7 @@ class AllAdapter extends StatelessWidget {
               Container(
                 margin: EdgeInsets.all(5.0),
                 child: new Text(
-                  ' : 2500$index',
+                  ' : ${bill.amount}',
                   style: TextStyle(fontSize: 14.0),
                 ),
               ),
@@ -72,7 +73,7 @@ class AllAdapter extends StatelessWidget {
               Container(
                 margin: EdgeInsets.all(5.0),
                 child: new Text(
-                  ' : Paid',
+                  ' : ${bill.status}',
                   style: TextStyle(fontSize: 14.0),
                 ),
               ),
