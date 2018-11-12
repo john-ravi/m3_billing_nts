@@ -61,23 +61,6 @@ Future<String> getUserMobile() async {
   return "";
 }
 
-Future<String> getuserName() async {
-  SharedPreferences pref = await SharedPreferences.getInstance();
-
-  return pref.getString('uname');
-}
-
-Future<String> getUserEmail() async {
-  SharedPreferences pref = await SharedPreferences.getInstance();
-
-  return pref.getString('uemail');
-}
-
-Future<bool> clearlogin() async {
-  SharedPreferences pref = await SharedPreferences.getInstance();
-  return pref.clear();
-}
-
 d(var debugvalue) {
   print("$debugvalue");
 }
@@ -153,6 +136,7 @@ bool isEmail(String em) {
 void createUserInDB(User user, BuildContext context) async {
   print("Create User");
 
+
   /** Creating User in database*/
   await putUserOnDb(user).then((httpResponse) {
     var bodyJson = json.decode(httpResponse.body);
@@ -195,6 +179,7 @@ Future<http.Response> putUserOnDb(User user) async {
 s(BuildContext context, String value) {
   try {
     Scaffold.of(context).showSnackBar(new SnackBar(
+      duration: Duration(seconds: 5),
         content: new Text(
       value,
       style: TextStyle(fontFamily: 'Georgia'),

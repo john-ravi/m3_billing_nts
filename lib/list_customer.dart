@@ -47,7 +47,6 @@ class ListCustomerState extends State<Customers> {
   void initState() {
     _isSearching = false;
     getCustomers().then((onValue) {
-      _searchList = new List();
       print("Listing Customers \n ${onValue.toString()}");
       setState(() {
         title = "Customers";
@@ -62,6 +61,22 @@ class ListCustomerState extends State<Customers> {
     });
     super.initState();
   }
+
+  void searchListener() {
+    _searchList = new List();
+
+    _searchList.clear();
+    if (_isSearching != null) {
+      var mobile = controllerSearch.text;
+      for (int i = 0; i < listCustomers.length; i++) {
+        if (listCustomers[i].contact_number.contains(mobile)) {
+          _searchList.add(listCustomers[i]);
+        }
+      }
+      finalCustomers = _searchList;
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -214,17 +229,5 @@ class ListCustomerState extends State<Customers> {
     );
   }
 
-  void searchListener() {
-    _searchList.clear();
-    if (_isSearching != null) {
-      var mobile = controllerSearch.text;
-      for (int i = 0; i < listCustomers.length; i++) {
-        if (listCustomers[i].contact_number.contains(mobile)) {
-          _searchList.add(listCustomers[i]);
-        }
-      }
-      finalCustomers = _searchList;
-    }
-  }
 
 }

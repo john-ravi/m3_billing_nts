@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:m3_billing_nts/model_delivery_boy.dart';
 import 'delivery_boy_fragement.dart';
 import 'colorspage.dart';
-import 'delivery_boy.dart';
+import 'delivery_boys.dart';
 
 class DeliveryBoyDetails extends StatefulWidget {
-  final String boyname;
 
-  DeliveryBoyDetails({this.boyname});
+  ModelDeliveryBoy deliveryBoy;
+
+  DeliveryBoyDetails(ModelDeliveryBoy modelDeliveryBoy);
 
   @override
   State<StatefulWidget> createState() {
@@ -40,7 +42,7 @@ class DeliveryBoyDetailsState extends State<DeliveryBoyDetails>
       ),
       home: Scaffold(
         appBar: AppBar(
-            title: Text(widget.boyname),
+            title: Text(widget.deliveryBoy.boy_name),
             backgroundColor: secondarycolor,
             leading: new IconButton(
                 icon: new Icon(Icons.arrow_back),

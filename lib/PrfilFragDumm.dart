@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:m3_billing_nts/user.dart';
 import 'package:m3_billing_nts/utils.dart';
@@ -10,7 +11,10 @@ import 'home.dart';
 
 import 'package:http/http.dart' as http;
 
-class ProfileFragment extends StatefulWidget {
+class ProfileFragmentd extends StatefulWidget {
+
+
+
   @override
   State<StatefulWidget> createState() {
     ProfileFragmentState profileState() => new ProfileFragmentState();
@@ -18,7 +22,8 @@ class ProfileFragment extends StatefulWidget {
   }
 }
 
-class ProfileFragmentState extends State<ProfileFragment> {
+class ProfileFragmentState extends State<ProfileFragmentd> {
+
   String flatNo, email, street, area, city, pincode = "";
 
   TextEditingController cntrlFlatNo = new TextEditingController();
@@ -30,6 +35,7 @@ class ProfileFragmentState extends State<ProfileFragment> {
 
   List listJsonArray;
   User user;
+
 
   @override
   void initState() {
@@ -90,6 +96,7 @@ pincode
   }
 
   getProfile() async {
+
     SharedPreferences preferences = await SharedPreferences.getInstance();
     var userId = preferences.getString(CURRENT_USER);
 
@@ -97,6 +104,15 @@ pincode
     var uri = Uri.http(
         authority, unencodedPath, {"page": "getMyProfile", "user_id": userId});
 
+    /*
+Full texts
+user_id
+user_name
+email_id
+mobile_number
+user_password
+aadhar_card
+registration_date*/
     d(uri);
     http.Response registerUserResponse = await http.get(uri);
     List<User> listUser = new List();
@@ -108,42 +124,24 @@ pincode
         print("decoded body \t" + decodedBody.toString());
         listJsonArray = decodedBody["body"];
 
-        print("List \t" + listJsonArray.toString() + "\n");
+        print("List \t" + listJsonArray.toString());
 
         listJsonArray.forEach((rowUser) {
-          print(rowUser.toString());
-          /*
-+ Options
-Full texts
-user_id
-user_name
-email_id
-mobile_number
-user_password
-aadhar_card
-registration_date
-flat_no
-street
-area
-city
-pincode
-
-    */
-
+          print("ROW \t" + rowUser.toString());
           listUser.add(User.named(
-              mobile: rowUser["mobile_number"],
-              email: rowUser["email_id"],
-              username: rowUser["user_name"],
-              flatNo: rowUser["flat_no"],
+              mobile: rowUser["mobile"],
+              email: rowUser["email"],
+              username: rowUser["username"],
+              flatNo: rowUser["flatNo"],
               street: rowUser["street"],
               area: rowUser["area"],
               city: rowUser["city"],
               pincode: rowUser["pincode"]));
-          print("List as Whiole \t" + listUser.toString());
+          print("Map as Whiole \t" + listJsonArray.toString());
         });
 
         setState(() {
-          user = listUser[0];
+          user = listJsonArray[0];
           cntrlPincode.text = user.pincode;
           cntrlCity.text = user.city;
           cntrlArea.text = user.area;
@@ -151,9 +149,8 @@ pincode
           cntrlFlatNo.text = user.flatNo;
           cntrlEmail.text = user.email;
 
-          email = user.email;
-          print("My Profile PRINTING $user");
         });
+        print("My Profile $user");
       } else {
         print("Couldn't fetch rows, please check");
       }
@@ -161,6 +158,7 @@ pincode
       print("Error Fetching States, Check Network: In Utility");
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -183,8 +181,7 @@ pincode
                     Container(
                       child: new SizedBox(
                         height: 670.0,
-                        child:
-                            Builder(builder: (context) => buildStack(context)),
+                        child: buildStack(context),
                       ),
                     )
                   ],
@@ -227,8 +224,8 @@ pincode
                                     fontSize: 16.0, color: Colors.grey),
                               )),
                           Container(
-                            child: Text(
-                              'M3',
+                            child: Text(",",
+                     //         user == null ? " " : user.username,
                               style: TextStyle(fontSize: 16.0),
                             ),
                           ),
@@ -259,8 +256,8 @@ pincode
                                     fontSize: 16.0, color: Colors.grey),
                               )),
                           Container(
-                            child: Text(
-                              '1234567890',
+                            child: Text("",
+                       //       user == null ? " " : user.mobile,
                               style: TextStyle(fontSize: 16.0),
                             ),
                           ),
@@ -282,8 +279,6 @@ pincode
                       margin: EdgeInsets.all(10.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
                           Container(
                               margin: EdgeInsets.only(bottom: 10.0),
@@ -293,14 +288,12 @@ pincode
                                     fontSize: 16.0, color: Colors.grey),
                               )),
                           Container(
-                            width: 200.0,
-                            child:
-                                Text(
-                              cntrlEmail.text,
+                            child: TextFormField(
+                              controller: cntrlEmail,
+                              keyboardType: TextInputType.emailAddress,
+
                               style: TextStyle(fontSize: 16.0),
-                            )
-/*                                TextFormField(
-                                    maxLines: 1, controller: cntrlEmail)*/,
+                            ),
                           ),
                         ],
                       ),
@@ -329,8 +322,10 @@ pincode
                                     fontSize: 16.0, color: Colors.grey),
                               )),
                           Container(
-                            child: Text(
-                              'A2',
+                            child: TextFormField(
+                              controller: cntrlFlatNo,
+                              keyboardType: TextInputType.text,
+                      //        initialValue: user == null ? " " : user.flatNo,
                               style: TextStyle(fontSize: 16.0),
                             ),
                           ),
@@ -361,8 +356,10 @@ pincode
                                     fontSize: 16.0, color: Colors.grey),
                               )),
                           Container(
-                            child: Text(
-                              'm3street',
+                            child: TextFormField(
+                              controller: cntrlStreet,
+                              keyboardType: TextInputType.text,
+                   //           initialValue: user == null ? " " : user.street,
                               style: TextStyle(fontSize: 16.0),
                             ),
                           ),
@@ -393,8 +390,10 @@ pincode
                                     fontSize: 16.0, color: Colors.grey),
                               )),
                           Container(
-                            child: Text(
-                              'Area m3',
+                            child: TextFormField(
+                              controller: cntrlArea,
+                              keyboardType: TextInputType.text,
+                 //             initialValue: user == null ? " " : user.area,
                               style: TextStyle(fontSize: 16.0),
                             ),
                           ),
@@ -425,8 +424,10 @@ pincode
                                     fontSize: 16.0, color: Colors.grey),
                               )),
                           Container(
-                            child: Text(
-                              'Hyderbad',
+                            child: TextFormField(
+                              controller: cntrlCity,
+                              keyboardType: TextInputType.text,
+                        //      initialValue: user == null ? " " : user.city,
                               style: TextStyle(fontSize: 16.0),
                             ),
                           ),
@@ -457,10 +458,15 @@ pincode
                                     fontSize: 16.0, color: Colors.grey),
                               )),
                           Container(
-                            child: Text(
-                              '5990011',
-                              style: TextStyle(fontSize: 16.0),
-                            ),
+                            child: TextFormField(
+                                controller: cntrlPincode,
+                                keyboardType: TextInputType.number,
+                       //         initialValue: user == null ? " " : user.pincode,
+                                style: TextStyle(fontSize: 16.0),
+                                inputFormatters: [
+                                  WhitelistingTextInputFormatter.digitsOnly,
+                                  LengthLimitingTextInputFormatter(6)
+                                ]),
                           ),
                         ],
                       ),
@@ -478,8 +484,7 @@ pincode
           constraints: new BoxConstraints(minWidth: 250.0),
           child: new RaisedButton(
             onPressed: () {
-              Navigator.push(context,
-                  new MaterialPageRoute(builder: (context) => new Home()));
+              updateAddress(context);
             },
             color: primarycolor,
             shape: new RoundedRectangleBorder(
@@ -494,4 +499,5 @@ pincode
       )
     ]);
   }
+
 }

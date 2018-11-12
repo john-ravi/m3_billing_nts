@@ -6,10 +6,21 @@ class User {
   String aadharCard;
   String username;
 
+  String flatNo;
+  String street;
+  String area;
+  String city;
+  String pincode;
+
 
 
   User(this.businessName, this.username, this.mobile, this.email, this.password,
       this.aadharCard);
+
+
+  User.named({this.businessName, this.mobile, this.email, this.password,
+      this.aadharCard, this.username, this.flatNo, this.street, this.area,
+      this.city, this.pincode});
 
   User.fromMap(Map map) {
     businessName = map[businessName];
@@ -18,5 +29,11 @@ class User {
     email = map[email];
     password = map[password];
     aadharCard = map[aadharCard];
+  }
+
+  @override
+  String toString() {
+    // TODO: implement toString
+    return "User $username and mobile $mobile email $email";
   }
 }

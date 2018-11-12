@@ -1,9 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:m3_billing_nts/model_delivery_boy.dart';
+import 'package:m3_billing_nts/utils.dart';
 import 'colorspage.dart';
 import 'delivery_boy_details.dart';
 import 'home.dart';
 import 'createDeliveryBoy.dart';
+import 'package:http/http.dart' as http;
 
 class DeliveryBoy extends StatefulWidget {
   @override
@@ -14,6 +19,48 @@ class DeliveryBoy extends StatefulWidget {
 }
 
 class DeliveryBoyState extends State<DeliveryBoy> {
+
+  List<ModelDeliveryBoy> listItems = new List();
+
+  List<ModelDeliveryBoy> finalItems = new List();
+
+  TextEditingController controllerSearch = new TextEditingController();
+  FocusNode focusNodeSearch = new FocusNode();
+
+  List<ModelDeliveryBoy> _searchList;
+  bool _isSearching;
+
+
+
+  @override
+  void initState() {
+    _isSearching = false;
+
+    callGetDeliveryBoys();
+
+    controllerSearch.addListener(searchListener);
+    focusNodeSearch.addListener(() => searchListener());
+
+    super.initState();
+  }
+
+  void searchListener() {
+    _searchList = new List();
+
+    _searchList.clear();
+    if (_isSearching != null) {
+      var name = controllerSearch.text;
+      for (int i = 0; i < finalItems.length; i++) {
+        if (finalItems[i].boy_name.contains(name)) {
+          _searchList.add(finalItems[i]);
+        }
+      }
+      setState(() {
+        finalItems = _searchList;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
@@ -78,6 +125,8 @@ class DeliveryBoyState extends State<DeliveryBoy> {
                                 ),
                           ),
                           keyboardType: TextInputType.text,
+                          controller: controllerSearch,
+                          focusNode: focusNodeSearch,
                         ),
                       ),
                     ],
@@ -92,7 +141,7 @@ class DeliveryBoyState extends State<DeliveryBoy> {
                             context,
                             new MaterialPageRoute(
                                 builder: (context) => new DeliveryBoyDetails(
-                                      boyname: 'M3$index',
+                                      finalItems[index],
                                     )));
                       },
                       child: Container(
@@ -117,7 +166,7 @@ class DeliveryBoyState extends State<DeliveryBoy> {
                                     Container(
                                       margin: EdgeInsets.all(5.0),
                                       child: new Text(
-                                        ' : M3$index',
+                                        finalItems[index].boy_name,
                                         style: TextStyle(
                                             fontSize: 14.0,
                                             ),
@@ -137,7 +186,7 @@ class DeliveryBoyState extends State<DeliveryBoy> {
                                     Container(
                                       margin: EdgeInsets.all(5.0),
                                       child: new Text(
-                                        ' : M3$index',
+                                        finalItems[index].contact_number,
                                         style: TextStyle(
                                             fontSize: 14.0,
                                             ),
@@ -157,7 +206,7 @@ class DeliveryBoyState extends State<DeliveryBoy> {
                                     Container(
                                       margin: EdgeInsets.all(5.0),
                                       child: new Text(
-                                        ' : Available',
+                                        finalItems[index].available_status,
                                         style: TextStyle(
                                             fontSize: 14.0,
                                             ),
@@ -196,7 +245,7 @@ class DeliveryBoyState extends State<DeliveryBoy> {
                         ),
                       ),
                     );
-                  }, childCount: 20),
+                  }, childCount: finalItems.length),
                 )
               ],
             ),
@@ -204,5 +253,71 @@ class DeliveryBoyState extends State<DeliveryBoy> {
         ),
       ),
     );
+  }
+
+  void callGetDeliveryBoys() async{
+
+    var uri = Uri.http(authority, unencodedPath, {
+      "page": "getDeliveryBoys"
+    });
+
+    d(uri);
+    http.Response htResponse;
+    try {
+      htResponse = await http.get(uri);
+    } on Exception catch (e) {
+
+      print("Exception OCCUred, check Network");
+    }
+
+    if (htResponse.statusCode == 200) {
+      // If the call to the server was successful, parse the JSON
+      var decodedBody = json.decode(htResponse.body);
+      print("decoded body \t" + decodedBody.toString());
+      if (decodedBody['response'].toString().compareTo("success") == 0) {
+        List rows = decodedBody['body'];
+        print("Listing Rows ${rows.toString()}");
+
+        /*
+Full texts
+id
+boy_name
+contact_number
+available_status
+address
+city
+state
+pincode
+*/
+
+        rows.forEach((row) {
+          listItems.add(ModelDeliveryBoy.named(
+              id: row["id"],
+              boy_name: row["boy_name"],
+              contact_number: row["contact_number"],
+              available_status: row["available_status"],
+              address: row["address"],
+              city: row["city"],
+              state: row["state"],
+              pincode: row["pincode"]
+          ));
+
+          setState(() {
+            finalItems = listItems;
+          });
+
+        });
+
+
+      } else {
+        print("Failed Pulling Boys ");
+      }
+    } else {
+      print("Network Error: ${htResponse.statusCode} --- ${htResponse
+          .reasonPhrase} ");
+      s(context, "Network Error: ${htResponse.statusCode} --- ${htResponse
+          .reasonPhrase} ");
+    }
+
   }
 }

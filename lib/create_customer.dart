@@ -339,36 +339,29 @@ class CreateCustomerState extends State<CreateCustomer> {
                             constraints: new BoxConstraints(minWidth: 250.0),
                             child: new RaisedButton(
                               onPressed: () {
-                                var name = controllerName.text;
-                                var mobile = ctrlMobile.text;
-                                var email = ctrlMail.text;
-                                var gstNum = ctrlGST.text;
-                                var address = ctrlAddress.text;
-                                var city = ctrlCity.text;
-                                var state = ctrlState.text;
-                                var pincode = ctrlPincode.text;
-                                //     var name = controllerName.text;
                                 if (controllerName.text.length < 2) {
-                                  print(
+                                  s(context,
                                       "Customer name should be atleast two letters");
                                 } else if (ctrlMobile.text.length != 10) {
-                                  print("Mobile should be 10 Digits");
+                                  s(context, "Mobile should be 10 Digits");
                                 } else if (ctrlMail.text.length > 0) {
                                   if (!isEmail(ctrlMail.text)) {
-                                    print("Please enter a valid email id");
+                                    s(context, "Please enter a valid email id");
                                   }
                                 } else if (ctrlGST.text.length > 0) {
                                   if (!ctrlGST.text.startsWith("GSTIN") ||
                                       !ctrlGST.text.startsWith("gstin")) {
-                                    print("GST number starts with GSTIN");
+                                    s(context, "GST number starts with GSTIN");
                                   }
                                 } else if (ctrlAddress.text.length > 35) {
-                                  print(
+                                  s(context,
                                       "Address should not cross 35 characters");
                                 } else if (ctrlCity.text.length > 15) {
-                                  print("City should not cross 15 characters");
+                                  s(context,
+                                      "City should not cross 15 characters");
                                 } else if (ctrlState.text.length > 15) {
-                                  print("State should not cross 15 characters");
+                                  s(context,
+                                      "State should not cross 15 characters");
                                 } else {
                                   checkIfCustomerExists(context);
                                 }
@@ -422,7 +415,8 @@ address*/
 
       if (responseBody["response"].toString().compareTo("Mobile_Registered") ==
           0) {
-        print("Customer Alredy Exists, Do you want create another customer with same mobile number?");
+        print(
+            "Customer Alredy Exists, Do you want create another customer with same mobile number?");
         s(context,
             "Customer Alredy Exists, Do you want create another customer with same mobile number?");
 
@@ -504,23 +498,19 @@ address*/
       throw Exception('Failed to load post, Network Error');
     }
 
-
     Navigator.push(
-        context,
-        new MaterialPageRoute(
-            builder: (context) => Customers()));
+        context, new MaterialPageRoute(builder: (context) => Customers()));
   }
 
   callGetStates() async {
-
     try {
       var statesMap = await getStates();
       setState(() {
-            print("Steeting state of States after returning");
-            mapStates = statesMap;
-          });
+        print("Steeting state of States after returning");
+        mapStates = statesMap;
+      });
     } catch (e) {
-     // print(e);
+      // print(e);
     }
   }
 
@@ -535,11 +525,10 @@ address*/
 
       List citiesList = await getCitiesUtils(stateId);
       setState(() {
-            print("Steeting state of States after returning");
-            cities = citiesList;
+        print("Steeting state of States after returning");
+        cities = citiesList;
 
-            print("After get cities \n ${cities.toString()}");
-
+        print("After get cities \n ${cities.toString()}");
       });
       removeloader();
     } catch (e) {

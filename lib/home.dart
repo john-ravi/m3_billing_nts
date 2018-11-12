@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -11,7 +12,7 @@ import 'colorspage.dart';
 import 'create_bills.dart';
 import 'create_catergory.dart';
 import 'create_item.dart';
-import 'delivery_boy.dart';
+import 'delivery_boys.dart';
 import 'groups.dart';
 import 'help.dart';
 import 'list_customer.dart';
@@ -26,12 +27,11 @@ import 'user.dart';
 import 'utils.dart';
 import 'vacation.dart';
 import 'vacationfragment.dart';
+import 'package:http/http.dart' as http;
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
 class Home extends StatefulWidget {
-
-
   @override
   State<StatefulWidget> createState() {
     HomeState homeState() => new HomeState();
@@ -39,11 +39,11 @@ class Home extends StatefulWidget {
   }
 }
 
-
 class HomeState extends State<Home> {
   int homeIndex = 3;
   User user;
   String userMobile;
+  List listUser;
 
   Future<bool> matchMobileWithLoggedInFire() {
     _auth.currentUser().then((fireUser) => {});
@@ -51,7 +51,6 @@ class HomeState extends State<Home> {
 
   @override
   void initState() {
-    // initMobile();
     super.initState();
   }
 
@@ -62,20 +61,6 @@ class HomeState extends State<Home> {
     ProfileFragment(),
   ];
 
-  initMobile() async {
-    print("Init Mobile");
-    await getUserMobile().then((stringM) {
-      if (stringM == null) {
-        print("NULL Mobile");
-        // initMobile();
-      } else {
-        setState(() {
-          print(stringM);
-          userMobile = stringM;
-        });
-      }
-    });
-  }
 
   void onTabTapped(int index) {
     setState(() {
@@ -85,23 +70,22 @@ class HomeState extends State<Home> {
 
   Future<bool> _onWillPop() {
     return showDialog(
-      context: context,
-      builder: (context) =>
-      new AlertDialog(
-        title: new Text('Are you sure?'),
-        content: new Text('Do you want to exit'),
-        actions: <Widget>[
-          new FlatButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: new Text('No'),
-          ),
-          new FlatButton(
-            onPressed: () => exit(0),
-            child: new Text('Yes'),
-          ),
-        ],
-      ),
-    ) ??
+          context: context,
+          builder: (context) => new AlertDialog(
+                title: new Text('Are you sure?'),
+                content: new Text('Do you want to exit'),
+                actions: <Widget>[
+                  new FlatButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: new Text('No'),
+                  ),
+                  new FlatButton(
+                    onPressed: () => exit(0),
+                    child: new Text('Yes'),
+                  ),
+                ],
+              ),
+        ) ??
         false;
   }
 
@@ -112,24 +96,25 @@ class HomeState extends State<Home> {
       child: new MaterialApp(
           theme: ThemeData(fontFamily: 'Georgia'),
           home: Builder(
-            builder: (context) =>
-            new Scaffold(
-              appBar: new AppBar(
-                elevation: 0.0,
-                title: Text('Home Screen'),
-                backgroundColor: secondarycolor,
-              ),
-              bottomNavigationBar: BottomNavigationBar(
-                type: BottomNavigationBarType.fixed,
-                onTap: onTabTapped,
-                currentIndex: homeIndex,
-                items: itemsBottomNavigation(),
-              ),
-              drawer: Drawer(
-                child: buildListViewDrawer(context),
-              ),
-              body: homechildren[homeIndex],
-            ),
+            builder: (context) => new Scaffold(
+                  appBar: new AppBar(
+                    elevation: 0.0,
+                    title: Text('Home Screen'),
+                    backgroundColor: secondarycolor,
+                  ),
+                  bottomNavigationBar: BottomNavigationBar(
+                    type: BottomNavigationBarType.fixed,
+                    onTap: onTabTapped,
+                    currentIndex: homeIndex,
+                    items: itemsBottomNavigation(),
+                  ),
+                  drawer: Drawer(
+                    child: buildListViewDrawer(context),
+                  ),
+                  body: Builder(builder: (context) {
+                    return homechildren[homeIndex];
+                  }),
+                ),
           )),
     );
   }
@@ -146,23 +131,20 @@ class HomeState extends State<Home> {
               children: <Widget>[
                 Container(
                   margin: EdgeInsets.only(top: 10.0),
-                  child: Icon(FontAwesomeIcons.user, size: 48.0,
-                      color: Colors.white),
+                  child: Icon(FontAwesomeIcons.user,
+                      size: 48.0, color: Colors.white),
                 ),
                 Container(
                   margin: EdgeInsets.only(top: 10.0),
                   child: Text(
                     '',
-                    style: TextStyle(
-                        fontSize: 18.0, color: Colors.white),
+                    style: TextStyle(fontSize: 18.0, color: Colors.white),
                   ),
                 ),
                 Container(
                   margin: EdgeInsets.only(top: 10.0),
-                  child: Text(
-                      "",
-                      style: TextStyle(
-                          fontSize: 18.0, color: Colors.white)),
+                  child: Text("",
+                      style: TextStyle(fontSize: 18.0, color: Colors.white)),
                 ),
               ],
             ),
@@ -175,10 +157,8 @@ class HomeState extends State<Home> {
             color: secondarycolor,
           ),
           onTap: () {
-            Navigator.push(
-                context,
-                new MaterialPageRoute(
-                    builder: (context) => new CreateBill()));
+            Navigator.push(context,
+                new MaterialPageRoute(builder: (context) => new CreateBill()));
           },
         ),
         new ListTile(
@@ -188,10 +168,8 @@ class HomeState extends State<Home> {
             color: secondarycolor,
           ),
           onTap: () {
-            Navigator.push(
-                context,
-                new MaterialPageRoute(
-                    builder: (context) => new Customers()));
+            Navigator.push(context,
+                new MaterialPageRoute(builder: (context) => new Customers()));
           },
         ),
         new ListTile(
@@ -214,10 +192,8 @@ class HomeState extends State<Home> {
             color: secondarycolor,
           ),
           onTap: () {
-            Navigator.push(
-                context,
-                new MaterialPageRoute(
-                    builder: (context) => new Products()));
+            Navigator.push(context,
+                new MaterialPageRoute(builder: (context) => new Products()));
           },
         ),
         new ListTile(
@@ -227,10 +203,8 @@ class HomeState extends State<Home> {
             color: secondarycolor,
           ),
           onTap: () {
-            Navigator.push(
-                context,
-                new MaterialPageRoute(
-                    builder: (context) => new AllBills()));
+            Navigator.push(context,
+                new MaterialPageRoute(builder: (context) => new AllBills()));
           },
         ),
         new ListTile(
@@ -240,10 +214,8 @@ class HomeState extends State<Home> {
             color: secondarycolor,
           ),
           onTap: () {
-            Navigator.push(
-                context,
-                new MaterialPageRoute(
-                    builder: (context) => new DeliveryBoy()));
+            Navigator.push(context,
+                new MaterialPageRoute(builder: (context) => new DeliveryBoy()));
           },
         ),
         new ListTile(
@@ -253,10 +225,8 @@ class HomeState extends State<Home> {
             color: secondarycolor,
           ),
           onTap: () {
-            Navigator.push(
-                context,
-                new MaterialPageRoute(
-                    builder: (context) => new Orders()));
+            Navigator.push(context,
+                new MaterialPageRoute(builder: (context) => new Orders()));
           },
         ),
         new ListTile(
@@ -266,10 +236,8 @@ class HomeState extends State<Home> {
             color: secondarycolor,
           ),
           onTap: () {
-            Navigator.push(
-                context,
-                new MaterialPageRoute(
-                    builder: (context) => new CreateItem()));
+            Navigator.push(context,
+                new MaterialPageRoute(builder: (context) => new CreateItem()));
           },
         ),
         new ListTile(
@@ -286,10 +254,8 @@ class HomeState extends State<Home> {
             color: secondarycolor,
           ),
           onTap: () {
-            Navigator.push(
-                context,
-                new MaterialPageRoute(
-                    builder: (context) => new Profile()));
+            Navigator.push(context,
+                new MaterialPageRoute(builder: (context) => new Profile()));
           },
         ),
         new ListTile(
@@ -299,10 +265,8 @@ class HomeState extends State<Home> {
             color: secondarycolor,
           ),
           onTap: () {
-            Navigator.push(
-                context,
-                new MaterialPageRoute(
-                    builder: (context) => new Groups()));
+            Navigator.push(context,
+                new MaterialPageRoute(builder: (context) => new Groups()));
           },
         ),
         new ListTile(
@@ -312,10 +276,8 @@ class HomeState extends State<Home> {
             color: secondarycolor,
           ),
           onTap: () {
-            Navigator.push(
-                context,
-                new MaterialPageRoute(
-                    builder: (context) => new Vacation()));
+            Navigator.push(context,
+                new MaterialPageRoute(builder: (context) => new Vacation()));
           },
         ),
         new ListTile(
@@ -345,10 +307,8 @@ class HomeState extends State<Home> {
             color: secondarycolor,
           ),
           onTap: () {
-            Navigator.push(
-                context,
-                new MaterialPageRoute(
-                    builder: (context) => new Help()));
+            Navigator.push(context,
+                new MaterialPageRoute(builder: (context) => new Help()));
           },
         ),
         new ListTile(
@@ -358,10 +318,8 @@ class HomeState extends State<Home> {
             color: secondarycolor,
           ),
           onTap: () {
-            Navigator.push(
-                context,
-                new MaterialPageRoute(
-                    builder: (context) => new Settings()));
+            Navigator.push(context,
+                new MaterialPageRoute(builder: (context) => new Settings()));
           },
         ),
         new ListTile(
@@ -389,9 +347,7 @@ class HomeState extends State<Home> {
 
     removeloader();
     Navigator.push(
-        context,
-        new MaterialPageRoute(
-            builder: (context) => new MyApp()));
+        context, new MaterialPageRoute(builder: (context) => new MyApp()));
   }
 
   List<BottomNavigationBarItem> itemsBottomNavigation() {
@@ -410,22 +366,19 @@ class HomeState extends State<Home> {
             FontAwesomeIcons.moneyBill,
             color: secondarycolor,
           ),
-          title:
-          Text('BILLS', style: TextStyle(color: secondarycolor))),
+          title: Text('BILLS', style: TextStyle(color: secondarycolor))),
       BottomNavigationBarItem(
           icon: Icon(
             FontAwesomeIcons.hotel,
             color: secondarycolor,
           ),
-          title: Text('VACATION',
-              style: TextStyle(color: secondarycolor))),
+          title: Text('VACATION', style: TextStyle(color: secondarycolor))),
       BottomNavigationBarItem(
           icon: Icon(
             FontAwesomeIcons.user,
             color: secondarycolor,
           ),
-          title: Text('PROFILE',
-              style: TextStyle(color: secondarycolor)))
+          title: Text('PROFILE', style: TextStyle(color: secondarycolor)))
     ];
   }
 }

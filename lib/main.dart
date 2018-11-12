@@ -39,7 +39,7 @@ class MyApp extends StatefulWidget {
 }
 
 class MyAppState extends State<MyApp> {
-  bool manualOverRide = true;
+  bool manualOverRide = false;
 
 
   @override
