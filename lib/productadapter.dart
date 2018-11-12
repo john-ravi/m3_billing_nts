@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:m3_billing_nts/model_items.dart';
 
 class ProductAdapter extends StatelessWidget {
-  final int index;
+  final Items item;
 
-  ProductAdapter(this.index);
+  ProductAdapter(this.item);
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +25,7 @@ class ProductAdapter extends StatelessWidget {
               Container(
                 margin: EdgeInsets.all(5.0),
                 child: new Text(
-                  ' : M3$index',
+                  ' : ${item.item_name}',
                   style: TextStyle(fontSize: 14.0),
                 ),
               ),
@@ -40,7 +41,7 @@ class ProductAdapter extends StatelessWidget {
               Container(
                 margin: EdgeInsets.all(5.0),
                 child: new Text(
-                  ' : 123456$index',
+                  ' : ${item.unit_cost}',
                   style: TextStyle(fontSize: 14.0),
                 ),
               ),
@@ -56,7 +57,7 @@ class ProductAdapter extends StatelessWidget {
               Container(
                 margin: EdgeInsets.all(5.0),
                 child: new Text(
-                  ' : 123456$index',
+                  ' : ${item.no_of_units}',
                   style: TextStyle(fontSize: 14.0),
                 ),
               ),
@@ -72,7 +73,7 @@ class ProductAdapter extends StatelessWidget {
               Container(
                 margin: EdgeInsets.all(5.0),
                 child: new Text(
-                  ' : $index',
+                  ' : ${item.start_date}',
                   style: TextStyle(fontSize: 14.0),
                 ),
               ),
@@ -88,7 +89,7 @@ class ProductAdapter extends StatelessWidget {
               Container(
                 margin: EdgeInsets.all(5.0),
                 child: new Text(
-                  ' : $index',
+                  ' : ${item.end_date}',
                   style: TextStyle(fontSize: 14.0),
                 ),
               ),
@@ -104,7 +105,7 @@ class ProductAdapter extends StatelessWidget {
               Container(
                 margin: EdgeInsets.all(5.0),
                 child: new Text(
-                  ' : $index',
+                  ' : ${item.tax}',
                   style: TextStyle(fontSize: 14.0),
                 ),
               ),

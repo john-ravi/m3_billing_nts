@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:m3_billing_nts/bills_model.dart';
+import 'package:m3_billing_nts/model_bills.dart';
 
 class AllAdapter extends StatelessWidget {
   final Bills bill;

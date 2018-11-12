@@ -68,11 +68,11 @@ class DeliveryBoyState extends State<DeliveryBoy> {
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0)),
                             prefixIcon: Icon(Icons.search),
-                            hintText: 'Search of orders',
+                            hintText: 'Search of Delivery Boys',
                             hintStyle: TextStyle(
                                 color: Colors.white,
                                 ),
-                            labelText: 'Search of orders',
+                            labelText: 'Search of Delivery Boys',
                             labelStyle: TextStyle(
                                 color: Colors.black,
                                 ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:m3_billing_nts/bills_model.dart';
+import 'package:m3_billing_nts/model_bills.dart';
 import 'allbilladapter.dart';
 
 class AllFragmentsPaid extends StatefulWidget {

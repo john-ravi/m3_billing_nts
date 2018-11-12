@@ -3,12 +3,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+
 import 'colorspage.dart';
-import 'home.dart';
 import 'main.dart';
-import 'utils.dart';
 import 'otp.dart';
 import 'user.dart';
+import 'utils.dart';
 
 class Register extends StatefulWidget {
   @override
@@ -153,10 +153,11 @@ class RegisterState extends State<Register> {
                                             keyboardType: TextInputType.number,
                                             controller: mobile,
                                             maxLength: 10,
-
                                             inputFormatters: [
-                                              WhitelistingTextInputFormatter.digitsOnly,
-                                              LengthLimitingTextInputFormatter(10),
+                                              WhitelistingTextInputFormatter
+                                                  .digitsOnly,
+                                              LengthLimitingTextInputFormatter(
+                                                  10),
                                             ],
                                           ),
                                         ),
@@ -224,100 +225,7 @@ class RegisterState extends State<Register> {
                                                 minWidth: 250.0),
                                             child: new RaisedButton(
                                               onPressed: () {
-                                                print("OnREgisterCLicked");
-                                                if (businessname.text.isEmpty) {
-                                                  s(context,
-                                                      'Enter The Business Name');
-                                                } else if (username
-                                                        .text.length >
-                                                    35) {
-                                                  s(context,
-                                                      "User Name should not exceed 35 characters");
-                                                } else if (mobile
-                                                    .text.isEmpty) {
-                                                  s(context,
-                                                      'Enter The Mobile Number');
-                                                } else if (mobile.text.length != 10) {
-                                                  s(context,
-                                                      'Please enter 10 digit Mobile Number');
-                                                } else if (email.text.isEmpty) {
-                                                  s(context,
-                                                      'Enter The Email Id');
-                                                } else if (!isEmail(
-                                                    email.text)) {
-                                                  s(context,
-                                                      'Please Check The Email Id');
-                                                } else if (password
-                                                    .text.isEmpty) {
-                                                  s(context,
-                                                      'Enter The Password');
-                                                } else if (password
-                                                        .text.length <
-                                                    6) {
-                                                  s(context,
-                                                      'Minimum Length Of The Password Is 6');
-                                                } else if (aadharcard
-                                                    .text.isEmpty) {
-                                                  s(context,
-                                                      'Enter The Aadhar Card Number');
-                                                } else {
-                                                  showloader(context);
-
-                                                  checkIfMobileRegistered(
-                                                          strQueryMobile:
-                                                              'checkUser&mobile=${mobile.text}')
-                                                      .then((httpResponse) {
-                                                    if (httpResponse != null) {
-                                                      print(
-                                                          "printing hhtp body" +
-                                                              httpResponse
-                                                                  .body);
-                                                      var numberJsonResponse =
-                                                          json.decode(
-                                                              httpResponse
-                                                                  .body);
-                                                      print(
-                                                          "Printing response " +
-                                                              numberJsonResponse[
-                                                                  'response']);
-
-                                                      if (numberJsonResponse[
-                                                                  'response']
-                                                              .toString() !=
-                                                          'Mobile_Registered') {
-                                                        // user not there
-
-                                                        print(
-                                                            "User Not Existing, call create()");
-                                                        user = new User(
-                                                            businessname.text,
-                                                            username.text,
-                                                            mobile.text,
-                                                            email.text,
-                                                            password.text,
-                                                            aadharcard.text);
-
-                                                        createUserInDB(
-                                                            user, context);
-                                                        removeloader();
-
-                                                        Navigator.push(
-                                                            context,
-                                                            new MaterialPageRoute(
-                                                                builder:
-                                                                    (context) =>
-                                                                         MobileOTP(user)));
-                                                      } else {
-                                                        s(context,
-                                                            "Mobile Number already registered, Please Login");
-                                                      }
-                                                    } else {
-                                                      print(
-                                                          "HTTP REsponse was null");
-                                                      removeloader();
-                                                    }
-                                                  });
-                                                }
+                                                onPressed(context);
                                               },
                                               color: primarycolor,
                                               shape: new RoundedRectangleBorder(
@@ -407,11 +315,68 @@ class RegisterState extends State<Register> {
         )));
   }
 
+  void onPressed(BuildContext context) {
+    print("OnREgisterCLicked");
+    if (businessname.text.isEmpty) {
+      s(context, 'Enter The Business Name');
+    } else if (username.text.isEmpty) {
+      s(context, 'Enter Your Name');
+    } else if (mobile.text.isEmpty) {
+      s(context, 'Enter The Mobile Number');
+    } else if (mobile.text.length != 10) {
+      s(context, 'Please enter 10 digit Mobile Number');
+    } else if (email.text.isEmpty) {
+      s(context, 'Enter The Email Id');
+    } else if (!isEmail(email.text)) {
+      s(context, 'Please Check The Email Id');
+    } else if (password.text.isEmpty) {
+      s(context, 'Enter The Password');
+    } else if (password.text.length < 6) {
+      s(context, 'Minimum Length Of The Password Is 6');
+    } else if (aadharcard.text.length != 12) {
+      s(context, 'Enter The 12 Digit Aadhar Card Number');
+    } else {
+      showloader(context);
+
+      checkIfMobileRegistered(strQueryMobile: 'checkUser&mobile=${mobile.text}')
+          .then((httpResponse) {
+        if (httpResponse != null) {
+          print("printing hhtp body" + httpResponse.body);
+          var numberJsonResponse = json.decode(httpResponse.body);
+          print("Printing response " + numberJsonResponse['response']);
+
+          if (numberJsonResponse['response'].toString() !=
+              'Mobile_Registered') {
+            // user not there
+
+            print("User Not Existing, call create()");
+            user = new User(businessname.text, username.text, mobile.text,
+                email.text, password.text, aadharcard.text);
+
+            createUserInDB(user, context);
+            removeloader();
+
+            Navigator.push(context,
+                new MaterialPageRoute(builder: (context) => MobileOTP(user)));
+          } else {
+            removeloader();
+
+            s(context, "Mobile Number already registered, Please Login");
+          }
+        } else {
+          print("HTTP REsponse was null");
+          removeloader();
+        }
+      });
+    }
+  }
+
+/*
   void submitPressed() {
     print("OnREgisterCLicked");
     if (businessname.text.isEmpty) {
       s(context, 'Enter The Business Name');
-    } else if (mobile.text.isEmpty) {
+    }  else if (mobile.text.isEmpty) {
       s(context, 'Enter The Mobile Number');
     } else if (mobile.text.length > 10 || mobile.text.length < 10) {
       s(context, 'Please Check The Mobile Number');
@@ -423,9 +388,7 @@ class RegisterState extends State<Register> {
       s(context, 'Enter The Password');
     } else if (password.text.length < 6) {
       s(context, 'Minimum Length Of The Password Is 6');
-    } else if (aadharcard.text.isEmpty || aadharcard.text.length != 12) {
-      s(context, 'Enter The 12 Digit Aadhar Card Number');
-    } else {
+    }  else {
       showloader(context);
 
       checkIfMobileRegistered(strQueryMobile: 'checkUser&mobile=${mobile.text}')
@@ -460,4 +423,5 @@ class RegisterState extends State<Register> {
       });
     }
   }
+*/
 }

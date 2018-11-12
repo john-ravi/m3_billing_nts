@@ -2,15 +2,35 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'colorspage.dart';
 import 'home.dart';
 import 'register.dart';
 import 'utils.dart';
 import 'forgot_password.dart';
 
-void main() => runApp(new MyApp());
+
+SharedPreferences prefs;
+
+void main() {
+
+  runWhat();
+
+}
+
+void runWhat() async{
+  await initBillingPrefs().then((bool) {
+    if(bool) {
+      runApp(Home());
+    } else {
+      runApp(new MyApp());
+
+    }
+  });
+}
 
 class MyApp extends StatefulWidget {
+
   @override
   State<StatefulWidget> createState() {
     MyAppState myAppState() => new MyAppState();
@@ -19,7 +39,20 @@ class MyApp extends StatefulWidget {
 }
 
 class MyAppState extends State<MyApp> {
-  bool manualOverRide = false;
+  bool manualOverRide = true;
+
+
+  @override
+  void initState() {
+    super.initState();
+
+  }
+
+
+  @override
+  void didChangeDependencies() {
+
+  }
 
   bool isEmail(String em) {
     String p =
@@ -236,7 +269,7 @@ class MyAppState extends State<MyApp> {
     if (!manualOverRide) {
       if (mobile.text.isEmpty) {
         s(context, 'Enter The Mobile Number');
-      } else if (mobile.text.length > 10 || mobile.text.length < 10) {
+      } else if (mobile.text.length != 10) {
         s(context, 'Please Check The Mobile Number');
       } else if (password.text.isEmpty) {
         s(context, 'Enter The Password');
@@ -290,7 +323,30 @@ class MyAppState extends State<MyApp> {
   }
 
   void gotoHome(BuildContext context) {
+    prefs.setBool("billingLoggedIn", true);
+    print(prefs.getBool("billingLoggedIn") ?? false);
+
+    prefs.setString("billingCurrentUser", mobile.text);
+    print(prefs.getString("billingCurrentUser"));
     Navigator.push(
         context, new MaterialPageRoute(builder: (context) => new Home()));
   }
+
 }
+
+Future<bool> initBillingPrefs() async{
+
+  prefs = await SharedPreferences.getInstance();
+  print(prefs.getBool("billingLoggedIn") ?? false);
+  print(prefs.getString("billingCurrentUser"));
+
+  if(prefs.getBool("billingLoggedIn") ?? false){
+    if(prefs.getString("billingCurrentUser") != null){
+
+      return true;
+    }
+
+  }
+  return false;
+}
+

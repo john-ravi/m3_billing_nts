@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:m3_billing_nts/bills_model.dart';
+import 'package:m3_billing_nts/model_bills.dart';
 import 'package:m3_billing_nts/customer.dart';
 import 'package:m3_billing_nts/customerWithId.dart';
 import 'package:m3_billing_nts/home.dart';
@@ -24,6 +24,9 @@ String unencodedPath = "/billing";
 String activeUrl = testingUrl;
 
 OverlayEntry loaderentry;
+
+const String LOGGED_IN = "billingLoggedIn";
+const String CURRENT_USER = "billingCurrentUser";
 
 showloader(BuildContext context) {
   OverlayState loaderstate = Overlay.of(context);
@@ -68,17 +71,6 @@ Future<String> getUserEmail() async {
   SharedPreferences pref = await SharedPreferences.getInstance();
 
   return pref.getString('uemail');
-}
-
-Future<String> createprefsuser(
-    String mobile, String uname, String uemail) async {
-  SharedPreferences pref = await SharedPreferences.getInstance();
-  await pref.setString('uid', mobile);
-  await pref.setString('uname', uname);
-  await pref.setString('uemail', uemail);
-  await pref.setBool('LoggedIn', true);
-  print("Pref Created for $mobile");
-  return mobile;
 }
 
 Future<bool> clearlogin() async {
@@ -181,7 +173,6 @@ void createUserInDB(User user, BuildContext context) async {
         }
     }
 
-    createprefsuser(user.mobile, user.username, user.email);
   });
 }
 
@@ -232,7 +223,6 @@ Future<List<Bills>> getBills() async {
     // If the call to the server was successful, parse the JSON
     var decodedBody = json.decode(registerUserResponse.body);
     if (decodedBody['response'].toString().compareTo("success") == 0) {
-      var mapStateToId = new Map();
 
       print("decoded body \t" + decodedBody.toString());
       List billsDecoded = decodedBody["body"];
@@ -342,6 +332,46 @@ Future<List<String>> getCitiesUtils(state_id) async {
 }
 
 Future<List<Customer>> getCustomers() async {
+  print("Get Customers Called");
+  var uri =
+      Uri.http(authority, unencodedPath, {"page": "getCustomersAndMobile"});
+
+  d(uri);
+  http.Response registerUserResponse = await http.get(uri);
+  List<Customer> listCustomers = new List();
+
+  if (registerUserResponse.statusCode == 200) {
+    // If the call to the server was successful, parse the JSON
+    var decodedBody = json.decode(registerUserResponse.body);
+    if (decodedBody['response'].toString().compareTo("success") == 0) {
+      print("decoded body \t" + decodedBody.toString());
+      List objectCustomersList = decodedBody["body"];
+
+      print("List \t" + objectCustomersList.toString());
+
+      /** FOR EACH */
+      objectCustomersList.forEach((rowCustomerObject) {
+        print("ROW \t" + rowCustomerObject.toString());
+
+        Map customerMap = rowCustomerObject;
+
+        print("CustomerMap  ${customerMap.toString()}");
+
+        listCustomers.add(new Customer(
+            customerMap["customer_name"], customerMap["contact_number"]));
+
+        //      print("List as Whiole \t" + listCustomers.toString());
+      });
+    } else {
+      print("Couldn't fetch rows, please check");
+    }
+  } else {
+    print("Error Fetching States, Check Network: In Utility");
+  }
+
+  return listCustomers;
+}
+Future<List<Customer>> dummy() async {
   print("Get Customers Called");
   var uri =
       Uri.http(authority, unencodedPath, {"page": "getCustomersAndMobile"});

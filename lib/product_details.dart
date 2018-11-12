@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:m3_billing_nts/model_items.dart';
 import 'colorspage.dart';
 
 class ProductDetails extends StatefulWidget {
-  final String productTitle;
+  Items item;
 
-  ProductDetails({this.productTitle});
+  ProductDetails({this.item});
 
   @override
   State<StatefulWidget> createState() {
@@ -24,9 +25,9 @@ class ProductDetailsState extends State<ProductDetails> {
       home: new Scaffold(
         appBar: AppBar(
           elevation: 0.0,
-          title: Text(widget.productTitle),
+          title: Text("Edit Item"),
           backgroundColor: secondarycolor,
-          actions: <Widget>[
+/*          actions: <Widget>[
             IconButton(
               icon: Icon(
                 FontAwesomeIcons.pencilAlt,
@@ -34,7 +35,7 @@ class ProductDetailsState extends State<ProductDetails> {
               ),
               onPressed: null,
             ),
-          ],
+          ]*/
           leading: new IconButton(
               iconSize: 18.0,
               icon: new Icon(FontAwesomeIcons.chevronLeft),
@@ -63,7 +64,7 @@ class ProductDetailsState extends State<ProductDetails> {
                   Container(
                     margin: EdgeInsets.only(left: 10.0, top: 10.0,bottom: 10.0),
                     child: Text(
-                      'M3',
+                      widget.item.item_name,
                       style: TextStyle(fontSize: 16.0),
                     ),
                   ),
@@ -80,7 +81,7 @@ class ProductDetailsState extends State<ProductDetails> {
                   Container(
                     margin: EdgeInsets.only(left: 10.0, top: 10.0,bottom: 10.0),
                     child: Text(
-                      '40Rs',
+                      widget.item.unit_cost + "Rs",
                       style: TextStyle(fontSize: 16.0),
                     ),
                   ),
@@ -97,7 +98,7 @@ class ProductDetailsState extends State<ProductDetails> {
                   Container(
                     margin: EdgeInsets.only(left: 10.0, top: 10.0,bottom: 10.0),
                     child: Text(
-                      '4',
+                      widget.item.no_of_units,
                       style: TextStyle(fontSize: 16.0),
                     ),
                   ),
@@ -114,7 +115,7 @@ class ProductDetailsState extends State<ProductDetails> {
                   Container(
                     margin: EdgeInsets.only(left: 10.0, top: 10.0,bottom: 10.0),
                     child: Text(
-                      '18-09-2018',
+                      widget.item.start_date,
                       style: TextStyle(fontSize: 16.0),
                     ),
                   ),
@@ -131,7 +132,7 @@ class ProductDetailsState extends State<ProductDetails> {
                   Container(
                     margin: EdgeInsets.only(left: 10.0, top: 10.0,bottom: 10.0),
                     child: Text(
-                      '30-09-2018',
+                      widget.item.end_date,
                       style: TextStyle(fontSize: 16.0),
                     ),
                   ),
@@ -148,7 +149,8 @@ class ProductDetailsState extends State<ProductDetails> {
                   Container(
                     margin: EdgeInsets.only(left: 10.0, top: 10.0,bottom: 10.0),
                     child: Text(
-                      '50Rs',
+
+                      widget.item.tax +'%',
                       style: TextStyle(fontSize: 16.0),
                     ),
                   ),

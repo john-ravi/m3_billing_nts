@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:m3_billing_nts/all_fragment_paid.dart';
 import 'package:m3_billing_nts/all_fragment_unpaid.dart';
-import 'package:m3_billing_nts/bills_model.dart';
+import 'package:m3_billing_nts/model_bills.dart';
 import 'package:m3_billing_nts/utils.dart';
 import 'home.dart';
 import 'colorspage.dart';
