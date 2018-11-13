@@ -4,7 +4,9 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:m3_billing_nts/bills_modified_fragment.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:share/share.dart';
 
 import 'allbills.dart';
 import 'calender_fragment.dart';
@@ -56,11 +58,10 @@ class HomeState extends State<Home> {
 
   final List<Widget> homechildren = [
     CalenderFragment(),
-    AllBills(),
+    BillFragments(),
     VacationFragment(),
     ProfileFragment(),
   ];
-
 
   void onTabTapped(int index) {
     setState(() {
@@ -280,13 +281,19 @@ class HomeState extends State<Home> {
                 new MaterialPageRoute(builder: (context) => new Vacation()));
           },
         ),
-        new ListTile(
-          title: new Text('Refer Friend'),
-          leading: new Icon(
-            FontAwesomeIcons.share,
-            color: secondarycolor,
-          ),
-        ),
+        Builder(
+            builder: (context) => new ListTile(
+                title: new Text('Refer Friend'),
+                leading: new Icon(
+                  FontAwesomeIcons.share,
+                  color: secondarycolor,
+                ),
+                onTap: () {
+                  final RenderBox box = context.findRenderObject();
+                  Share.share("Hi, I am Refering you M3 Billing App",
+                      sharePositionOrigin:
+                          box.localToGlobal(Offset.zero) & box.size);
+                })),
         new ListTile(
           title: new Text('Notification'),
           leading: new Icon(

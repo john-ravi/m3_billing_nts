@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:m3_billing_nts/edit_item.dart';
 import 'package:m3_billing_nts/model_items.dart';
 import 'colorspage.dart';
 import 'home.dart';
@@ -70,9 +71,10 @@ class ProductState extends State<Products> {
                 onTap: (){
                      Navigator.push(context,
                   new MaterialPageRoute(builder: (context) => new
-                  ProductDetails( item: finalItems[index])));
+                  EditItem(finalItems[index])));
                 },
                 // ignore: argument_type_not_assignable
+                /*EditItem(finalItems[index])*/
                 child: ProductAdapter(finalItems[index]),
               );
             },

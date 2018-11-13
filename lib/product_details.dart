@@ -27,15 +27,6 @@ class ProductDetailsState extends State<ProductDetails> {
           elevation: 0.0,
           title: Text("Edit Item"),
           backgroundColor: secondarycolor,
-/*          actions: <Widget>[
-            IconButton(
-              icon: Icon(
-                FontAwesomeIcons.pencilAlt,
-                color: Colors.white,
-              ),
-              onPressed: null,
-            ),
-          ]*/
           leading: new IconButton(
               iconSize: 18.0,
               icon: new Icon(FontAwesomeIcons.chevronLeft),
@@ -54,113 +45,117 @@ class ProductDetailsState extends State<ProductDetails> {
               elevation: 6.0,
               margin: EdgeInsets.all(10.0),
               child: ListView(
-                children: <Widget>[
-                  Container(
-                      margin: EdgeInsets.only(left: 10.0, top: 10.0),
-                      child: Text(
-                        'Item Name : ',
-                        style: TextStyle(fontSize: 16.0, color: Colors.black),
-                      )),
-                  Container(
-                    margin: EdgeInsets.only(left: 10.0, top: 10.0,bottom: 10.0),
-                    child: Text(
-                      widget.item.item_name,
-                      style: TextStyle(fontSize: 16.0),
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.only( right: 10.0, left: 10.0),
-                     child: Divider( color: Colors.black,),
-                  ),
-                  Container(
-                      margin: EdgeInsets.only(left: 10.0, top: 10.0),
-                      child: Text(
-                        'Unit Cost : ',
-                        style: TextStyle(fontSize: 16.0, color: Colors.black),
-                      )),
-                  Container(
-                    margin: EdgeInsets.only(left: 10.0, top: 10.0,bottom: 10.0),
-                    child: Text(
-                      widget.item.unit_cost + "Rs",
-                      style: TextStyle(fontSize: 16.0),
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.only( right: 10.0, left: 10.0),
-                     child: Divider( color: Colors.black,),
-                  ),
-                  Container(
-                      margin: EdgeInsets.only(left: 10.0, top: 10.0),
-                      child: Text(
-                        'No Of Units : ',
-                        style: TextStyle(fontSize: 16.0, color: Colors.black),
-                      )),
-                  Container(
-                    margin: EdgeInsets.only(left: 10.0, top: 10.0,bottom: 10.0),
-                    child: Text(
-                      widget.item.no_of_units,
-                      style: TextStyle(fontSize: 16.0),
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.only( right: 10.0, left: 10.0),
-                     child: Divider( color: Colors.black,),
-                  ),
-                  Container(
-                      margin: EdgeInsets.only(left: 10.0, top: 10.0),
-                      child: Text(
-                        'Available From : ',
-                        style: TextStyle(fontSize: 16.0, color: Colors.black),
-                      )),
-                  Container(
-                    margin: EdgeInsets.only(left: 10.0, top: 10.0,bottom: 10.0),
-                    child: Text(
-                      widget.item.start_date,
-                      style: TextStyle(fontSize: 16.0),
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.only( right: 10.0, left: 10.0),
-                     child: Divider( color: Colors.black,),
-                  ),
-                  Container(
-                      margin: EdgeInsets.only(left: 10.0, top: 10.0),
-                      child: Text(
-                        'Available To : ',
-                        style: TextStyle(fontSize: 16.0, color: Colors.black),
-                      )),
-                  Container(
-                    margin: EdgeInsets.only(left: 10.0, top: 10.0,bottom: 10.0),
-                    child: Text(
-                      widget.item.end_date,
-                      style: TextStyle(fontSize: 16.0),
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.only( right: 10.0, left: 10.0),
-                     child: Divider( color: Colors.black,),
-                  ),
-                  Container(
-                      margin: EdgeInsets.only(left: 10.0, top: 10.0),
-                      child: Text(
-                        'Tax : ',
-                        style: TextStyle(fontSize: 16.0, color: Colors.black),
-                      )),
-                  Container(
-                    margin: EdgeInsets.only(left: 10.0, top: 10.0,bottom: 10.0),
-                    child: Text(
-
-                      widget.item.tax +'%',
-                      style: TextStyle(fontSize: 16.0),
-                    ),
-                  ),
-                  
-                ],
+                children: listChildren(),
               ),
             )
           ],
         ),
       ),
     );
+  }
+
+  List<Widget> listChildren() {
+    return  <Widget>[
+                Container(
+                    margin: EdgeInsets.only(left: 10.0, top: 10.0),
+                    child: Text(
+                      'Item Name : ',
+                      style: TextStyle(fontSize: 16.0, color: Colors.black),
+                    )),
+                Container(
+                  margin: EdgeInsets.only(left: 10.0, top: 10.0,bottom: 10.0),
+                  child: Text(
+                    widget.item.item_name,
+                    style: TextStyle(fontSize: 16.0),
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only( right: 10.0, left: 10.0),
+                   child: Divider( color: Colors.black,),
+                ),
+                Container(
+                    margin: EdgeInsets.only(left: 10.0, top: 10.0),
+                    child: Text(
+                      'Unit Cost : ',
+                      style: TextStyle(fontSize: 16.0, color: Colors.black),
+                    )),
+                Container(
+                  margin: EdgeInsets.only(left: 10.0, top: 10.0,bottom: 10.0),
+                  child: Text(
+                    widget.item.unit_cost + "Rs",
+                    style: TextStyle(fontSize: 16.0),
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only( right: 10.0, left: 10.0),
+                   child: Divider( color: Colors.black,),
+                ),
+                Container(
+                    margin: EdgeInsets.only(left: 10.0, top: 10.0),
+                    child: Text(
+                      'No Of Units : ',
+                      style: TextStyle(fontSize: 16.0, color: Colors.black),
+                    )),
+                Container(
+                  margin: EdgeInsets.only(left: 10.0, top: 10.0,bottom: 10.0),
+                  child: Text(
+                    widget.item.no_of_units,
+                    style: TextStyle(fontSize: 16.0),
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only( right: 10.0, left: 10.0),
+                   child: Divider( color: Colors.black,),
+                ),
+                Container(
+                    margin: EdgeInsets.only(left: 10.0, top: 10.0),
+                    child: Text(
+                      'Available From : ',
+                      style: TextStyle(fontSize: 16.0, color: Colors.black),
+                    )),
+                Container(
+                  margin: EdgeInsets.only(left: 10.0, top: 10.0,bottom: 10.0),
+                  child: Text(
+                    widget.item.start_date,
+                    style: TextStyle(fontSize: 16.0),
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only( right: 10.0, left: 10.0),
+                   child: Divider( color: Colors.black,),
+                ),
+                Container(
+                    margin: EdgeInsets.only(left: 10.0, top: 10.0),
+                    child: Text(
+                      'Available To : ',
+                      style: TextStyle(fontSize: 16.0, color: Colors.black),
+                    )),
+                Container(
+                  margin: EdgeInsets.only(left: 10.0, top: 10.0,bottom: 10.0),
+                  child: Text(
+                    widget.item.end_date,
+                    style: TextStyle(fontSize: 16.0),
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only( right: 10.0, left: 10.0),
+                   child: Divider( color: Colors.black,),
+                ),
+                Container(
+                    margin: EdgeInsets.only(left: 10.0, top: 10.0),
+                    child: Text(
+                      'Tax : ',
+                      style: TextStyle(fontSize: 16.0, color: Colors.black),
+                    )),
+                Container(
+                  margin: EdgeInsets.only(left: 10.0, top: 10.0,bottom: 10.0),
+                  child: Text(
+
+                    widget.item.tax +'%',
+                    style: TextStyle(fontSize: 16.0),
+                  ),
+                ),
+
+              ];
   }
 }

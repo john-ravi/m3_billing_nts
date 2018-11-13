@@ -24,9 +24,7 @@ dependencies:
   google_sign_in: ^3.2.2
   firebase_auth: ^0.6.2+1
   autocomplete_textfield: ^1.5.1
-
-
-
+  share: ^0.5.3
   font_awesome_flutter: ^8.1.0
   shared_preferences: ^0.4.2
   flutter_calendar:

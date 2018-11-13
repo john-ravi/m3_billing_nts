@@ -118,7 +118,7 @@ class CreateItemState extends State<CreateItem> {
               iconSize: 18.0,
               icon: new Icon(FontAwesomeIcons.chevronLeft),
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
+                Navigator.of(context).pop();
               }),
         ),
         body: Stack(

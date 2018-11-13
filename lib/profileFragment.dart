@@ -19,7 +19,11 @@ class ProfileFragment extends StatefulWidget {
 }
 
 class ProfileFragmentState extends State<ProfileFragment> {
-  String flatNo, email, street, area, city, pincode = "";
+  String flatNo= "";
+  String name = "";
+  String mobile = "";
+  String email, street, area, city, pincode;
+
 
   TextEditingController cntrlFlatNo = new TextEditingController();
   TextEditingController cntrlEmail = new TextEditingController();
@@ -30,6 +34,8 @@ class ProfileFragmentState extends State<ProfileFragment> {
 
   List listJsonArray;
   User user;
+
+  String text;
 
   @override
   void initState() {
@@ -49,12 +55,13 @@ class ProfileFragmentState extends State<ProfileFragment> {
 
     var uri = Uri.http(authority, unencodedPath, {
       "page": "updateProfile",
-      "email_id": validEmail.isEmpty ? "" : validEmail,
+      "email_id": cntrlEmail.text,
       "flat_no": cntrlFlatNo.text,
       "street": cntrlStreet.text,
       "area": cntrlArea.text,
       "city": cntrlCity.text,
-      "pincode": cntrlPincode.text
+      "pincode": cntrlPincode.text,
+      "mobile_number": user.mobile
     });
 
     /*
@@ -77,9 +84,9 @@ pincode
       var decodedBody = json.decode(registerUserResponse.body);
       print("decoded body \t" + decodedBody.toString());
       if (decodedBody['response'].toString().compareTo("success") == 0) {
-        print("Successfully Updated $user");
+        s(context, "Successfully Updated ${user.username}");
       } else {
-        print("Couldn't fetch User , please check");
+        s(context, "Failed Update, please retry");
       }
     } else {
       print("Please Check Network: ");
@@ -150,8 +157,10 @@ pincode
           cntrlStreet.text = user.street;
           cntrlFlatNo.text = user.flatNo;
           cntrlEmail.text = user.email;
+          name = user.username;
+          mobile = user.mobile;
 
-          email = user.email;
+
           print("My Profile PRINTING $user");
         });
       } else {
@@ -164,334 +173,317 @@ pincode
 
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
-      theme: ThemeData(fontFamily: 'Georgia'),
-      debugShowCheckedModeBanner: false,
-      home: new Scaffold(
-        body: SingleChildScrollView(
-          child: Stack(
-            children: <Widget>[
-              new Image.asset(
-                'assets/images/bg.png',
-                fit: BoxFit.cover,
-                width: double.infinity,
-              ),
-              Container(
-                margin: EdgeInsets.only(top: 10.0),
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                      child: new SizedBox(
-                        height: 670.0,
-                        child:
-                            Builder(builder: (context) => buildStack(context)),
+
+
+    return Stack(
+      children: <Widget>[
+        new Image.asset(
+          'assets/images/bg.png',
+          fit: BoxFit.cover,
+          width: double.infinity,
+        ),
+
+        Container(
+          margin: EdgeInsets.only(right: 10.0, left: 10.0, bottom: 42.0),
+
+          child: Card(
+            elevation: 6.0,
+
+            child: ListView(
+              children: <Widget>[
+                Container(
+                  margin: EdgeInsets.only(left: 16.0, top: 16.0, right: 16.0),
+                  child: Row(
+                    children: <Widget>[
+                      Icon(
+                        FontAwesomeIcons.user,
+                        color: secondarycolor,
                       ),
-                    )
-                  ],
+                      Container(
+                        margin: EdgeInsets.only(left: 16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Container(
+                                margin: EdgeInsets.only(bottom: 10.0),
+                                child: Text(
+                                  'Name',
+                                  style: TextStyle(
+                                      fontSize: 16.0, color: Colors.grey),
+                                )),
+                            Container(
+                              child: Text(
+                                name,
+                                style: TextStyle(fontSize: 16.0),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
                 ),
-              ),
-            ],
+                Container(
+                  margin: EdgeInsets.only(left: 16.0, top: 16.0, right: 16.0),
+                  child: Row(
+                    children: <Widget>[
+                      Icon(
+                        FontAwesomeIcons.mobileAlt,
+                        color: secondarycolor,
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(left: 16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Container(
+                                margin: EdgeInsets.only(bottom: 10.0),
+                                child: Text(
+                                  'Mobile',
+                                  style: TextStyle(
+                                      fontSize: 16.0, color: Colors.grey),
+                                )),
+                            Container(
+                              child: Text(
+                                mobile,
+                                style: TextStyle(fontSize: 16.0),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                new Padding(
+                  padding: const EdgeInsets.only(left:16.0, top: 16.0, right: 16.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(
+                        FontAwesomeIcons.envelope,
+                        color: secondarycolor,
+
+                      ),
+                      Padding(padding: EdgeInsets.only(left: 16.0),),
+                      Expanded(
+
+                        child: new Column(
+
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            new TextField(
+                              decoration: const InputDecoration(
+                                labelText: 'Email:',
+                                hintText: 'Email',
+                              ),
+                              maxLines: 1,
+                              controller: cntrlEmail,
+
+                            ),
+                            const Padding(padding: EdgeInsets.only(top: 8.0)),
+
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                new Padding(
+                  padding: const EdgeInsets.only(left:16.0, top: 16.0, right: 16.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(
+                        FontAwesomeIcons.home,
+                        color: secondarycolor,
+
+                      ),
+                      Padding(padding: EdgeInsets.only(left: 16.0),),
+                      Expanded(
+
+                        child: new Column(
+
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            new TextField(
+                              decoration: const InputDecoration(
+                                labelText: 'Flat/House No:',
+                                hintText: 'Flat/House No:',
+                              ),
+                              maxLines: 1,
+                              controller: cntrlFlatNo,
+                            ),
+                            const Padding(padding: EdgeInsets.only(top: 8.0)),
+
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                new Padding(
+                  padding: const EdgeInsets.only(left:16.0, top: 16.0, right: 16.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(
+                        FontAwesomeIcons.home,
+                        color: secondarycolor,
+
+                      ),
+                      Padding(padding: EdgeInsets.only(left: 16.0),),
+                      Expanded(
+
+                        child: new Column(
+
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            new TextField(
+                              decoration: const InputDecoration(
+                                labelText: 'Street:',
+                                hintText: 'Street',
+                              ),
+                              maxLines: 1,
+                              controller: cntrlStreet,
+                            ),
+                            const Padding(padding: EdgeInsets.only(top: 8.0)),
+
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                new Padding(
+                  padding: const EdgeInsets.only(left:16.0, top: 16.0, right: 16.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(
+                        FontAwesomeIcons.home,
+                        color: secondarycolor,
+
+                      ),
+                      Padding(padding: EdgeInsets.only(left: 16.0),),
+                      Expanded(
+
+                        child: new Column(
+
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            new TextField(
+                              decoration: const InputDecoration(
+                                labelText: 'Area:',
+                                hintText: 'Area:',
+                              ),
+                              maxLines: 1,
+                              controller: cntrlArea,
+                            ),
+                            const Padding(padding: EdgeInsets.only(top: 8.0)),
+
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                new Padding(
+                  padding: const EdgeInsets.only(left:16.0, top: 16.0, right: 16.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(
+                        FontAwesomeIcons.home,
+                        color: secondarycolor,
+
+                      ),
+                      Padding(padding: EdgeInsets.only(left: 16.0),),
+                      Expanded(
+
+                        child: new Column(
+
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            new TextField(
+                              decoration: const InputDecoration(
+                                labelText: 'City:',
+                                hintText: 'City:',
+                              ),
+                              maxLines: 1,
+                              controller: cntrlCity,
+                            ),
+                            const Padding(padding: EdgeInsets.only(top: 8.0)),
+
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                new Padding(
+                  padding: const EdgeInsets.only(left:16.0, top: 16.0, right: 16.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(
+                        FontAwesomeIcons.home,
+                        color: secondarycolor,
+
+                      ),
+                      Padding(padding: EdgeInsets.only(left: 16.0),),
+                      Expanded(
+
+                        child: new Column(
+
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            new TextField(
+                              decoration: const InputDecoration(
+                                labelText: 'Pincode:',
+                                hintText: 'Pincode:',
+                              ),
+                              maxLines: 1,
+                              controller: cntrlPincode,
+                            ),
+                            const Padding(padding: EdgeInsets.only(top: 8.0)),
+
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-      ),
+
+
+        Container(
+          alignment: Alignment.bottomCenter,
+          child: ConstrainedBox(
+            constraints: new BoxConstraints(minWidth: 250.0),
+            child: new RaisedButton(
+              onPressed: () {
+                updateAddress(context);
+              },
+              color: primarycolor,
+              shape: new RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(30.0)),
+              child: new Text('UPDATE ADDRESS',
+                  style: new TextStyle(
+                      color: Colors.white,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold)),
+            ),
+          ),
+        )
+        ,
+      ] ,
     );
+
   }
 
-  Stack buildStack(BuildContext context) {
-    return Stack(children: <Widget>[
-      Container(
-        height: 650.0,
-        margin: EdgeInsets.only(right: 10.0, left: 10.0),
-        child: Card(
-          elevation: 6.0,
-          child: new Column(
-            children: <Widget>[
-              Container(
-                margin: EdgeInsets.only(left: 10.0),
-                child: Row(
-                  children: <Widget>[
-                    Icon(
-                      FontAwesomeIcons.user,
-                      color: secondarycolor,
-                    ),
-                    Container(
-                      margin: EdgeInsets.all(10.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Container(
-                              margin: EdgeInsets.only(bottom: 10.0),
-                              child: Text(
-                                'Name',
-                                style: TextStyle(
-                                    fontSize: 16.0, color: Colors.grey),
-                              )),
-                          Container(
-                            child: Text(
-                              'M3',
-                              style: TextStyle(fontSize: 16.0),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.only(left: 10.0),
-                child: Row(
-                  children: <Widget>[
-                    Icon(
-                      FontAwesomeIcons.mobileAlt,
-                      color: secondarycolor,
-                    ),
-                    Container(
-                      margin: EdgeInsets.all(10.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Container(
-                              margin: EdgeInsets.only(bottom: 10.0),
-                              child: Text(
-                                'Mobile Number',
-                                style: TextStyle(
-                                    fontSize: 16.0, color: Colors.grey),
-                              )),
-                          Container(
-                            child: Text(
-                              '1234567890',
-                              style: TextStyle(fontSize: 16.0),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.only(left: 10.0),
-                child: Row(
-                  children: <Widget>[
-                    Icon(
-                      FontAwesomeIcons.envelope,
-                      color: secondarycolor,
-                    ),
-                    Container(
-                      margin: EdgeInsets.all(10.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Container(
-                              margin: EdgeInsets.only(bottom: 10.0),
-                              child: Text(
-                                'Email',
-                                style: TextStyle(
-                                    fontSize: 16.0, color: Colors.grey),
-                              )),
-                          Container(
-                            width: 200.0,
-                            child:
-                                Text(
-                              cntrlEmail.text,
-                              style: TextStyle(fontSize: 16.0),
-                            )
-/*                                TextFormField(
-                                    maxLines: 1, controller: cntrlEmail)*/,
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.only(left: 10.0),
-                child: Row(
-                  children: <Widget>[
-                    Icon(
-                      FontAwesomeIcons.home,
-                      color: secondarycolor,
-                    ),
-                    Container(
-                      margin: EdgeInsets.all(10.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Container(
-                              margin: EdgeInsets.only(bottom: 10.0),
-                              child: Text(
-                                'Flat No',
-                                style: TextStyle(
-                                    fontSize: 16.0, color: Colors.grey),
-                              )),
-                          Container(
-                            child: Text(
-                              'A2',
-                              style: TextStyle(fontSize: 16.0),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.only(left: 10.0),
-                child: Row(
-                  children: <Widget>[
-                    Icon(
-                      FontAwesomeIcons.home,
-                      color: secondarycolor,
-                    ),
-                    Container(
-                      margin: EdgeInsets.all(10.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Container(
-                              margin: EdgeInsets.only(bottom: 10.0),
-                              child: Text(
-                                'Building & Street Address',
-                                style: TextStyle(
-                                    fontSize: 16.0, color: Colors.grey),
-                              )),
-                          Container(
-                            child: Text(
-                              'm3street',
-                              style: TextStyle(fontSize: 16.0),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.only(left: 10.0),
-                child: Row(
-                  children: <Widget>[
-                    Icon(
-                      FontAwesomeIcons.home,
-                      color: secondarycolor,
-                    ),
-                    Container(
-                      margin: EdgeInsets.all(10.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Container(
-                              margin: EdgeInsets.only(bottom: 10.0),
-                              child: Text(
-                                'Area',
-                                style: TextStyle(
-                                    fontSize: 16.0, color: Colors.grey),
-                              )),
-                          Container(
-                            child: Text(
-                              'Area m3',
-                              style: TextStyle(fontSize: 16.0),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.only(left: 10.0),
-                child: Row(
-                  children: <Widget>[
-                    Icon(
-                      FontAwesomeIcons.home,
-                      color: secondarycolor,
-                    ),
-                    Container(
-                      margin: EdgeInsets.all(10.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Container(
-                              margin: EdgeInsets.only(bottom: 10.0),
-                              child: Text(
-                                'City',
-                                style: TextStyle(
-                                    fontSize: 16.0, color: Colors.grey),
-                              )),
-                          Container(
-                            child: Text(
-                              'Hyderbad',
-                              style: TextStyle(fontSize: 16.0),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.only(left: 10.0),
-                child: Row(
-                  children: <Widget>[
-                    Icon(
-                      FontAwesomeIcons.home,
-                      color: secondarycolor,
-                    ),
-                    Container(
-                      margin: EdgeInsets.all(10.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Container(
-                              margin: EdgeInsets.only(bottom: 10.0),
-                              child: Text(
-                                'Pincode',
-                                style: TextStyle(
-                                    fontSize: 16.0, color: Colors.grey),
-                              )),
-                          Container(
-                            child: Text(
-                              '5990011',
-                              style: TextStyle(fontSize: 16.0),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      Container(
-        alignment: Alignment.bottomCenter,
-        child: ConstrainedBox(
-          constraints: new BoxConstraints(minWidth: 250.0),
-          child: new RaisedButton(
-            onPressed: () {
-              Navigator.push(context,
-                  new MaterialPageRoute(builder: (context) => new Home()));
-            },
-            color: primarycolor,
-            shape: new RoundedRectangleBorder(
-                borderRadius: new BorderRadius.circular(30.0)),
-            child: new Text('UPDATE ADDRESS',
-                style: new TextStyle(
-                    color: Colors.white,
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold)),
-          ),
-        ),
-      )
-    ]);
-  }
 }
