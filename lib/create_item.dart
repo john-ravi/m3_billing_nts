@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:m3_billing_nts/home.dart';
 import 'package:m3_billing_nts/products.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -22,6 +23,7 @@ class CreateItem extends StatefulWidget {
 class CreateItemState extends State<CreateItem> {
   String startdate = '';
   String endate = '';
+  DateTime dateStart, dateEnd;
   var itemAvailableStartDate;
 
   var sharedPreferences;
@@ -39,10 +41,30 @@ class CreateItemState extends State<CreateItem> {
   }
 
   Future selectDate(int selectedvalue, BuildContext context) async {
-    if (selectedvalue == 2 && startdate == '') {
+    DateTime picked;
+      print("1 Selected date end is $dateEnd and start date is $dateStart");
+    if (selectedvalue == 2 && dateStart == null) {
       s(context, "Please select Start Date Before End Date");
+    } else if(selectedvalue == 1 && dateEnd != null){
+      var subtractedDate = dateEnd.subtract(Duration(days: 365));
+      print("subtracted date $subtractedDate");
+      picked = await showDatePicker(
+          context: context,
+          initialDate: dateEnd,
+          firstDate: subtractedDate,
+          lastDate: dateEnd);
+
+      if (picked != null) {
+        setState(() {
+          dateStart = picked;
+          startdate = "${picked.day}- ${picked.month} - ${picked.year}";
+        });
+        print("String start $startdate");
+        print("date start $dateStart");
+      }
+
+
     } else {
-      DateTime picked;
       if (selectedvalue == 1) {
         picked = await showDatePicker(
             context: context,
@@ -51,23 +73,29 @@ class CreateItemState extends State<CreateItem> {
             lastDate: new DateTime(2044));
 
         if (picked != null) {
-          setState(() =>
-              startdate = '${picked.day}- ${picked.month} - ${picked.year}');
-          print(startdate);
+          setState(() {
+            dateStart = picked;
+            startdate = "${picked.day}- ${picked.month} - ${picked.year}";
+          });
+          print("String start $startdate");
+          print("date start $dateStart");
         }
 
-        itemAvailableStartDate = picked;
       } else {
         picked = await showDatePicker(
             context: context,
-            initialDate: new DateTime.now(),
-            firstDate: itemAvailableStartDate,
+            initialDate: dateStart,
+            firstDate: dateStart,
             lastDate: new DateTime(2044));
 
         if (picked != null) {
           setState(
-              () => endate = '${picked.day}- ${picked.month} - ${picked.year}');
-          print(endate);
+              () {
+                dateEnd = picked;
+                endate = "${picked.day}- ${picked.month} - ${picked.year}";
+              });
+          print("string end $endate");
+          print("date end $dateEnd");
         }
       }
     }
@@ -90,7 +118,7 @@ class CreateItemState extends State<CreateItem> {
               iconSize: 18.0,
               icon: new Icon(FontAwesomeIcons.chevronLeft),
               onPressed: () {
-                createItem(context);
+                Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
               }),
         ),
         body: Stack(

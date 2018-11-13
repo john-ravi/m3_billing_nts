@@ -140,7 +140,7 @@ class CreateBillState extends State<CreateBill> {
                     ],
                   ),
                 ),
-                buildSliverListDefault(),
+                Builder(builder: (context) => buildSliverListDefault(context)),
               ],
             )
           ],
@@ -149,7 +149,7 @@ class CreateBillState extends State<CreateBill> {
     );
   }
 
-  SliverList buildSliverListDefault() {
+  SliverList buildSliverListDefault(BuildContext context) {
     return new SliverList(
       delegate:
           new SliverChildBuilderDelegate((BuildContext context, int index) {
@@ -158,7 +158,7 @@ class CreateBillState extends State<CreateBill> {
             setState(() {
               selectedCustomer = finalCustomers[index];
             });
-            alertForCreateBill();
+            alertForCreateBill(context);
           },
           child: Container(
             margin: EdgeInsets.all(10.0),
@@ -235,27 +235,30 @@ class CreateBillState extends State<CreateBill> {
     }
   }
 
-  void alertForCreateBill() {
+  void alertForCreateBill(BuildContext snackContext) {
     showDialog(
       context: context,
       builder: (context) => new AlertDialog(
             title: new Text('Create Bill'),
-            content: buildAlertBody(),
-            actions: <Widget>[
+            content: AlertBodyPaidStatus(selectedCustomer, snackContext),
+/*            actions: <Widget>[
               new FlatButton(
                 onPressed: () => Navigator.of(context).pop(true),
                 child: new Text('No'),
               ),
               new FlatButton(
-                onPressed: () => createBillOnCustomer(),
+                onPressed: () {
+                  createBillOnCustomer();
+                },
                 child: new Text('Yes'),
               ),
-            ],
+            ]*/
           ),
     );
   }
 
   Widget buildAlertBody() {
+    String paidStatus;
     return Container(
       height: 160.0,
       child: Column(
@@ -300,11 +303,15 @@ class CreateBillState extends State<CreateBill> {
                 child: new DropdownButton<String>(
                   isDense: true,
                   hint: new Text("Select Paid Status"),
-                  value: status,
+                  value: paidStatus == "" ? null : paidStatus,
                   onChanged: (String newValue) {
                     setState(() {
                       status = newValue;
+                      paidStatus = newValue;
+                      print(
+                          "Selected paid status as $status and local is $paidStatus");
                     });
+                    paidStatus = newValue;
                   },
                   items: statuslist.map((String map) {
                     return new DropdownMenuItem<String>(
@@ -323,34 +330,154 @@ class CreateBillState extends State<CreateBill> {
     );
   }
 
-  createBillOnCustomer() async{
+}
 
+class AlertBodyPaidStatus extends StatefulWidget {
+  CustomerWithId selectedCustomer;
+
+  BuildContext snackbarContext;
+
+  AlertBodyPaidStatus(this.selectedCustomer, this.snackbarContext);
+
+  @override
+  _AlertBodyPaidStatusState createState() => _AlertBodyPaidStatusState();
+}
+
+class _AlertBodyPaidStatusState extends State<AlertBodyPaidStatus> {
+  TextEditingController contrlAmount = new TextEditingController();
+  List<String> statuslist = new List<String>();
+  String paidStatus = "";
+
+  @override
+  void initState() {
+    statuslist.addAll(['PAID', 'UNPAID']);
+
+    super.initState();
+  }
+
+  createBillOnCustomer() async {
     var amount = contrlAmount.text;
-    if(amount.isEmpty){
-      s(context, "Please Enter Bill Amount");
-    } else {
+    if (amount.isEmpty) {
+      s(widget.snackbarContext, "Please Enter Bill Amount");
+    } else if(paidStatus.isEmpty){
+      s(widget.snackbarContext, "Please Select Paid Status");
+
+    }else {
       showloader(context);
-      await utilsCreateBill(selectedCustomer.id, amount, status).then((responseBill) {
+      await utilsCreateBill(widget.selectedCustomer.id, amount, paidStatus)
+          .then((responseBill) {
         if (responseBill.statusCode == 200) {
           // If the call to the server was successful, parse the JSON
           var decodedBody = json.decode(responseBill.body);
           print("response Body ${decodedBody.toString()}");
           if (decodedBody['response'].toString().compareTo("success") == 0) {
-
-            var string = "Bill for $amount created on ${selectedCustomer.customer_name}";
-            showSnack(string, _keyScaffold);
+            var string =
+                "Bill for $amount created on ${widget.selectedCustomer.customer_name}";
+            s(widget.snackbarContext, string);
             Navigator.of(context).pop(true);
-
           } else {
-            showSnack("Error Creating Bill", _keyScaffold);
+            s(widget.snackbarContext, "Error Creating Bill");
           }
         } else {
           print("Network Error ${responseBill.statusCode}");
         }
-
       });
       removeloader();
     }
   }
 
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 260.0,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Container(
+            margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
+            child: Text('${widget.selectedCustomer.customer_name}'),
+          ),
+          Container(
+            margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
+            child: TextFormField(
+              controller: contrlAmount,
+              decoration: new InputDecoration(
+                contentPadding: EdgeInsets.all(10.0),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5.0)),
+                hintText: 'Enter Amount',
+                hintStyle: TextStyle(
+                  color: Colors.white,
+                ),
+                labelText: 'Enter Amount',
+                labelStyle: TextStyle(
+                  color: Colors.black,
+                ),
+              ),
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                WhitelistingTextInputFormatter.digitsOnly,
+              ],
+            ),
+          ),
+          new Container(
+            padding: EdgeInsets.all(7.0),
+            margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
+            width: double.infinity,
+            decoration: new BoxDecoration(
+                borderRadius: new BorderRadius.circular(5.0),
+                border: new Border.all(color: Colors.black)),
+            child: DropdownButtonHideUnderline(
+              child: ButtonTheme(
+                child: new DropdownButton<String>(
+                  isDense: true,
+
+                  hint: new Text("Select Paid Status"),
+                  value: paidStatus == "" ? null : paidStatus,
+                  onChanged: (String newValue) {
+                    setState(() {
+                      paidStatus = newValue;
+                      print("Selected paid status as $paidStatus");
+                    });
+                  },
+                  items: statuslist.map((String map) {
+                    return new DropdownMenuItem<String>(
+                      value: map,
+                      child: new Text(
+                        map,
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+          ),
+          Container(
+              padding: EdgeInsets.all(7.0),
+              margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
+              width: double.infinity,
+              decoration: new BoxDecoration(
+                  borderRadius: new BorderRadius.circular(5.0),
+                  border: new Border.all(color: Colors.black)),
+              child: Row(
+                children: <Widget>[
+                  new FlatButton(
+                    onPressed: () => Navigator.of(context).pop(true),
+                    child: new Text('No'),
+                  ),
+                  new FlatButton(
+                    onPressed: () {
+
+                      createBillOnCustomer();
+                    },
+                    child: new Text('Yes'),
+                  ),
+                ],
+              )),
+        ],
+      ),
+    );
+
+  }
 }

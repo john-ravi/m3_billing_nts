@@ -8,7 +8,7 @@ class DeliveryBoyDetails extends StatefulWidget {
 
   ModelDeliveryBoy deliveryBoy;
 
-  DeliveryBoyDetails(ModelDeliveryBoy modelDeliveryBoy);
+  DeliveryBoyDetails(this.deliveryBoy);
 
   @override
   State<StatefulWidget> createState() {
@@ -25,6 +25,7 @@ class DeliveryBoyDetailsState extends State<DeliveryBoyDetails>
   @override
   void initState() {
     super.initState();
+    print("Details PAge ${widget.deliveryBoy}");
     deliverycontroller = new TabController(vsync: this, length: 3);
   }
 

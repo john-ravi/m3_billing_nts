@@ -19,7 +19,6 @@ class DeliveryBoy extends StatefulWidget {
 }
 
 class DeliveryBoyState extends State<DeliveryBoy> {
-
   List<ModelDeliveryBoy> listItems = new List();
 
   List<ModelDeliveryBoy> finalItems = new List();
@@ -29,8 +28,6 @@ class DeliveryBoyState extends State<DeliveryBoy> {
 
   List<ModelDeliveryBoy> _searchList;
   bool _isSearching;
-
-
 
   @override
   void initState() {
@@ -65,7 +62,7 @@ class DeliveryBoyState extends State<DeliveryBoy> {
   Widget build(BuildContext context) {
     return new MaterialApp(
       theme: new ThemeData(
-        fontFamily: 'Georgia',
+          fontFamily: 'Georgia',
           primaryColor: Colors.black,
           accentColor: Colors.black,
           hintColor: Colors.black),
@@ -107,8 +104,8 @@ class DeliveryBoyState extends State<DeliveryBoy> {
                   delegate: new SliverChildListDelegate(
                     <Widget>[
                       new Container(
-                        margin: EdgeInsets.only(
-                            left: 10.0, right: 10.0, top: 10.0),
+                        margin:
+                            EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
                         child: TextFormField(
                           decoration: new InputDecoration(
                             contentPadding: EdgeInsets.all(3.0),
@@ -117,12 +114,12 @@ class DeliveryBoyState extends State<DeliveryBoy> {
                             prefixIcon: Icon(Icons.search),
                             hintText: 'Search of Delivery Boys',
                             hintStyle: TextStyle(
-                                color: Colors.white,
-                                ),
+                              color: Colors.white,
+                            ),
                             labelText: 'Search of Delivery Boys',
                             labelStyle: TextStyle(
-                                color: Colors.black,
-                                ),
+                              color: Colors.black,
+                            ),
                           ),
                           keyboardType: TextInputType.text,
                           controller: controllerSearch,
@@ -137,18 +134,17 @@ class DeliveryBoyState extends State<DeliveryBoy> {
                       (BuildContext context, int index) {
                     return GestureDetector(
                       onTap: () {
-                        Navigator.push(
-                            context,
-                            new MaterialPageRoute(
-                                builder: (context) => new DeliveryBoyDetails(
-                                      finalItems[index],
-                                    )));
+                        Navigator.push(context,
+                            new MaterialPageRoute(builder: (context) {
+                          print("Delivery Boy Selected ${finalItems[index]}");
+                          return new DeliveryBoyDetails(finalItems[index]);
+                        }));
                       },
                       child: Container(
                         margin: EdgeInsets.all(10.0),
                         child: Card(
                           elevation: 6.0,
-                           margin: EdgeInsets.all(4.0),
+                          margin: EdgeInsets.all(4.0),
                           child: Column(
                             children: <Widget>[
                               Table(
@@ -159,8 +155,8 @@ class DeliveryBoyState extends State<DeliveryBoy> {
                                       child: new Text(
                                         'Boy Name ',
                                         style: TextStyle(
-                                            fontSize: 14.0,
-                                            ),
+                                          fontSize: 14.0,
+                                        ),
                                       ),
                                     ),
                                     Container(
@@ -168,8 +164,8 @@ class DeliveryBoyState extends State<DeliveryBoy> {
                                       child: new Text(
                                         finalItems[index].boy_name,
                                         style: TextStyle(
-                                            fontSize: 14.0,
-                                            ),
+                                          fontSize: 14.0,
+                                        ),
                                       ),
                                     ),
                                   ]),
@@ -179,8 +175,8 @@ class DeliveryBoyState extends State<DeliveryBoy> {
                                       child: new Text(
                                         'Boy Mobile Number ',
                                         style: TextStyle(
-                                            fontSize: 14.0,
-                                            ),
+                                          fontSize: 14.0,
+                                        ),
                                       ),
                                     ),
                                     Container(
@@ -188,8 +184,8 @@ class DeliveryBoyState extends State<DeliveryBoy> {
                                       child: new Text(
                                         finalItems[index].contact_number,
                                         style: TextStyle(
-                                            fontSize: 14.0,
-                                            ),
+                                          fontSize: 14.0,
+                                        ),
                                       ),
                                     ),
                                   ]),
@@ -199,8 +195,8 @@ class DeliveryBoyState extends State<DeliveryBoy> {
                                       child: new Text(
                                         'Status ',
                                         style: TextStyle(
-                                            fontSize: 14.0,
-                                            ),
+                                          fontSize: 14.0,
+                                        ),
                                       ),
                                     ),
                                     Container(
@@ -208,8 +204,8 @@ class DeliveryBoyState extends State<DeliveryBoy> {
                                       child: new Text(
                                         finalItems[index].available_status,
                                         style: TextStyle(
-                                            fontSize: 14.0,
-                                            ),
+                                          fontSize: 14.0,
+                                        ),
                                       ),
                                     ),
                                   ])
@@ -234,7 +230,6 @@ class DeliveryBoyState extends State<DeliveryBoy> {
                                       'Add to group',
                                       style: TextStyle(
                                           fontSize: 14.0,
-                                          
                                           color: secondarycolor),
                                     ),
                                   ),
@@ -255,18 +250,14 @@ class DeliveryBoyState extends State<DeliveryBoy> {
     );
   }
 
-  void callGetDeliveryBoys() async{
-
-    var uri = Uri.http(authority, unencodedPath, {
-      "page": "getDeliveryBoys"
-    });
+  void callGetDeliveryBoys() async {
+    var uri = Uri.http(authority, unencodedPath, {"page": "getDeliveryBoys"});
 
     d(uri);
     http.Response htResponse;
     try {
       htResponse = await http.get(uri);
     } on Exception catch (e) {
-
       print("Exception OCCUred, check Network");
     }
 
@@ -299,25 +290,20 @@ pincode
               address: row["address"],
               city: row["city"],
               state: row["state"],
-              pincode: row["pincode"]
-          ));
+              pincode: row["pincode"]));
 
           setState(() {
             finalItems = listItems;
           });
-
         });
-
-
       } else {
         print("Failed Pulling Boys ");
       }
     } else {
-      print("Network Error: ${htResponse.statusCode} --- ${htResponse
-          .reasonPhrase} ");
-      s(context, "Network Error: ${htResponse.statusCode} --- ${htResponse
-          .reasonPhrase} ");
+      print(
+          "Network Error: ${htResponse.statusCode} --- ${htResponse.reasonPhrase} ");
+      s(context,
+          "Network Error: ${htResponse.statusCode} --- ${htResponse.reasonPhrase} ");
     }
-
   }
 }

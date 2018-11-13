@@ -67,9 +67,9 @@ class ListCustomerState extends State<Customers> {
 
     _searchList.clear();
     if (_isSearching != null) {
-      var mobile = controllerSearch.text;
+      var name = controllerSearch.text;
       for (int i = 0; i < listCustomers.length; i++) {
-        if (listCustomers[i].contact_number.contains(mobile)) {
+        if (listCustomers[i].customer_name.contains(name)) {
           _searchList.add(listCustomers[i]);
         }
       }
@@ -132,11 +132,11 @@ class ListCustomerState extends State<Customers> {
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0)),
                             prefixIcon: Icon(Icons.search),
-                            hintText: 'Search Customer mobile',
+                            hintText: 'Search Customer',
                             hintStyle: TextStyle(
                               color: Colors.white,
                             ),
-                            labelText: 'Search Customer mobile',
+                            labelText: 'Search Customer',
                             labelStyle: TextStyle(
                               color: Colors.black,
                             ),

@@ -7,7 +7,7 @@ import 'home.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 
-class CreateBill extends StatefulWidget {
+class CreateBillcopied extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
     CreateBillState createbillState() => new CreateBillState();
@@ -15,7 +15,7 @@ class CreateBill extends StatefulWidget {
   }
 }
 
-class CreateBillState extends State<CreateBill> {
+class CreateBillState extends State<CreateBillcopied> {
   String status;
 
   bool customersLoaded = false;

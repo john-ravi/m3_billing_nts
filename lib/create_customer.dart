@@ -524,13 +524,14 @@ address*/
       print("Call Get Citites for $newState with Id: $stateId");
 
       List citiesList = await getCitiesUtils(stateId);
+      removeloader();
+
       setState(() {
         print("Steeting state of States after returning");
         cities = citiesList;
 
         print("After get cities \n ${cities.toString()}");
       });
-      removeloader();
     } catch (e) {
       print(e);
     }
