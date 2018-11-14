@@ -31,6 +31,7 @@ import 'vacation.dart';
 import 'vacationfragment.dart';
 import 'package:http/http.dart' as http;
 
+
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
 class Home extends StatefulWidget {
@@ -53,6 +54,7 @@ class HomeState extends State<Home> {
 
   @override
   void initState() {
+    getUser();
     super.initState();
   }
 
@@ -144,7 +146,7 @@ class HomeState extends State<Home> {
                 ),
                 Container(
                   margin: EdgeInsets.only(top: 10.0),
-                  child: Text("",
+                  child: Text(userMobile ?? "",
                       style: TextStyle(fontSize: 18.0, color: Colors.white)),
                 ),
               ],
@@ -387,5 +389,15 @@ class HomeState extends State<Home> {
           ),
           title: Text('PROFILE', style: TextStyle(color: secondarycolor)))
     ];
+  }
+
+  void getUser() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+
+     setState(() {
+       userMobile = prefs.getString(CURRENT_USER);
+
+     });
   }
 }
