@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'colorspage.dart';
 import 'home.dart';
 
@@ -42,8 +43,7 @@ class MobileOTPState extends State<MobileOTP> {
          print("signInWithPhoneNumber auto succeeded: $user" + "\nGOING TO JOME PAGE");
        });
 
-       Navigator.push(context, new MaterialPageRoute(builder: (context) => Home()));
-
+gotoHome(context);
          };
 
      final PhoneVerificationFailed verificationFailed =
@@ -240,7 +240,7 @@ class MobileOTPState extends State<MobileOTP> {
                                           });
                                           if(_auth != null){
                                             if(_auth.currentUser() != null){
-                                              Navigator.push(context, new MaterialPageRoute(builder: (context) => Home()));
+                                              gotoHome(context);
                                             }
                                           }
                                         },
@@ -274,4 +274,16 @@ class MobileOTPState extends State<MobileOTP> {
       ),
     );
   }
+
+   void gotoHome(BuildContext context) async{
+
+     SharedPreferences prefs = await SharedPreferences.getInstance();
+     prefs.setBool("billingLoggedIn", true);
+     print(prefs.getBool("billingLoggedIn") ?? false);
+
+     prefs.setString("billingCurrentUser", widget.user.mobile.trim());
+     print(prefs.getString("billingCurrentUser"));
+
+     Navigator.push(context, new MaterialPageRoute(builder: (context) => Home()));
+   }
 }

@@ -122,7 +122,7 @@ pincode
       "city": selectedCity,
       "group_name": cntrlGroupName.text,
       "address": cntrlAddress.text,
-      "pincode": selectedCity
+      "pincode": cntrlPinCode.text
     });
 
     print("Printing Create Customer URI \n $uri");
