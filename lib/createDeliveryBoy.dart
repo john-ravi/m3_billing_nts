@@ -94,6 +94,10 @@ class CreateDeliveryBoyState extends State<CreateDeliveryBoy> {
                       ),
                     ),
                     keyboardType: TextInputType.text,
+                    inputFormatters: [
+                      WhitelistingTextInputFormatter(RegExp("^[A-Za-z ]+")),
+                      LengthLimitingTextInputFormatter(25),
+                    ],
                   ),
                 ),
                 Container(
@@ -114,6 +118,7 @@ class CreateDeliveryBoyState extends State<CreateDeliveryBoy> {
                       ),
                     ),
                     keyboardType: TextInputType.number,
+                    maxLength: 10,
                     inputFormatters: [
                       WhitelistingTextInputFormatter.digitsOnly,
                       LengthLimitingTextInputFormatter(10)
@@ -214,6 +219,7 @@ class CreateDeliveryBoyState extends State<CreateDeliveryBoy> {
                       ),
                     ),
                     keyboardType: TextInputType.number,
+                    maxLength: 6,
                     inputFormatters: [
                       WhitelistingTextInputFormatter.digitsOnly,
                       LengthLimitingTextInputFormatter(6)
@@ -249,7 +255,7 @@ class CreateDeliveryBoyState extends State<CreateDeliveryBoy> {
                   }
                 } else if (pincode.text.length > 0) {
                   if (pincode.text.length != 6) {
-                    s(context,"Pincode should 6 Digits");
+                    s(context,"Pincode should be 6 Digits");
                   }
                 } else {
                      checkIfBoyExists(context);
@@ -294,8 +300,11 @@ pincode*/
       "pincode": pincode.text.isEmpty ? " " : pincode.text
     });
 
+    showloader(context);
     print("Printing Create boy_name URI \n $uri");
     final response = await http.get(uri);
+
+    removeloader();
 
     if (response.statusCode == 200) {
       // If the call to the server was successful, parse the JSON
@@ -319,6 +328,7 @@ pincode*/
   }
 
   void checkIfBoyExists(BuildContext context) async {
+    showloader(context);
     var uri = new Uri.http("18.191.190.195", "/billing", {
       "page": "checkDeliveryBoy",
       "contact_number": mobile.text,
@@ -326,6 +336,7 @@ pincode*/
 
     print("Checking If Delivery Boy Exists \n $uri");
     final response = await http.get(uri);
+    removeloader();
 
     if (response.statusCode == 200) {
       // If the call to the server was successful, parse the JSON
@@ -334,29 +345,21 @@ pincode*/
 
       if (responseBody["response"].toString().compareTo("Mobile_Registered") ==
           0) {
-        print(
-            "Delivery Boy Alredy Exists, Do you want create another Delivery Boy with same mobile number?");
         s(context,
-            "Delivery Boy Alredy Exists, Do you want create another Delivery Boy with same mobile number?");
+            "Delivery Boy Alredy Exists with this Mobile Number");
 
         showDialog(
           context: context,
           builder: (context) => new AlertDialog(
-                title: new Text('Create New Delivery Boy!'),
+                title: new Text('Alert!'),
                 content: new Text(
-                    'Delivery Boy Alredy Exists, Do you want create another Delivery Boy with same mobile number?'),
+                    'Delivery Boy Alredy Exists with this Mobile Number'),
                 actions: <Widget>[
                   new FlatButton(
-                    onPressed: () => Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => DeliveryBoy())),
-                    child: new Text('No'),
-                  ),
-                  new FlatButton(
                     onPressed: () {
-                      createDeliveryBoy(context);
                       Navigator.of(context).pop();
                     },
-                    child: new Text('Yes, Create New'),
+                    child: new Text('OK'),
                   ),
                 ],
               ),

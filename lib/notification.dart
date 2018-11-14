@@ -40,8 +40,10 @@ class NotificationState extends State<Notifications> {
           child: new Icon(Icons.add),
           backgroundColor: secondarycolor,
           onPressed: () {
+/*
             Navigator.push(context,
                 new MaterialPageRoute(builder: (context) => new CreateGroup()));
+*/
           },
         ),
         body: Stack(

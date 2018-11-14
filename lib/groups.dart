@@ -1,9 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:m3_billing_nts/model_Group.dart';
 import 'colorspage.dart';
 import 'home.dart';
 import 'colorspage.dart';
 import 'create_group.dart';
+
+import 'package:http/http.dart' as http;
+
+import 'utils.dart';
 
 class Groups extends StatefulWidget {
   @override
@@ -14,6 +21,17 @@ class Groups extends StatefulWidget {
 }
 
 class GroupsState extends State<Groups> {
+
+  List<Group> listGroup = new List();
+
+  @override
+  void initState() {
+    super.initState();
+    callGetGroups();
+
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
@@ -107,14 +125,14 @@ class GroupsState extends State<Groups> {
                                     Container(
                                      margin: EdgeInsets.only( top: 25.0,left: 5.0),
                                       child: new Text(
-                                        ' : M3$index',
+                                        listGroup[index].group_name,
                                         style: TextStyle(
                                             fontSize: 14.0,
                                             ),
                                       ),
                                     ),
                                   ]),
-                                  TableRow(children: [
+/*                                  TableRow(children: [
                                     Container(
                                       margin: EdgeInsets.only( top: 10.0,left: 5.0, bottom: 25.0),
                                       child: new Text(
@@ -133,7 +151,7 @@ class GroupsState extends State<Groups> {
                                             ),
                                       ),
                                     ),
-                                  ]),
+                                  ])*/
                                 ],
                               ),
                             ],
@@ -141,7 +159,7 @@ class GroupsState extends State<Groups> {
                         ),
                       ),
                     );
-                  }, childCount: 20),
+                  }, childCount: listGroup.length),
                 )
               ],
             ),
@@ -149,5 +167,68 @@ class GroupsState extends State<Groups> {
         ),
       ),
     );
+  }
+
+  void callGetGroups() async{
+
+    var uri = Uri.http(authority, unencodedPath, {
+      "page": "getGroups"
+    });
+
+    d(uri);
+    http.Response htResponse;
+    try {
+      htResponse = await http.get(uri);
+    } on Exception catch (e) {
+
+      print("Exception OCCUred, check Network");
+    }
+
+    if (htResponse.statusCode == 200) {
+      // If the call to the server was successful, parse the JSON
+      var decodedBody = json.decode(htResponse.body);
+      print("decoded body \t" + decodedBody.toString());
+      if (decodedBody['response'].toString().compareTo("success") == 0) {
+        List rows = decodedBody['body'];
+        print("Listing Rows ${rows.toString()}");
+
+        /*
+createGroup
+
+Full texts
+id
+state
+city
+group_name
+address
+pincode
+*/
+
+        rows.forEach((row) {
+          listGroup.add(Group(
+              id: row["id"],
+              state: row["state"],
+              city: row["city"],
+              group_name: row["group_name"],
+              address: row["address"],
+              pincode: row["pincode"]
+          ));
+
+          setState(() {
+          });
+
+        });
+
+
+      } else {
+        print("Failed Pulling Item ");
+      }
+    } else {
+      print("Network Error: ${htResponse.statusCode} --- ${htResponse
+          .reasonPhrase} ");
+      s(context, "Network Error: ${htResponse.statusCode} --- ${htResponse
+          .reasonPhrase} ");
+    }
+
   }
 }

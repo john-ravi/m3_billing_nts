@@ -70,8 +70,8 @@ class MobileOTPState extends State<MobileOTP> {
      };
 
      await _auth.verifyPhoneNumber(
-         phoneNumber: "+919948039139",
-         timeout: const Duration(seconds: 7),
+         phoneNumber: "+91" + widget.user.mobile.trim(),
+         timeout: const Duration(seconds: 14),
          verificationCompleted: verificationCompleted,
          verificationFailed: verificationFailed,
          codeSent: codeSent,

@@ -13,6 +13,8 @@ import 'colorspage.dart';
 import 'user.dart';
 import 'utils.dart';
 
+import 'package:http/http.dart' as http;
+
 class CreateBill extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -239,94 +241,9 @@ class CreateBillState extends State<CreateBill> {
     showDialog(
       context: context,
       builder: (context) => new AlertDialog(
-            title: new Text('Create Bill'),
+           // title: new Text('Create Bill'),
             content: AlertBodyPaidStatus(selectedCustomer, snackContext),
-/*            actions: <Widget>[
-              new FlatButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                child: new Text('No'),
-              ),
-              new FlatButton(
-                onPressed: () {
-                  createBillOnCustomer();
-                },
-                child: new Text('Yes'),
-              ),
-            ]*/
           ),
-    );
-  }
-
-  Widget buildAlertBody() {
-    String paidStatus;
-    return Container(
-      height: 160.0,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Container(
-            margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
-            child: Text('${selectedCustomer.customer_name}'),
-          ),
-          Container(
-            margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
-            child: TextFormField(
-              controller: contrlAmount,
-              decoration: new InputDecoration(
-                contentPadding: EdgeInsets.all(10.0),
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5.0)),
-                hintText: 'Enter Amount',
-                hintStyle: TextStyle(
-                  color: Colors.white,
-                ),
-                labelText: 'Enter Amount',
-                labelStyle: TextStyle(
-                  color: Colors.black,
-                ),
-              ),
-              keyboardType: TextInputType.number,
-              inputFormatters: [
-                WhitelistingTextInputFormatter.digitsOnly,
-              ],
-            ),
-          ),
-          new Container(
-            padding: EdgeInsets.all(7.0),
-            margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
-            width: double.infinity,
-            decoration: new BoxDecoration(
-                borderRadius: new BorderRadius.circular(5.0),
-                border: new Border.all(color: Colors.black)),
-            child: DropdownButtonHideUnderline(
-              child: ButtonTheme(
-                child: new DropdownButton<String>(
-                  isDense: true,
-                  hint: new Text("Select Paid Status"),
-                  value: paidStatus == "" ? null : paidStatus,
-                  onChanged: (String newValue) {
-                    setState(() {
-                      status = newValue;
-                      paidStatus = newValue;
-                      print(
-                          "Selected paid status as $status and local is $paidStatus");
-                    });
-                    paidStatus = newValue;
-                  },
-                  items: statuslist.map((String map) {
-                    return new DropdownMenuItem<String>(
-                      value: map,
-                      child: new Text(
-                        map,
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -348,12 +265,49 @@ class _AlertBodyPaidStatusState extends State<AlertBodyPaidStatus> {
   List<String> statuslist = new List<String>();
   String paidStatus = "";
 
+  List<String> listPaidStatus = new List();
+
+
   @override
   void initState() {
-    statuslist.addAll(['PAID', 'UNPAID']);
+
+    getPaidCategories();
 
     super.initState();
   }
+
+  void getPaidCategories() async {
+    listPaidStatus.clear();
+    var uri = new Uri.http(
+        "18.191.190.195", "/billing", {"page": "getPaidCategories"});
+
+    print("getPaidCategories \n $uri");
+    final response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      // If the call to the server was successful, parse the JSON
+      var responseBody = json.decode(response.body);
+      print(responseBody.toString());
+
+      var stringResponse = responseBody["response"].toString();
+      if (stringResponse == "success") {
+        List rawList = responseBody["body"];
+        print("raw List \t ${rawList.toString()}");
+
+        rawList.forEach((rawRow) {
+          // catergory_name
+
+          listPaidStatus.add(rawRow["catergory_name"]);
+          print("list after this Iteration ${listPaidStatus.toString()}");
+
+          setState(() {
+            statuslist = listPaidStatus;
+          });
+        });
+      }
+    }
+  }
+
 
   createBillOnCustomer() async {
     var amount = contrlAmount.text;
@@ -389,94 +343,91 @@ class _AlertBodyPaidStatusState extends State<AlertBodyPaidStatus> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 260.0,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Container(
-            margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
-            child: Text('${widget.selectedCustomer.customer_name}'),
-          ),
-          Container(
-            margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
-            child: TextFormField(
-              controller: contrlAmount,
-              decoration: new InputDecoration(
-                contentPadding: EdgeInsets.all(10.0),
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5.0)),
-                hintText: 'Enter Amount',
-                hintStyle: TextStyle(
-                  color: Colors.white,
-                ),
-                labelText: 'Enter Amount',
-                labelStyle: TextStyle(
-                  color: Colors.black,
-                ),
+    return ListView(
+      shrinkWrap: true,
+      children: <Widget>[
+        Container(
+          margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
+          child: Text('${widget.selectedCustomer.customer_name}'),
+        ),
+        Container(
+          margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
+          child: TextFormField(
+            controller: contrlAmount,
+            decoration: new InputDecoration(
+              contentPadding: EdgeInsets.all(10.0),
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(5.0)),
+              hintText: 'Enter Amount',
+              hintStyle: TextStyle(
+                color: Colors.white,
               ),
-              keyboardType: TextInputType.number,
-              inputFormatters: [
-                WhitelistingTextInputFormatter.digitsOnly,
-              ],
+              labelText: 'Enter Amount',
+              labelStyle: TextStyle(
+                color: Colors.black,
+              ),
+            ),
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              WhitelistingTextInputFormatter.digitsOnly,
+            ],
+          ),
+        ),
+        new Container(
+          padding: EdgeInsets.all(7.0),
+          margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
+          width: double.infinity,
+          decoration: new BoxDecoration(
+              borderRadius: new BorderRadius.circular(5.0),
+              border: new Border.all(color: Colors.black)),
+          child: DropdownButtonHideUnderline(
+            child: ButtonTheme(
+              child: new DropdownButton<String>(
+                isDense: true,
+
+                hint: new Text("Select Paid Status"),
+                value: paidStatus == "" ? null : paidStatus,
+                onChanged: (String newValue) {
+                  setState(() {
+                    paidStatus = newValue;
+                    print("Selected paid status as $paidStatus");
+                  });
+                },
+                items: statuslist.map((String map) {
+                  return new DropdownMenuItem<String>(
+                    value: map,
+                    child: new Text(
+                      map,
+                    ),
+                  );
+                }).toList(),
+              ),
             ),
           ),
-          new Container(
+        ),
+        Container(
             padding: EdgeInsets.all(7.0),
             margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
             width: double.infinity,
             decoration: new BoxDecoration(
                 borderRadius: new BorderRadius.circular(5.0),
                 border: new Border.all(color: Colors.black)),
-            child: DropdownButtonHideUnderline(
-              child: ButtonTheme(
-                child: new DropdownButton<String>(
-                  isDense: true,
-
-                  hint: new Text("Select Paid Status"),
-                  value: paidStatus == "" ? null : paidStatus,
-                  onChanged: (String newValue) {
-                    setState(() {
-                      paidStatus = newValue;
-                      print("Selected paid status as $paidStatus");
-                    });
-                  },
-                  items: statuslist.map((String map) {
-                    return new DropdownMenuItem<String>(
-                      value: map,
-                      child: new Text(
-                        map,
-                      ),
-                    );
-                  }).toList(),
+            child: Row(
+              children: <Widget>[
+                new FlatButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: new Text('No'),
                 ),
-              ),
-            ),
-          ),
-          Container(
-              padding: EdgeInsets.all(7.0),
-              margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
-              width: double.infinity,
-              decoration: new BoxDecoration(
-                  borderRadius: new BorderRadius.circular(5.0),
-                  border: new Border.all(color: Colors.black)),
-              child: Row(
-                children: <Widget>[
-                  new FlatButton(
-                    onPressed: () => Navigator.of(context).pop(true),
-                    child: new Text('No'),
-                  ),
-                  new FlatButton(
-                    onPressed: () {
+                new FlatButton(
+                  onPressed: () {
 
-                      createBillOnCustomer();
-                    },
-                    child: new Text('Yes'),
-                  ),
-                ],
-              )),
-        ],
-      ),
+                    createBillOnCustomer();
+                  },
+                  child: new Text('Yes'),
+                ),
+              ],
+            )),
+      ],
     );
 
   }

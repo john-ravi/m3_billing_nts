@@ -80,7 +80,14 @@ class CreateCustomerState extends State<CreateCustomer> {
                 fit: BoxFit.cover,
                 width: double.infinity,
               ),
-              buildSingleChildScrollView(context)
+              Container(
+                margin: EdgeInsets.only(
+                    right: 10.0, left: 10.0, bottom: 42.0),
+                child: Card(
+                  elevation: 6.0,
+                  child: buildForm(context),
+                ),
+              ),
             ],
           );
         }),
@@ -88,304 +95,266 @@ class CreateCustomerState extends State<CreateCustomer> {
     );
   }
 
-  SingleChildScrollView buildSingleChildScrollView(BuildContext context) {
-    return SingleChildScrollView(
-      child: new Center(
-        child: SizedBox(
-          height: 550.0,
-          child: Stack(
-            children: <Widget>[
-              Container(
-                height: 540.0,
-                child: Card(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0)),
-                  elevation: 6.0,
-                  margin: EdgeInsets.all(10.0),
-                  child: Form(
-                    autovalidate: true,
-                    key: _formKey,
-                    child: new ListView(
-                      children: <Widget>[
-                        Container(
-                          margin: EdgeInsets.only(
-                              top: 10.0, right: 10.0, left: 10.0),
-                          child: TextFormField(
-                            textInputAction: TextInputAction.continueAction,
-                            controller: controllerName,
-                            decoration: new InputDecoration(
-                              contentPadding: EdgeInsets.all(10.0),
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(5.0)),
-                              hintText: 'Enter Customer Name',
-                              hintStyle: TextStyle(
-                                color: Colors.white,
-                              ),
-                              labelText: 'Enter Customer Name',
-                              labelStyle: TextStyle(
-                                color: Colors.black,
-                              ),
-                            ),
-                            keyboardType: TextInputType.text,
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(
-                              top: 10.0, right: 10.0, left: 10.0),
-                          child: TextFormField(
-                            textInputAction: TextInputAction.continueAction,
-                            controller: ctrlMobile,
-                            decoration: new InputDecoration(
-                              contentPadding: EdgeInsets.all(10.0),
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(5.0)),
-                              hintText: 'Enter Contact Number',
-                              hintStyle: TextStyle(
-                                color: Colors.white,
-                              ),
-                              labelText: 'Enter Contact Number',
-                              labelStyle: TextStyle(
-                                color: Colors.black,
-                              ),
-                            ),
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              WhitelistingTextInputFormatter.digitsOnly,
-                              LengthLimitingTextInputFormatter(10),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          alignment: Alignment.bottomLeft,
-                          margin: EdgeInsets.only(
-                              top: 10.0, right: 10.0, left: 10.0),
-                          child: Text('Other Info (Optional)',
-                              style: TextStyle(
-                                  fontSize: 16.0, color: Colors.black)),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(
-                              top: 10.0, right: 10.0, left: 10.0),
-                          child: TextFormField(
-                            controller: ctrlMail,
-                            decoration: new InputDecoration(
-                              contentPadding: EdgeInsets.all(10.0),
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(5.0)),
-                              hintText: 'Enter Email',
-                              hintStyle: TextStyle(
-                                color: Colors.white,
-                              ),
-                              labelText: 'Enter Email',
-                              labelStyle: TextStyle(
-                                color: Colors.black,
-                              ),
-                            ),
-                            keyboardType: TextInputType.emailAddress,
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(
-                              top: 10.0, right: 10.0, left: 10.0),
-                          child: TextFormField(
-                            controller: ctrlGST,
-                            decoration: new InputDecoration(
-                              contentPadding: EdgeInsets.all(10.0),
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(5.0)),
-                              hintText: 'Enter Gst Number',
-                              hintStyle: TextStyle(
-                                color: Colors.white,
-                              ),
-                              labelText: 'Enter Gst Number',
-                              labelStyle: TextStyle(
-                                color: Colors.black,
-                              ),
-                            ),
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              WhitelistingTextInputFormatter.digitsOnly,
-                            ],
-                          ),
-                        ),
-                        Container(
-                          alignment: Alignment.bottomLeft,
-                          margin: EdgeInsets.only(
-                              top: 10.0, right: 10.0, left: 10.0),
-                          child: Text('Address Details (Optional)',
-                              style: TextStyle(
-                                  fontSize: 16.0, color: Colors.black)),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(
-                              top: 10.0, right: 10.0, left: 10.0),
-                          child: TextFormField(
-                            controller: ctrlAddress,
-                            decoration: new InputDecoration(
-                              contentPadding: EdgeInsets.all(10.0),
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(5.0)),
-                              hintText: 'Enter Address',
-                              hintStyle: TextStyle(
-                                color: Colors.white,
-                              ),
-                              labelText: 'Enter Address',
-                              labelStyle: TextStyle(
-                                color: Colors.black,
-                              ),
-                            ),
-                            keyboardType: TextInputType.text,
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(
-                              top: 10.0, right: 10.0, left: 10.0),
-                          width: double.infinity,
-                          decoration: ShapeDecoration(
-                            shape: RoundedRectangleBorder(
-                              side: BorderSide(
-                                  width: 1.0, style: BorderStyle.solid),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(5.0)),
-                            ),
-                          ),
-                          child: DropdownButtonHideUnderline(
-                            child: Container(
-                              margin: EdgeInsets.only(left: 10.0, right: 10.0),
-                              child: new DropdownButton<String>(
-                                hint: new Text("Select State"),
-                                value:
-                                    selectedState == "" ? null : selectedState,
-                                onChanged: (String newValue) {
-                                  setState(() {
-                                    selectedState = newValue;
-                                    selectedCity = "";
-                                  });
-                                  callGetCities(newValue);
-                                },
-                                items: mapStates.keys.map((state) {
-                                  return new DropdownMenuItem<String>(
-                                    value: state,
-                                    child: Text(state),
-                                  );
-                                }).toList(),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(
-                              top: 10.0, right: 10.0, left: 10.0),
-                          width: double.infinity,
-                          decoration: ShapeDecoration(
-                            shape: RoundedRectangleBorder(
-                              side: BorderSide(
-                                  width: 1.0, style: BorderStyle.solid),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(5.0)),
-                            ),
-                          ),
-                          child: DropdownButtonHideUnderline(
-                            child: Container(
-                              margin: EdgeInsets.only(left: 10.0, right: 10.0),
-                              child: new DropdownButton<String>(
-                                hint: new Text("Select City"),
-                                value: selectedCity == "" ? null : selectedCity,
-                                onChanged: (String newValue) {
-                                  print("Printing Changed City $newValue");
-                                  setState(() {
-                                    selectedCity = newValue;
-                                  });
-                                },
-                                items: cities.map((city) {
-                                  return new DropdownMenuItem<String>(
-                                    value: city,
-                                    child: Text(city),
-                                  );
-                                }).toList(),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(
-                              top: 10.0, right: 10.0, left: 10.0),
-                          child: TextFormField(
-                            controller: ctrlPincode,
-                            decoration: new InputDecoration(
-                              contentPadding: EdgeInsets.all(10.0),
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(5.0)),
-                              hintText: 'Pincode',
-                              hintStyle: TextStyle(
-                                color: Colors.white,
-                              ),
-                              labelText: 'Pincode',
-                              labelStyle: TextStyle(
-                                color: Colors.black,
-                              ),
-                            ),
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              WhitelistingTextInputFormatter.digitsOnly,
-                              LengthLimitingTextInputFormatter(6),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          alignment: Alignment.bottomCenter,
-                          margin: EdgeInsets.only(top: 24.0),
-                          child: ConstrainedBox(
-                            constraints: new BoxConstraints(minWidth: 250.0),
-                            child: new RaisedButton(
-                              onPressed: () {
-                                if (controllerName.text.length < 2) {
-                                  s(context,
-                                      "Customer name should be atleast two letters");
-                                } else if (ctrlMobile.text.length != 10) {
-                                  s(context, "Mobile should be 10 Digits");
-                                } else if (ctrlMail.text.length > 0) {
-                                  if (!isEmail(ctrlMail.text)) {
-                                    s(context, "Please enter a valid email id");
-                                  }
-                                } else if (ctrlGST.text.length > 0) {
-                                  if (!ctrlGST.text.startsWith("GSTIN") ||
-                                      !ctrlGST.text.startsWith("gstin")) {
-                                    s(context, "GST number starts with GSTIN");
-                                  }
-                                } else if (ctrlAddress.text.length > 35) {
-                                  s(context,
-                                      "Address should not cross 35 characters");
-                                } else if (ctrlCity.text.length > 15) {
-                                  s(context,
-                                      "City should not cross 15 characters");
-                                } else if (ctrlState.text.length > 15) {
-                                  s(context,
-                                      "State should not cross 15 characters");
-                                } else {
-                                  checkIfCustomerExists(context);
-                                }
-                              },
-                              color: primarycolor,
-                              shape: new RoundedRectangleBorder(
-                                  borderRadius:
-                                      new BorderRadius.circular(30.0)),
-                              child: new Text('CREATE CUSTOMER',
-                                  style: new TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16.0,
-                                  )),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+
+  Form buildForm(BuildContext context) {
+    return Form(
+      autovalidate: true,
+      key: _formKey,
+      child: new ListView(
+        children: <Widget>[
+          Container(
+            margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
+            child: TextFormField(
+              controller: controllerName,
+              decoration: new InputDecoration(
+                contentPadding: EdgeInsets.all(10.0),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5.0)),
+                hintText: 'Enter Name',
+                hintStyle: TextStyle(
+                  color: Colors.white,
+                ),
+                labelText: 'Enter Name',
+                labelStyle: TextStyle(
+                  color: Colors.black,
                 ),
               ),
-            ],
+              keyboardType: TextInputType.text,
+              inputFormatters: [
+                WhitelistingTextInputFormatter(RegExp("^[A-Za-z ]+")),
+              ],
+            ),
           ),
-        ),
+          Container(
+            margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
+            child: TextFormField(
+              controller: ctrlMobile,
+              decoration: new InputDecoration(
+                contentPadding: EdgeInsets.all(10.0),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5.0)),
+                hintText: 'Mobile No:',
+                hintStyle: TextStyle(
+                  color: Colors.white,
+                ),
+                labelText: 'Mobile No:',
+                labelStyle: TextStyle(
+                  color: Colors.black,
+                ),
+              ),
+              keyboardType: TextInputType.number,
+              maxLength: 10,
+              inputFormatters: [
+                WhitelistingTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(10),
+              ],
+            ),
+          ),
+          Container(
+            alignment: Alignment.bottomLeft,
+            margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
+            child: Text('Other Info (Optional)',
+                style: TextStyle(fontSize: 16.0, color: Colors.black)),
+          ),
+          Container(
+            margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
+            child: TextFormField(
+              controller: ctrlMail,
+              decoration: new InputDecoration(
+                contentPadding: EdgeInsets.all(10.0),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5.0)),
+                hintText: 'Enter Email',
+                hintStyle: TextStyle(
+                  color: Colors.white,
+                ),
+                labelText: 'Enter Email',
+                labelStyle: TextStyle(
+                  color: Colors.black,
+                ),
+              ),
+              keyboardType: TextInputType.emailAddress,
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
+            child: TextFormField(
+              controller: ctrlGST,
+              decoration: new InputDecoration(
+                contentPadding: EdgeInsets.all(10.0),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5.0)),
+                hintText: 'Enter Gst Number',
+                hintStyle: TextStyle(
+                  color: Colors.white,
+                ),
+                labelText: 'Enter Gst Number',
+                labelStyle: TextStyle(
+                  color: Colors.black,
+                ),
+              ),
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                WhitelistingTextInputFormatter.digitsOnly,
+              ],
+            ),
+          ),
+          Container(
+            alignment: Alignment.bottomLeft,
+            margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
+            child: Text('Address Details (Optional)',
+                style: TextStyle(fontSize: 16.0, color: Colors.black)),
+          ),
+          Container(
+            margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
+            child: TextFormField(
+              controller: ctrlAddress,
+              decoration: new InputDecoration(
+                contentPadding: EdgeInsets.all(10.0),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5.0)),
+                hintText: 'Enter Address',
+                hintStyle: TextStyle(
+                  color: Colors.white,
+                ),
+                labelText: 'Enter Address',
+                labelStyle: TextStyle(
+                  color: Colors.black,
+                ),
+              ),
+              keyboardType: TextInputType.text,
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
+            width: double.infinity,
+            decoration: ShapeDecoration(
+              shape: RoundedRectangleBorder(
+                side: BorderSide(width: 1.0, style: BorderStyle.solid),
+                borderRadius: BorderRadius.all(Radius.circular(5.0)),
+              ),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: Container(
+                margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                child: new DropdownButton<String>(
+                  hint: new Text("Select State"),
+                  value: selectedState == "" ? null : selectedState,
+                  onChanged: (String newValue) {
+                    setState(() {
+                      selectedState = newValue;
+                      selectedCity = "";
+                    });
+                    callGetCities(newValue);
+                  },
+                  items: mapStates.keys.map((state) {
+                    return new DropdownMenuItem<String>(
+                      value: state,
+                      child: Text(state),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
+            width: double.infinity,
+            decoration: ShapeDecoration(
+              shape: RoundedRectangleBorder(
+                side: BorderSide(width: 1.0, style: BorderStyle.solid),
+                borderRadius: BorderRadius.all(Radius.circular(5.0)),
+              ),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: Container(
+                margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                child: new DropdownButton<String>(
+                  hint: new Text("Select City"),
+                  value: selectedCity == "" ? null : selectedCity,
+                  onChanged: (String newValue) {
+                    print("Printing Changed City $newValue");
+                    setState(() {
+                      selectedCity = newValue;
+                    });
+                  },
+                  items: cities.map((city) {
+                    return new DropdownMenuItem<String>(
+                      value: city,
+                      child: Text(city),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
+            child: TextFormField(
+              controller: ctrlPincode,
+              decoration: new InputDecoration(
+                contentPadding: EdgeInsets.all(10.0),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5.0)),
+                hintText: 'Pincode',
+                hintStyle: TextStyle(
+                  color: Colors.white,
+                ),
+                labelText: 'Pincode',
+                labelStyle: TextStyle(
+                  color: Colors.black,
+                ),
+              ),
+              keyboardType: TextInputType.number,
+              maxLength: 6,
+              inputFormatters: [
+                WhitelistingTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(6),
+              ],
+            ),
+          ),
+          Container(
+            alignment: Alignment.bottomCenter,
+            margin: EdgeInsets.only(top: 24.0),
+            child: ConstrainedBox(
+              constraints: new BoxConstraints(minWidth: 250.0),
+              child: new RaisedButton(
+                onPressed: () {
+                  if (controllerName.text.length < 2) {
+                    s(context, "Customer name should be atleast two letters");
+                  } else if (ctrlMobile.text.length != 10) {
+                    s(context, "Mobile should be 10 Digits");
+                  } else if (ctrlMail.text.length > 0) {
+                    if (!isEmail(ctrlMail.text)) {
+                      s(context, "Please enter a valid email id");
+                    }
+                  } else if (ctrlGST.text.length > 0) {
+                    if (!ctrlGST.text.startsWith("GSTIN") ||
+                        !ctrlGST.text.startsWith("gstin")) {
+                      s(context, "GST number starts with GSTIN");
+                    }
+                  } else if (ctrlAddress.text.length > 35) {
+                    s(context, "Address should not cross 35 characters");
+                  } else if (ctrlCity.text.length > 15) {
+                    s(context, "City should not cross 15 characters");
+                  } else if (ctrlState.text.length > 15) {
+                    s(context, "State should not cross 15 characters");
+                  } else {
+                    checkIfCustomerExists(context);
+                  }
+                },
+                color: primarycolor,
+                shape: new RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(30.0)),
+                child: new Text('CREATE CUSTOMER',
+                    style: new TextStyle(
+                      color: Colors.white,
+                      fontSize: 16.0,
+                    )),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -400,6 +369,7 @@ address*/
 
     print("Mobile ${ctrlMobile.text}");
 
+    showloader(context);
     var uri = new Uri.http("18.191.190.195", "/billing", {
       "page": "checkCustomerMobile",
       "contact_number": ctrlMobile.text,
@@ -416,28 +386,29 @@ address*/
       if (responseBody["response"].toString().compareTo("Mobile_Registered") ==
           0) {
         print(
-            "Customer Alredy Exists, Do you want create another customer with same mobile number?");
-        s(context,
-            "Customer Alredy Exists, Do you want create another customer with same mobile number?");
+            "Customer Already Exists, Do you want create another customer with same mobile number?");
 
+        removeloader();
         showDialog(
           context: context,
           builder: (context) => new AlertDialog(
-                title: new Text('Create New Customer!'),
-                content: new Text(
-                    'Customer Alredy Exists, Do you want create another customer with same mobile number?'),
+                title: new Text('Alert!'),
+                content:
+                    new Text('Customer Already Exists for this Mobile Number'),
                 actions: <Widget>[
+/*
                   new FlatButton(
                     onPressed: () => Navigator.push(context,
                         MaterialPageRoute(builder: (context) => Customers())),
                     child: new Text('No'),
                   ),
+*/
                   new FlatButton(
                     onPressed: () {
                       createCustomer(context);
                       Navigator.of(context).pop();
                     },
-                    child: new Text('Yes, Create New'),
+                    child: new Text('Ok'),
                   ),
                 ],
               ),
@@ -469,6 +440,7 @@ address*/
     print("Printing Create Customer URI \n $uri");
     final response = await http.get(uri);
 
+    removeloader();
     if (response.statusCode == 200) {
       // If the call to the server was successful, parse the JSON
       var responseBody = json.decode(response.body);
