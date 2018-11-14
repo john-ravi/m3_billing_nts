@@ -105,7 +105,14 @@ pincode
         authority, unencodedPath, {"page": "getMyProfile", "user_id": userId});
 
     d(uri);
-    http.Response registerUserResponse = await http.get(uri);
+    http.Response registerUserResponse;
+    try {
+      registerUserResponse = await http.get(uri);
+    } catch (e) {
+      print(e);
+
+     // await Duration()
+    }
     List<User> listUser = new List();
 
     if (registerUserResponse.statusCode == 200) {
