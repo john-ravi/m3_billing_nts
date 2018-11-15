@@ -3,20 +3,25 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:m3_billing_nts/model_group.dart';
 import 'package:m3_billing_nts/utils.dart';
 import 'colorspage.dart';
 import 'groups.dart';
 import 'package:http/http.dart' as http;
 
-class CreateGroup extends StatefulWidget {
+class EditGroup extends StatefulWidget {
+ final Group group;
+
+  EditGroup(this.group);
+
   @override
   State<StatefulWidget> createState() {
-    CreateGroupState createGroupState() => new CreateGroupState();
-    return createGroupState();
+    EditGroupState eGroupState() => new EditGroupState();
+    return eGroupState();
   }
 }
 
-class CreateGroupState extends State<CreateGroup> {
+class EditGroupState extends State<EditGroup> {
   TextEditingController cntrlGroupName = new TextEditingController();
   TextEditingController cntrlAddress = new TextEditingController();
   TextEditingController cntrlPinCode = new TextEditingController();
@@ -29,6 +34,8 @@ class CreateGroupState extends State<CreateGroup> {
   void initState() {
     callGetStates();
 
+    selectedState = widget.group.state;
+    selectedCity = widget.group.city;
     super.initState();
   }
 
@@ -38,7 +45,7 @@ class CreateGroupState extends State<CreateGroup> {
       theme: ThemeData(fontFamily: 'Georgia'),
       home: Scaffold(
         appBar: new AppBar(
-          title: Text('Create Group'),
+          title: Text('Edit Group'),
           backgroundColor: secondarycolor,
           leading: new IconButton(
               iconSize: 18.0,
@@ -57,7 +64,8 @@ class CreateGroupState extends State<CreateGroup> {
               width: double.infinity,
             ),
             new Center(
-              child: Builder(builder: (context) => buildSingleChildScrollView(context)),
+              child: Builder(
+                  builder: (context) => buildSingleChildScrollView(context)),
             )
           ],
         ),
@@ -67,41 +75,41 @@ class CreateGroupState extends State<CreateGroup> {
 
   SingleChildScrollView buildSingleChildScrollView(BuildContext context) {
     return SingleChildScrollView(
-              child: SizedBox(
-                height: 410.0,
-                child: Stack(
-                  children: <Widget>[
-                    buildContainer(),
-                    Container(
-                      alignment: Alignment.bottomCenter,
-                      child: ConstrainedBox(
-                        constraints: new BoxConstraints(minWidth: 250.0),
-                        child: new RaisedButton(
-                          onPressed: () {
-                            if (cntrlGroupName.text.isEmpty) {
-                              s(context, "Please enter a Group Name");
-                            } else if (cntrlPinCode.text.isNotEmpty &&
-                                cntrlPinCode.text.length != 6) {
-                              s(context, "Please enter 6 digit pincode");
-                            } else {
-                              createGroup(context);
-                            }
-                          },
-                          color: primarycolor,
-                          shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(30.0)),
-                          child: new Text('Create Group',
-                              style: new TextStyle(
-                                color: Colors.white,
-                                fontSize: 16.0,
-                              )),
-                        ),
-                      ),
-                    )
-                  ],
+      child: SizedBox(
+        height: 410.0,
+        child: Stack(
+          children: <Widget>[
+            buildContainer(),
+            Container(
+              alignment: Alignment.bottomCenter,
+              child: ConstrainedBox(
+                constraints: new BoxConstraints(minWidth: 250.0),
+                child: new RaisedButton(
+                  onPressed: () {
+                    if (cntrlGroupName.text.isEmpty) {
+                      s(context, "Please enter Group Name");
+                    } else if (cntrlPinCode.text.isNotEmpty &&
+                        cntrlPinCode.text.length != 6) {
+                      s(context, "Please enter 6 digit pincode");
+                    } else {
+                  //    createGroup(context);
+                    }
+                  },
+                  color: primarycolor,
+                  shape: new RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(30.0)),
+                  child: new Text('Edit Group',
+                      style: new TextStyle(
+                        color: Colors.white,
+                        fontSize: 16.0,
+                      )),
                 ),
               ),
-            );
+            )
+          ],
+        ),
+      ),
+    );
   }
 
   void createGroup(BuildContext context) async {
@@ -162,6 +170,7 @@ pincode
               margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
               child: TextFormField(
                 controller: cntrlGroupName,
+                initialValue: widget.group.group_name,
                 decoration: new InputDecoration(
                   contentPadding: EdgeInsets.all(10.0),
                   border: OutlineInputBorder(
@@ -277,6 +286,8 @@ pincode
               margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
               child: TextFormField(
                 controller: cntrlPinCode,
+
+                initialValue: widget.group.pincode,
                 decoration: new InputDecoration(
                   contentPadding: EdgeInsets.all(10.0),
                   border: OutlineInputBorder(
@@ -310,6 +321,8 @@ pincode
       setState(() {
         print("Steeting state of States after returning");
         mapStates = statesMap;
+        selectedState = widget.group.state;
+
       });
     } catch (e) {
       // print(e);
@@ -331,6 +344,8 @@ pincode
       setState(() {
         print("Steeting state of States after returning");
         cities = citiesList;
+
+        selectedCity = widget.group.city;
 
         print("After get cities \n ${cities.toString()}");
       });

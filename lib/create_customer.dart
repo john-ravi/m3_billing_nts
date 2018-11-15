@@ -81,8 +81,7 @@ class CreateCustomerState extends State<CreateCustomer> {
                 width: double.infinity,
               ),
               Container(
-                margin: EdgeInsets.only(
-                    right: 10.0, left: 10.0, bottom: 42.0),
+                margin: EdgeInsets.only(right: 10.0, left: 10.0, bottom: 42.0),
                 child: Card(
                   elevation: 6.0,
                   child: buildForm(context),
@@ -94,7 +93,6 @@ class CreateCustomerState extends State<CreateCustomer> {
       ),
     );
   }
-
 
   Form buildForm(BuildContext context) {
     return Form(
@@ -324,15 +322,13 @@ class CreateCustomerState extends State<CreateCustomer> {
                     s(context, "Customer name should be atleast two letters");
                   } else if (ctrlMobile.text.length != 10) {
                     s(context, "Mobile should be 10 Digits");
-                  } else if (ctrlMail.text.length > 0) {
-                    if (!isEmail(ctrlMail.text)) {
-                      s(context, "Please enter a valid email id");
-                    }
-                  } else if (ctrlGST.text.length > 0) {
-                    if (!ctrlGST.text.startsWith("GSTIN") ||
-                        !ctrlGST.text.startsWith("gstin")) {
-                      s(context, "GST number starts with GSTIN");
-                    }
+                  } else if (ctrlMail.text.length > 0 &&
+                      !isEmail(ctrlMail.text)) {
+                    s(context, "Please enter a valid email id");
+                  } else if (ctrlGST.text.length > 0 &&
+                      (!ctrlGST.text.startsWith("GSTIN") ||
+                          !ctrlGST.text.startsWith("gstin"))) {
+                    s(context, "GST number starts with GSTIN");
                   } else if (ctrlAddress.text.length > 35) {
                     s(context, "Address should not cross 35 characters");
                   } else if (ctrlCity.text.length > 15) {
@@ -416,7 +412,7 @@ address*/
       } else {
         print("Customer Mobile Not REgisted calling create ");
         createCustomer(context);
-        s(_scaffoldKey.currentState.context, "Creating Customer");
+        s(context, "Creating Customer");
       }
     } else {
       // If that call was not successful, throw an error.
@@ -448,7 +444,7 @@ address*/
 
       if (responseBody["response"].toString().compareTo("success") == 0) {
         s(
-            _scaffoldKey.currentState.context,
+            context,
             "Customer Created as " +
                 controllerName.text +
                 " with Mobile " +
@@ -462,7 +458,7 @@ address*/
         ctrlCity.clear();
         ctrlPincode.clear();
       } else {
-        s(_scaffoldKey.currentState.context,
+        s(context,
             "Failed Adding Customer, Please Retry!");
       }
     } else {

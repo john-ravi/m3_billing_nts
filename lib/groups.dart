@@ -2,7 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:m3_billing_nts/model_Group.dart';
+import 'package:m3_billing_nts/edit_group.dart';
+import 'package:m3_billing_nts/model_group.dart';
 import 'colorspage.dart';
 import 'home.dart';
 import 'colorspage.dart';
@@ -103,6 +104,11 @@ class GroupsState extends State<Groups> {
                   delegate: new SliverChildBuilderDelegate(
                       (BuildContext context, int index) {
                     return GestureDetector(
+                      onTap: () {
+
+                        EditGroup(listGroup[index]);
+                      },
+
                       child: Container(
                         margin: EdgeInsets.all(10.0),
                         child: Card(
@@ -112,18 +118,21 @@ class GroupsState extends State<Groups> {
                             children: <Widget>[
                               Table(
                                 children: [
-                                  TableRow(children: [
+                                  TableRow(
+                                      children: [
                                     Container(
-                                      margin: EdgeInsets.only( top: 25.0,left: 5.0),
+
+                                      margin: EdgeInsets.all( 7.0),
                                       child: new Text(
                                         'Group Name ',
                                         style: TextStyle(
                                             fontSize: 14.0,
+
                                             ),
                                       ),
                                     ),
                                     Container(
-                                     margin: EdgeInsets.only( top: 25.0,left: 5.0),
+                                     margin: EdgeInsets.all(  7.0),
                                       child: new Text(
                                         listGroup[index].group_name,
                                         style: TextStyle(

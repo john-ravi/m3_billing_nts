@@ -51,7 +51,7 @@ class DeliveryBoyDetailsState extends State<DeliveryBoyDetails>
                   Navigator.push(
                       context,
                       new MaterialPageRoute(
-                          builder: (context) => new DeliveryBoy()));
+                          builder: (context) => new DeliveryBoys()));
                 }),
             bottom: TabBar(
               controller: deliverycontroller,

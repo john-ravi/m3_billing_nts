@@ -7,6 +7,7 @@ import 'package:m3_billing_nts/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'colorspage.dart';
 import 'home.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:http/http.dart' as http;
 
@@ -19,11 +20,10 @@ class ProfileFragment extends StatefulWidget {
 }
 
 class ProfileFragmentState extends State<ProfileFragment> {
-  String flatNo= "";
+  String flatNo = "";
   String name = "";
   String mobile = "";
   String email, street, area, city, pincode;
-
 
   TextEditingController cntrlFlatNo = new TextEditingController();
   TextEditingController cntrlEmail = new TextEditingController();
@@ -44,27 +44,22 @@ class ProfileFragmentState extends State<ProfileFragment> {
   }
 
   void updateAddress(BuildContext context) async {
-    String validEmail;
-    if (cntrlEmail.text.isNotEmpty) {
-      if (!isEmail(cntrlEmail.text)) {
-        s(context, "Please Enter a Valid Email");
-      } else {
-        validEmail = cntrlEmail.text;
-      }
-    }
+    if (cntrlEmail.text.isNotEmpty && !isEmail(cntrlEmail.text)) {
+      s(context, "Please Enter a Valid Email");
+    } else {
+      var uri = Uri.http(authority, unencodedPath, {
+        "page": "updateProfile",
+        "email_id": cntrlEmail.text,
+        "flat_no": cntrlFlatNo.text,
+        "street": cntrlStreet.text,
+        "area": cntrlArea.text,
+        "city": cntrlCity.text,
+        "pincode": cntrlPincode.text,
+        "mobile_number": user.mobile
+        /** Not updating mobile but passing for where mobile = clause*/
+      });
 
-    var uri = Uri.http(authority, unencodedPath, {
-      "page": "updateProfile",
-      "email_id": cntrlEmail.text,
-      "flat_no": cntrlFlatNo.text,
-      "street": cntrlStreet.text,
-      "area": cntrlArea.text,
-      "city": cntrlCity.text,
-      "pincode": cntrlPincode.text,
-      "mobile_number": user.mobile
-    });
-
-    /*
+      /*
 
 user_id
 user_name
@@ -76,25 +71,34 @@ city
 pincode
 */
 
-    d(uri);
-    http.Response registerUserResponse = await http.get(uri);
+      d(uri);
+      http.Response registerUserResponse = await http.get(uri);
 
-    if (registerUserResponse.statusCode == 200) {
-      // If the call to the server was successful, parse the JSON
-      var decodedBody = json.decode(registerUserResponse.body);
-      print("decoded body \t" + decodedBody.toString());
-      if (decodedBody['response'].toString().compareTo("success") == 0) {
-        s(context, "Successfully Updated ${user.username}");
+      if (registerUserResponse.statusCode == 200) {
+        // If the call to the server was successful, parse the JSON
+        var decodedBody = json.decode(registerUserResponse.body);
+        print("decoded body \t" + decodedBody.toString());
+        if (decodedBody['response'].toString().compareTo("success") == 0) {
+          s(context, "Successfully Updated ${user.username}");
+          Fluttertoast.showToast(
+              msg: "Successfully Updated ${user.username}",
+              toastLength: Toast.LENGTH_LONG,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIos: 4,
+
+              textcolor: '#ffffff'
+          );
+        } else {
+          s(context, "Failed Update, please retry");
+        }
       } else {
-        s(context, "Failed Update, please retry");
+        print("Please Check Network: ");
       }
-    } else {
-      print("Please Check Network: ");
-    }
 
-    Navigator.push(
-        context, new MaterialPageRoute(builder: (context) => new Home()));
-  }
+      Navigator.push(
+          context, new MaterialPageRoute(builder: (context) => new Home()));
+    }
+  } // UPDATE Adress
 
   getProfile() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -111,7 +115,7 @@ pincode
     } catch (e) {
       print(e);
 
-     // await Duration()
+      // await Duration()
     }
     List<User> listUser = new List();
 
@@ -156,6 +160,7 @@ pincode
           print("List as Whiole \t" + listUser.toString());
         });
 
+
         setState(() {
           user = listUser[0];
           cntrlPincode.text = user.pincode;
@@ -166,7 +171,6 @@ pincode
           cntrlEmail.text = user.email;
           name = user.username;
           mobile = user.mobile;
-
 
           print("My Profile PRINTING $user");
         });
@@ -180,8 +184,6 @@ pincode
 
   @override
   Widget build(BuildContext context) {
-
-
     return Stack(
       children: <Widget>[
         new Image.asset(
@@ -189,13 +191,10 @@ pincode
           fit: BoxFit.cover,
           width: double.infinity,
         ),
-
         Container(
           margin: EdgeInsets.only(right: 10.0, left: 10.0, bottom: 42.0),
-
           child: Card(
             elevation: 6.0,
-
             child: ListView(
               children: <Widget>[
                 Container(
@@ -263,20 +262,20 @@ pincode
                   ),
                 ),
                 new Padding(
-                  padding: const EdgeInsets.only(left:16.0, top: 16.0, right: 16.0),
+                  padding:
+                      const EdgeInsets.only(left: 16.0, top: 16.0, right: 16.0),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
                       Icon(
                         FontAwesomeIcons.envelope,
                         color: secondarycolor,
-
                       ),
-                      Padding(padding: EdgeInsets.only(left: 16.0),),
+                      Padding(
+                        padding: EdgeInsets.only(left: 16.0),
+                      ),
                       Expanded(
-
                         child: new Column(
-
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
                             new TextField(
@@ -286,32 +285,29 @@ pincode
                               ),
                               maxLines: 1,
                               controller: cntrlEmail,
-
                             ),
                             const Padding(padding: EdgeInsets.only(top: 8.0)),
-
                           ],
                         ),
                       ),
                     ],
                   ),
                 ),
-
                 new Padding(
-                  padding: const EdgeInsets.only(left:16.0, top: 16.0, right: 16.0),
+                  padding:
+                      const EdgeInsets.only(left: 16.0, top: 16.0, right: 16.0),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
                       Icon(
                         FontAwesomeIcons.home,
                         color: secondarycolor,
-
                       ),
-                      Padding(padding: EdgeInsets.only(left: 16.0),),
+                      Padding(
+                        padding: EdgeInsets.only(left: 16.0),
+                      ),
                       Expanded(
-
                         child: new Column(
-
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
                             new TextField(
@@ -323,7 +319,6 @@ pincode
                               controller: cntrlFlatNo,
                             ),
                             const Padding(padding: EdgeInsets.only(top: 8.0)),
-
                           ],
                         ),
                       ),
@@ -331,20 +326,20 @@ pincode
                   ),
                 ),
                 new Padding(
-                  padding: const EdgeInsets.only(left:16.0, top: 16.0, right: 16.0),
+                  padding:
+                      const EdgeInsets.only(left: 16.0, top: 16.0, right: 16.0),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
                       Icon(
                         FontAwesomeIcons.home,
                         color: secondarycolor,
-
                       ),
-                      Padding(padding: EdgeInsets.only(left: 16.0),),
+                      Padding(
+                        padding: EdgeInsets.only(left: 16.0),
+                      ),
                       Expanded(
-
                         child: new Column(
-
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
                             new TextField(
@@ -356,7 +351,6 @@ pincode
                               controller: cntrlStreet,
                             ),
                             const Padding(padding: EdgeInsets.only(top: 8.0)),
-
                           ],
                         ),
                       ),
@@ -364,20 +358,20 @@ pincode
                   ),
                 ),
                 new Padding(
-                  padding: const EdgeInsets.only(left:16.0, top: 16.0, right: 16.0),
+                  padding:
+                      const EdgeInsets.only(left: 16.0, top: 16.0, right: 16.0),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
                       Icon(
                         FontAwesomeIcons.home,
                         color: secondarycolor,
-
                       ),
-                      Padding(padding: EdgeInsets.only(left: 16.0),),
+                      Padding(
+                        padding: EdgeInsets.only(left: 16.0),
+                      ),
                       Expanded(
-
                         child: new Column(
-
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
                             new TextField(
@@ -389,7 +383,6 @@ pincode
                               controller: cntrlArea,
                             ),
                             const Padding(padding: EdgeInsets.only(top: 8.0)),
-
                           ],
                         ),
                       ),
@@ -397,20 +390,20 @@ pincode
                   ),
                 ),
                 new Padding(
-                  padding: const EdgeInsets.only(left:16.0, top: 16.0, right: 16.0),
+                  padding:
+                      const EdgeInsets.only(left: 16.0, top: 16.0, right: 16.0),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
                       Icon(
                         FontAwesomeIcons.home,
                         color: secondarycolor,
-
                       ),
-                      Padding(padding: EdgeInsets.only(left: 16.0),),
+                      Padding(
+                        padding: EdgeInsets.only(left: 16.0),
+                      ),
                       Expanded(
-
                         child: new Column(
-
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
                             new TextField(
@@ -422,7 +415,6 @@ pincode
                               controller: cntrlCity,
                             ),
                             const Padding(padding: EdgeInsets.only(top: 8.0)),
-
                           ],
                         ),
                       ),
@@ -430,20 +422,20 @@ pincode
                   ),
                 ),
                 new Padding(
-                  padding: const EdgeInsets.only(left:16.0, top: 16.0, right: 16.0),
+                  padding:
+                      const EdgeInsets.only(left: 16.0, top: 16.0, right: 16.0),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
                       Icon(
                         FontAwesomeIcons.home,
                         color: secondarycolor,
-
                       ),
-                      Padding(padding: EdgeInsets.only(left: 16.0),),
+                      Padding(
+                        padding: EdgeInsets.only(left: 16.0),
+                      ),
                       Expanded(
-
                         child: new Column(
-
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
                             new TextField(
@@ -455,7 +447,6 @@ pincode
                               controller: cntrlPincode,
                             ),
                             const Padding(padding: EdgeInsets.only(top: 8.0)),
-
                           ],
                         ),
                       ),
@@ -466,8 +457,6 @@ pincode
             ),
           ),
         ),
-
-
         Container(
           alignment: Alignment.bottomCenter,
           child: ConstrainedBox(
@@ -486,11 +475,8 @@ pincode
                       fontWeight: FontWeight.bold)),
             ),
           ),
-        )
-        ,
-      ] ,
+        ),
+      ],
     );
-
   }
-
 }

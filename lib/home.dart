@@ -218,7 +218,7 @@ class HomeState extends State<Home> {
           ),
           onTap: () {
             Navigator.push(context,
-                new MaterialPageRoute(builder: (context) => new DeliveryBoy()));
+                new MaterialPageRoute(builder: (context) => new DeliveryBoys()));
           },
         ),
         new ListTile(

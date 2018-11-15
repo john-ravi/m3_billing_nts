@@ -12,6 +12,8 @@ import 'user.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 
+import 'package:fluttertoast/fluttertoast.dart';
+
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
 String commonUrl = "http://149.248.0.189:8080/billing/";
@@ -142,7 +144,7 @@ void createUserInDB(User user, BuildContext context) async {
     var bodyJson = json.decode(httpResponse.body);
     print(bodyJson.toString());
 
-    switch (json.decode(bodyJson.response)) {
+    switch (bodyJson["response"]) {
       case "UserCreated":
         {
           print("Success -- User Created on Database");
@@ -187,6 +189,16 @@ s(BuildContext context, String value) {
   } on Exception catch (e) {
     print("printing Exception $e");
   }
+}
+
+showToast(String msg){
+  Fluttertoast.showToast(
+      msg: msg,
+      toastLength: Toast.LENGTH_LONG,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIos: 1,
+      textcolor: '#ffffff'
+  );
 }
 
 void showSnack(String string, GlobalKey<ScaffoldState> keyScaffold) {
@@ -246,7 +258,7 @@ customer_name
   return bills;
 }
 
-Future<Map> getStates() async {
+Future<Map<String, String>> getStates() async {
   var uri = Uri.http(authority, unencodedPath, {
     "page": "getStates",
   });
@@ -258,7 +270,7 @@ Future<Map> getStates() async {
     // If the call to the server was successful, parse the JSON
     var decodedBody = json.decode(registerUserResponse.body);
     if (decodedBody['response'].toString().compareTo("success") == 0) {
-      var mapStateToId = new Map();
+      Map<String, String> mapStateToId = new Map();
 
       print("decoded body \t" + decodedBody.toString());
       List statesTableList = decodedBody["body"];
