@@ -46,7 +46,7 @@ class RegisterState extends State<Register> {
         home: new Scaffold(body: new Builder(
           builder: (BuildContext context) {
             return new Stack(
-            //  fit: StackFit.loose,
+              //  fit: StackFit.loose,
               children: <Widget>[
                 Container(
                   child: new Image.asset(
@@ -188,6 +188,10 @@ class RegisterState extends State<Register> {
             keyboardType: TextInputType.text,
             obscureText: true,
             controller: password,
+            maxLength: 8,
+            inputFormatters: [
+              LengthLimitingTextInputFormatter(8),
+            ],
           ),
         ),
         new ListTile(
@@ -246,10 +250,8 @@ class RegisterState extends State<Register> {
               ),
               InkWell(
                 onTap: () {
-                  Navigator.push(
-                      context,
-                      new MaterialPageRoute(
-                          builder: (context) => new MyApp()));
+                  Navigator.push(context,
+                      new MaterialPageRoute(builder: (context) => new MyApp()));
                 },
                 child: Container(
                   child: Text(
@@ -303,9 +305,9 @@ class RegisterState extends State<Register> {
       s(context, 'Enter The Email Id');
     } else if (!isEmail(email.text)) {
       s(context, 'Please Check The Email Id');
-    } else if (password.text.isEmpty ||
-        password.text.length < 6 ||
-        password.text.length > 8) {
+    } else if (password.text.isEmpty) {
+      s(context, 'Password Should be 6-8 characters');
+    } else if (password.text.length < 6) {
       s(context, 'Password Should be 6-8 characters');
     } else if (aadharcard.text.length != 12) {
       s(context, 'Enter The 12 Digit Aadhar Card Number');
@@ -327,7 +329,6 @@ class RegisterState extends State<Register> {
             user = new User(businessname.text, username.text, mobile.text,
                 email.text, password.text, aadharcard.text);
 
-            createUserInDB(user, context);
             removeloader();
 
             Navigator.push(context,

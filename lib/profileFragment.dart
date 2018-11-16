@@ -11,6 +11,11 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:http/http.dart' as http;
 
+List<String> listStates = new List();
+List<String> listCities = new List();
+
+String superState, superCity;
+
 class ProfileFragment extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -31,16 +36,43 @@ class ProfileFragmentState extends State<ProfileFragment> {
   TextEditingController cntrlArea = new TextEditingController();
   TextEditingController cntrlCity = new TextEditingController();
   TextEditingController cntrlPincode = new TextEditingController();
+  TextEditingController cntrlState = new TextEditingController();
 
   List listJsonArray;
   User user;
 
   String text;
+  Future<Map> states;
+
+  FocusNode focusState = new FocusNode();
 
   @override
   void initState() {
-    getProfile();
+
+    initEverything();
+    focusState.addListener(stateListener);
+    cntrlState.addListener(stateListener);
     super.initState();
+  }
+
+  void stateListener() {
+    dialogForState(cntrlState.text, listStates);
+  }
+
+  void initEverything() async {
+    await getProfile().then((_) {
+      print("After Get Profile");
+      setState(() {
+
+      });
+      states = getStates();
+      states.then((onValue) {
+        listStates = onValue.keys.toList();
+        setState(() {
+
+        });
+      });
+    });
   }
 
   void updateAddress(BuildContext context) async {
@@ -85,9 +117,7 @@ pincode
               toastLength: Toast.LENGTH_LONG,
               gravity: ToastGravity.CENTER,
               timeInSecForIos: 4,
-
-              textcolor: '#ffffff'
-          );
+              textcolor: '#ffffff');
         } else {
           s(context, "Failed Update, please retry");
         }
@@ -100,7 +130,7 @@ pincode
     }
   } // UPDATE Adress
 
-  getProfile() async {
+  Future<void> getProfile() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     var userId = preferences.getString(CURRENT_USER);
 
@@ -159,7 +189,6 @@ pincode
               pincode: rowUser["pincode"]));
           print("List as Whiole \t" + listUser.toString());
         });
-
 
         setState(() {
           user = listUser[0];
@@ -349,6 +378,8 @@ pincode
                               ),
                               maxLines: 1,
                               controller: cntrlStreet,
+
+                              focusNode: focusState,
                             ),
                             const Padding(padding: EdgeInsets.only(top: 8.0)),
                           ],
@@ -408,11 +439,46 @@ pincode
                           children: <Widget>[
                             new TextField(
                               decoration: const InputDecoration(
+                                labelText: 'State:',
+                                hintText: 'State:',
+                              ),
+                              maxLines: 1,
+                              controller: cntrlState,
+                              onChanged: (text) =>
+                                  dialogForState(text, listStates),
+                            ),
+                            const Padding(padding: EdgeInsets.only(top: 8.0)),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                new Padding(
+                  padding:
+                      const EdgeInsets.only(left: 16.0, top: 16.0, right: 16.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(
+                        FontAwesomeIcons.home,
+                        color: secondarycolor,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(left: 16.0),
+                      ),
+                      Expanded(
+                        child: new Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            new TextField(
+                              decoration: const InputDecoration(
                                 labelText: 'City:',
                                 hintText: 'City:',
                               ),
                               maxLines: 1,
                               controller: cntrlCity,
+                              onChanged: (text) => dialodForCity(text),
                             ),
                             const Padding(padding: EdgeInsets.only(top: 8.0)),
                           ],
@@ -478,5 +544,87 @@ pincode
         ),
       ],
     );
+  }
+
+  dialodForCity(String text) {
+    showDialog(
+        context: null,
+        builder: (context) {
+          Column body = new Column(children: [
+            new ListTile(
+              title: TextField(),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () {
+                      print("Lsit Tapped");
+             //         addBoyToGroup(widget.listGroup[index]);
+                    },
+                    child: new ListTile(
+                      title: new Text(listCities[index])),
+                  );
+                },
+                itemCount: listCities.length,
+                shrinkWrap: true,
+              ),
+            ),
+          ]);
+
+          return AlertDialog(
+            content: body,
+          );
+        });
+  }
+
+  dialogForState(String text, List<String> listStates) {
+
+    TextEditingController controllerSearch = new TextEditingController();
+    FocusNode focusNodeSearch = new FocusNode();
+
+    Column body = new Column(children: [
+      TextField(
+        decoration: new InputDecoration(
+          contentPadding: EdgeInsets.all(1.0),
+          border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0)),
+          hintText: 'Search State',
+          hintStyle: TextStyle(
+            color: Colors.white,
+          ),
+          labelText: 'Search State',
+          labelStyle: TextStyle(
+            color: Colors.black,
+          ),
+        ),
+        keyboardType: TextInputType.text,
+        autofocus: true,
+        controller: controllerSearch,
+        focusNode: focusNodeSearch,
+
+      ),
+      Expanded(
+        child: ListView.builder(
+          itemBuilder: (context, index) {
+            return GestureDetector(
+              onTap: () {
+                superState = listStates[index];
+                print("Lsit Tapped $superState");
+                Navigator.pop(context);
+                cntrlState.text = superState;
+              },
+              child: new ListTile(
+                  title: new Text(listStates[index])),
+            );
+          },
+          itemCount: listStates.length,
+          shrinkWrap: true,
+        ),
+      ),
+    ]);
+
+    showDialog(context: context,
+    builder: (context) => AlertDialog(content: body,));
   }
 }

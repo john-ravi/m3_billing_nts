@@ -9,6 +9,8 @@ import 'colorspage.dart';
 import 'delivery_boys.dart';
 import 'package:http/http.dart' as http;
 
+String superState, superCity;
+
 class CreateDeliveryBoy extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -54,8 +56,13 @@ class CreateDeliveryBoyState extends State<CreateDeliveryBoy> {
         clearOnSubmit: false,
         suggestions: listStates,
         textInputAction: TextInputAction.go,
-        textChanged: (item) {},
+        textChanged: (item) {
+          print("Changed state chars $item");
+          choDialog(item);
+          textFieldStates.key.currentState.textField.controller.text = "John";
+        },
         textSubmitted: (item) {
+          print("State Submitted");
           setState(() {
             state = item;
           });
@@ -63,13 +70,15 @@ class CreateDeliveryBoyState extends State<CreateDeliveryBoy> {
         itemBuilder: (context, item) {
           print("Building $item");
           return new Padding(
-              padding: EdgeInsets.all(8.0),
-              child: GestureDetector(
+            padding: EdgeInsets.all(8.0),
+            child: Text(item),
+/*              child: GestureDetector(
                   onTap: () {
                     print("Auto Tapped TApped");
                     callGetCities(item);
                   },
-                  child: Text(item)));
+                  child: Text(item))*/
+          );
         },
         itemSorter: (a, b) {
           print("$a .. $b");
@@ -133,199 +142,190 @@ class CreateDeliveryBoyState extends State<CreateDeliveryBoy> {
               }),
         ),
         body: Stack(
-          fit: StackFit.expand,
+          //    fit: StackFit.expand,
           children: <Widget>[
             new Image.asset(
               'assets/images/bg.png',
               fit: BoxFit.cover,
               width: double.infinity,
             ),
-            Container(
-              margin: EdgeInsets.only(top: 10.0, right: 10.0, bottom: 42.0),
-              child: Card(
-                elevation: 6.0,
-                margin: EdgeInsets.all(10.0),
-                child: new ListView(
-                  children: <Widget>[
-                    Container(
-                      margin:
-                          EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
-                      child: TextFormField(
-                        controller: boyName,
-                        decoration: new InputDecoration(
-                          contentPadding: EdgeInsets.all(10.0),
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(5.0)),
-                          hintText: 'Enter Delivery Boy Name',
-                          hintStyle: TextStyle(
-                            color: Colors.white,
-                          ),
-                          labelText: 'Enter Delivery Boy Name',
-                          labelStyle: TextStyle(
-                            color: Colors.black,
-                          ),
-                        ),
-                        keyboardType: TextInputType.text,
-                        inputFormatters: [
-                          WhitelistingTextInputFormatter(RegExp("^[A-Za-z ]+")),
-                          LengthLimitingTextInputFormatter(25),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      margin:
-                          EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
-                      child: TextFormField(
-                        controller: mobile,
-                        decoration: new InputDecoration(
-                          contentPadding: EdgeInsets.all(10.0),
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(5.0)),
-                          hintText: 'Enter Contact Number',
-                          hintStyle: TextStyle(
-                            color: Colors.white,
-                          ),
-                          labelText: 'Enter Contact Number',
-                          labelStyle: TextStyle(
-                            color: Colors.black,
-                          ),
-                        ),
-                        keyboardType: TextInputType.number,
-                        maxLength: 10,
-                        inputFormatters: [
-                          WhitelistingTextInputFormatter.digitsOnly,
-                          LengthLimitingTextInputFormatter(10)
-                        ],
-                      ),
-                    ),
-                    Container(
-                      alignment: Alignment.bottomLeft,
-                      margin:
-                          EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
-                      child: Text('Assign to Group (Optional)',
-                          style: TextStyle(
-                              fontSize: 12.0,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline,
-                              color: secondarycolor)),
-                    ),
-                    Container(
-                      alignment: Alignment.bottomLeft,
-                      margin:
-                          EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
-                      child: Text('Address Details (Optional)',
-                          style:
-                              TextStyle(fontSize: 16.0, color: Colors.black)),
-                    ),
-                    Container(
-                      margin:
-                          EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
-                      child: TextFormField(
-                        controller: address,
-                        decoration: new InputDecoration(
-                          contentPadding: EdgeInsets.all(10.0),
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(5.0)),
-                          hintText: 'Enter Address',
-                          hintStyle: TextStyle(
-                            color: Colors.white,
-                          ),
-                          labelText: 'Enter Address',
-                          labelStyle: TextStyle(
-                            color: Colors.black,
-                          ),
-                        ),
-                        keyboardType: TextInputType.text,
-                      ),
-                    ),
-                    Container(
-                    //  height: 300.0,
-                      margin:
-                      EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
-                      child: textFieldStates,
-                    ),
-                    Container(
-                      margin:
-                          EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
-                      child: textFieldCities,
-                    ),
-                    Container(
-                      margin:
-                          EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
-                      child: TextFormField(
-                        controller: pincode,
-                        decoration: new InputDecoration(
-                          contentPadding: EdgeInsets.all(10.0),
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(5.0)),
-                          hintText: 'Pincode',
-                          hintStyle: TextStyle(
-                            color: Colors.white,
-                          ),
-                          labelText: 'Pincode',
-                          labelStyle: TextStyle(
-                            color: Colors.black,
-                          ),
-                        ),
-                        keyboardType: TextInputType.number,
-                        maxLength: 6,
-                        inputFormatters: [
-                          WhitelistingTextInputFormatter.digitsOnly,
-                          LengthLimitingTextInputFormatter(6)
-                        ],
-                      ),
-                    ),
-                  ],
+            Column(
+              children: <Widget>[
+                Expanded(
+                  child: Card(
+                      elevation: 6.0,
+                      margin: EdgeInsets.all(10.0),
+                      child: Builder(
+                          builder: (context) => buildListView(context))),
                 ),
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.only(top: 42.0),
-              alignment: Alignment.bottomCenter,
-              child: ConstrainedBox(
-                constraints: new BoxConstraints(minWidth: 250.0),
-                child: new RaisedButton(
-                  onPressed: () {
-                    //     var name = controllerName.text;
-                    if (boyName.text.length < 2) {
-                      s(context,
-                          "Delivery Boy name should be atleast two letters");
-                    } else if (mobile.text.length != 10) {
-                      s(context, "Mobile should be 10 Digits");
-                    } else if (address.text.length > 0) {
-                      if (address.text.length > 50) {
-                        s(context, "Address should not exceed 50 characters");
-                      }
-                    } else if (state.length > 0) {
-                      if (state.length > 20) {
-                        s(context, "State should not exceed 20 characters");
-                      }
-                    } else if (city.length > 0) {
-                      if (city.length > 20) {
-                        s(context, "City should not exceed 20 characters");
-                      }
-                    } else if (pincode.text.length > 0) {
-                      if (pincode.text.length != 6) {
-                        s(context, "Pincode should be 6 Digits");
-                      }
-                    } else {
-                      checkIfBoyExists(context);
-                    }
-                  },
-                  color: primarycolor,
-                  shape: new RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(30.0)),
-                  child: new Text('Create Delivery Boy',
-                      style: new TextStyle(
-                        color: Colors.white,
-                        fontSize: 16.0,
-                      )),
-                ),
-              ),
+              ],
             ),
           ],
         ),
       ),
+    );
+  }
+
+  ListView buildListView(BuildContext context) {
+    return new ListView(
+      shrinkWrap: true,
+      children: <Widget>[
+        Container(
+          margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
+          child: TextFormField(
+            controller: boyName,
+            decoration: new InputDecoration(
+              contentPadding: EdgeInsets.all(10.0),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
+              hintText: 'Enter Delivery Boy Name',
+              hintStyle: TextStyle(
+                color: Colors.white,
+              ),
+              labelText: 'Enter Delivery Boy Name',
+              labelStyle: TextStyle(
+                color: Colors.black,
+              ),
+            ),
+            keyboardType: TextInputType.text,
+            inputFormatters: [
+              WhitelistingTextInputFormatter(RegExp("^[A-Za-z ]+")),
+              LengthLimitingTextInputFormatter(25),
+            ],
+          ),
+        ),
+        Container(
+          margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
+          child: TextFormField(
+            controller: mobile,
+            decoration: new InputDecoration(
+              contentPadding: EdgeInsets.all(10.0),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
+              hintText: 'Enter Contact Number',
+              hintStyle: TextStyle(
+                color: Colors.white,
+              ),
+              labelText: 'Enter Contact Number',
+              labelStyle: TextStyle(
+                color: Colors.black,
+              ),
+            ),
+            keyboardType: TextInputType.number,
+            maxLength: 10,
+            inputFormatters: [
+              WhitelistingTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(10)
+            ],
+          ),
+        ),
+        Container(
+          alignment: Alignment.bottomLeft,
+          margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
+          child: Text('Assign to Group (Optional)',
+              style: TextStyle(
+                  fontSize: 12.0,
+                  fontWeight: FontWeight.bold,
+                  decoration: TextDecoration.underline,
+                  color: secondarycolor)),
+        ),
+        Container(
+          alignment: Alignment.bottomLeft,
+          margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
+          child: Text('Address Details (Optional)',
+              style: TextStyle(fontSize: 16.0, color: Colors.black)),
+        ),
+        Container(
+          margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
+          child: TextFormField(
+            controller: address,
+            decoration: new InputDecoration(
+              contentPadding: EdgeInsets.all(10.0),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
+              hintText: 'Enter Address',
+              hintStyle: TextStyle(
+                color: Colors.white,
+              ),
+              labelText: 'Enter Address',
+              labelStyle: TextStyle(
+                color: Colors.black,
+              ),
+            ),
+            keyboardType: TextInputType.text,
+          ),
+        ),
+        Container(
+          //  height: 300.0,
+          margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
+          child: textFieldStates,
+        ),
+        Container(
+          margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
+          child: textFieldCities,
+        ),
+        Container(
+          margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
+          child: TextFormField(
+            controller: pincode,
+            decoration: new InputDecoration(
+              contentPadding: EdgeInsets.all(10.0),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
+              hintText: 'Pincode',
+              hintStyle: TextStyle(
+                color: Colors.white,
+              ),
+              labelText: 'Pincode',
+              labelStyle: TextStyle(
+                color: Colors.black,
+              ),
+            ),
+            keyboardType: TextInputType.number,
+            maxLength: 6,
+            inputFormatters: [
+              WhitelistingTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(6)
+            ],
+          ),
+        ),
+        Container(
+          margin: EdgeInsets.only(top: 24.0),
+          alignment: Alignment.bottomCenter,
+          child: ConstrainedBox(
+            constraints: new BoxConstraints(minWidth: 250.0),
+            child: new RaisedButton(
+              onPressed: () {
+                if (boyName.text.length < 2) {
+                  s(context, "Delivery Boy name should be atleast two letters");
+                } else if (mobile.text.length != 10) {
+                  s(context, "Mobile should be 10 Digits");
+                } else if (address.text.isNotEmpty &&
+                    address.text.length > 50) {
+                  s(context, "Address should not exceed 50 characters");
+                } else if (state.isNotEmpty && state.length > 20) {
+                  s(context, "State should not exceed 20 characters");
+                } else if (city.isNotEmpty && city.length > 20) {
+                  s(context, "City should not exceed 20 characters");
+                } else if (pincode.text.isNotEmpty &&
+                    pincode.text.length != 6) {
+                  s(context, "Pincode should be 6 Digits");
+                } else {
+                  checkIfBoyExists(context);
+                }
+              },
+              color: primarycolor,
+              shape: new RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(30.0)),
+              child: new Text('Create Delivery Boy',
+                  style: new TextStyle(
+                    color: Colors.white,
+                    fontSize: 16.0,
+                  )),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -450,5 +450,53 @@ pincode*/
       // If that call was not successful, throw an error.
       print("Network Error - ${response.reasonPhrase}");
     }
+  }
+
+  void choDialog(String item) {
+    showDialog(
+      context: context,
+      builder: (context) => new AlertDialog(
+            content: StatesDialog(item, listStates),
+          ),
+    );
+  }
+}
+
+class StatesDialog extends StatefulWidget {
+  String searchText;
+  List<String> listStates;
+
+  StatesDialog(this.searchText, this.listStates);
+
+  @override
+  _StatesDialogStat createState() => _StatesDialogStat();
+}
+
+class _StatesDialogStat extends State<AddBoyToGroupDialog> {
+  @override
+  Widget build(BuildContext context) {
+    Column body = new Column(children: [
+      new ListTile(
+        title: TextField(),
+      ),
+      Expanded(
+        child: ListView.builder(
+          itemBuilder: (context, index) {
+            return GestureDetector(
+              onTap: () {
+                print("Lsit Tapped");
+                //     addBoyToGroup(widget.listGroup[index]);
+              },
+              child: new ListTile(
+                  title: new Text(widget.listGroup[index].group_name)),
+            );
+          },
+          itemCount: widget.listGroup.length,
+          shrinkWrap: true,
+        ),
+      ),
+    ]);
+
+    return body;
   }
 }

@@ -75,11 +75,11 @@ class HomeState extends State<Home> {
     return showDialog(
           context: context,
           builder: (context) => new AlertDialog(
-                title: new Text('Are you sure?'),
+                title: new Text('Home - Are you sure?'),
                 content: new Text('Do you want to exit'),
                 actions: <Widget>[
                   new FlatButton(
-                    onPressed: () => Navigator.of(context).pop(false),
+                    onPressed: () => Navigator.pop(context),
                     child: new Text('No'),
                   ),
                   new FlatButton(

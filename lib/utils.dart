@@ -135,7 +135,7 @@ bool isEmail(String em) {
   return regExp.hasMatch(em);
 }
 
-void createUserInDB(User user, BuildContext context) async {
+Future<void> createUserInDB(User user, BuildContext context) async {
   print("Create User");
 
 

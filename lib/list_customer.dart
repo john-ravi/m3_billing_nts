@@ -46,20 +46,26 @@ class ListCustomerState extends State<Customers> {
   @override
   void initState() {
     _isSearching = false;
-    getCustomers().then((onValue) {
-      print("Listing Customers \n ${onValue.toString()}");
-      setState(() {
-        title = "Customers";
-        listCustomers = onValue;
-        finalCustomers = listCustomers;
-      });
-    });
+    getNames();
 
     controllerSearch.addListener(searchListener);
     focusNodeSearch.addListener(() {
       searchListener();
     });
     super.initState();
+  }
+
+  void getNames() async{
+    await getCustomers().then((onValue) {
+      print("Listing Customers \n ${onValue.toString()}");
+
+      setState(() {
+        title = "Customers";
+        listCustomers = onValue;
+        finalCustomers = listCustomers;
+
+      });
+    });
   }
 
   void searchListener() {

@@ -95,6 +95,7 @@ class CreateCustomerState extends State<CreateCustomer> {
   }
 
   Form buildForm(BuildContext context) {
+    var gstReg = "([0]{1}[1-9]{1}|[1-2]{1}[0-9]{1}|[3]{1}[0-7]{1})([a-zA-Z]{5}[0-9]{4}[a-zA-Z]{1}[1-9a-zA-Z]{1}[zZ]{1}[0-9a-zA-Z]{1})";
     return Form(
       autovalidate: true,
       key: _formKey,
@@ -191,9 +192,11 @@ class CreateCustomerState extends State<CreateCustomer> {
                   color: Colors.black,
                 ),
               ),
-              keyboardType: TextInputType.number,
+              keyboardType: TextInputType.text,
               inputFormatters: [
-                WhitelistingTextInputFormatter.digitsOnly,
+                WhitelistingTextInputFormatter(RegExp("^[0-9A-Za-z0-9]+")),
+                LengthLimitingTextInputFormatter(14),
+
               ],
             ),
           ),
@@ -325,11 +328,7 @@ class CreateCustomerState extends State<CreateCustomer> {
                   } else if (ctrlMail.text.length > 0 &&
                       !isEmail(ctrlMail.text)) {
                     s(context, "Please enter a valid email id");
-                  } else if (ctrlGST.text.length > 0 &&
-                      (!ctrlGST.text.startsWith("GSTIN") ||
-                          !ctrlGST.text.startsWith("gstin"))) {
-                    s(context, "GST number starts with GSTIN");
-                  } else if (ctrlAddress.text.length > 35) {
+                  }  else if (ctrlAddress.text.length > 35) {
                     s(context, "Address should not cross 35 characters");
                   } else if (ctrlCity.text.length > 15) {
                     s(context, "City should not cross 15 characters");
@@ -382,7 +381,7 @@ address*/
       if (responseBody["response"].toString().compareTo("Mobile_Registered") ==
           0) {
         print(
-            "Customer Already Exists, Do you want create another customer with same mobile number?");
+            "Customer Already Exists");
 
         removeloader();
         showDialog(
@@ -392,13 +391,6 @@ address*/
                 content:
                     new Text('Customer Already Exists for this Mobile Number'),
                 actions: <Widget>[
-/*
-                  new FlatButton(
-                    onPressed: () => Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Customers())),
-                    child: new Text('No'),
-                  ),
-*/
                   new FlatButton(
                     onPressed: () {
                       createCustomer(context);
