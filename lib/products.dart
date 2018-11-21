@@ -21,18 +21,14 @@ class Products extends StatefulWidget {
 }
 
 class ProductState extends State<Products> {
-
   List<Items> listItems = new List();
 
   List<Items> finalItems = new List();
-
-
 
   @override
   void initState() {
     super.initState();
     callGetProducts();
-
   }
 
   @override
@@ -47,8 +43,7 @@ class ProductState extends State<Products> {
               iconSize: 18.0,
               icon: new Icon(FontAwesomeIcons.chevronLeft),
               onPressed: () {
-                Navigator.pushReplacement(context,
-                    new MaterialPageRoute(builder: (context) => new Home()));
+                Navigator.pop(context);
               }),
         ),
         body: Builder(builder: (context) => buildStack(context)),
@@ -58,43 +53,40 @@ class ProductState extends State<Products> {
 
   Stack buildStack(BuildContext context) {
     return Stack(
-        children: <Widget>[
-          new Image.asset(
-            'assets/images/bg.png',
-            fit: BoxFit.cover,
-            width: double.infinity,
-          ),
-          ListView.builder(
-            itemCount: finalItems.length,
-            itemBuilder: (BuildContext context, int index) {
-              return new GestureDetector(
-                onTap: (){
-                     Navigator.push(context,
-                  new MaterialPageRoute(builder: (context) => new
-                  EditItem(finalItems[index])));
-                },
-                // ignore: argument_type_not_assignable
-                /*EditItem(finalItems[index])*/
-                child: ProductAdapter(finalItems[index]),
-              );
-            },
-          )
-        ],
-      );
+      children: <Widget>[
+        new Image.asset(
+          'assets/images/bg.png',
+          fit: BoxFit.cover,
+          width: double.infinity,
+        ),
+        ListView.builder(
+          itemCount: finalItems.length,
+          itemBuilder: (BuildContext context, int index) {
+            return new GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    new MaterialPageRoute(
+                        builder: (context) => new EditItem(finalItems[index])));
+              },
+              // ignore: argument_type_not_assignable
+              /*EditItem(finalItems[index])*/
+              child: ProductAdapter(finalItems[index]),
+            );
+          },
+        )
+      ],
+    );
   }
 
-  void callGetProducts() async{
-
-    var uri = Uri.http(authority, unencodedPath, {
-      "page": "getMyItems"
-    });
+  void callGetProducts() async {
+    var uri = Uri.http(authority, unencodedPath, {"page": "getMyItems"});
 
     d(uri);
     http.Response htResponse;
     try {
-       htResponse = await http.get(uri);
+      htResponse = await http.get(uri);
     } on Exception catch (e) {
-
       print("Exception OCCUred, check Network");
     }
 
@@ -108,31 +100,26 @@ class ProductState extends State<Products> {
 
         rows.forEach((row) {
           listItems.add(Items.named(
-            id: row["id"],
-            item_name: row["item_name"],
-            unit_cost: row["unit_cost"],
-            no_of_units: row["no_of_units"],
-            start_date: row["start_date"],
-            end_date: row["end_date"],
-            tax: row["tax"]
-          ));
+              id: row["id"],
+              item_name: row["item_name"],
+              unit_cost: row["unit_cost"],
+              no_of_units: row["no_of_units"],
+              start_date: row["start_date"],
+              end_date: row["end_date"],
+              tax: row["tax"]));
 
           setState(() {
             finalItems = listItems;
           });
-
         });
-
-
       } else {
         print("Failed Pulling Item ");
       }
     } else {
-      print("Network Error: ${htResponse.statusCode} --- ${htResponse
-          .reasonPhrase} ");
-      s(context, "Network Error: ${htResponse.statusCode} --- ${htResponse
-          .reasonPhrase} ");
+      print(
+          "Network Error: ${htResponse.statusCode} --- ${htResponse.reasonPhrase} ");
+      s(context,
+          "Network Error: ${htResponse.statusCode} --- ${htResponse.reasonPhrase} ");
     }
-
   }
 }

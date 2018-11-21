@@ -123,7 +123,7 @@ class EditItemState extends State<EditItem> {
               iconSize: 18.0,
               icon: new Icon(FontAwesomeIcons.chevronLeft),
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
+                Navigator.pop(context);
               }),
         ),
         body: Stack(

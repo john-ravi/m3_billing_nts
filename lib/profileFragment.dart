@@ -14,7 +14,7 @@ import 'package:http/http.dart' as http;
 List<String> listStates = new List();
 List<String> listCities = new List();
 
-String superState, superCity;
+String superState = "", superCity = "";
 
 class ProfileFragment extends StatefulWidget {
   @override
@@ -28,7 +28,10 @@ class ProfileFragmentState extends State<ProfileFragment> {
   String flatNo = "";
   String name = "";
   String mobile = "";
-  String email, street, area, city, pincode;
+  String city = "";
+  String state = "Tap to Select State";
+  bool stateSelected = false;
+  bool citySelected = false;
 
   TextEditingController cntrlFlatNo = new TextEditingController();
   TextEditingController cntrlEmail = new TextEditingController();
@@ -40,39 +43,40 @@ class ProfileFragmentState extends State<ProfileFragment> {
 
   List listJsonArray;
   User user;
+  List listCities = new List();
 
   String text;
-  Future<Map> states;
+  var mapStatesToId;
 
   FocusNode focusState = new FocusNode();
 
   @override
   void initState() {
-
     initEverything();
     focusState.addListener(stateListener);
-    cntrlState.addListener(stateListener);
+    //  cntrlState.addListener(stateListener);
     super.initState();
   }
 
-  void stateListener() {
-    dialogForState(cntrlState.text, listStates);
+  @override
+  void dispose() {
+    focusState.removeListener(stateListener);
+    super.dispose();
+  }
+
+  void stateListener() async {
+    dialogForState(listStates);
   }
 
   void initEverything() async {
     await getProfile().then((_) {
       print("After Get Profile");
-      setState(() {
-
-      });
-      states = getStates();
-      states.then((onValue) {
-        listStates = onValue.keys.toList();
-        setState(() {
-
-        });
-      });
+      setState(() {});
     });
+
+    mapStatesToId = await getStates();
+    listStates = mapStatesToId.keys.toList();
+    setState(() {});
   }
 
   void updateAddress(BuildContext context) async {
@@ -85,7 +89,9 @@ class ProfileFragmentState extends State<ProfileFragment> {
         "flat_no": cntrlFlatNo.text,
         "street": cntrlStreet.text,
         "area": cntrlArea.text,
-        "city": cntrlCity.text,
+        "state": superState,
+        // validations are done on superStateCity vars as they are ""
+        "city": superCity,
         "pincode": cntrlPincode.text,
         "mobile_number": user.mobile
         /** Not updating mobile but passing for where mobile = clause*/
@@ -173,6 +179,7 @@ registration_date
 flat_no
 street
 area
+state
 city
 pincode
 
@@ -185,6 +192,7 @@ pincode
               flatNo: rowUser["flat_no"],
               street: rowUser["street"],
               area: rowUser["area"],
+              state: rowUser["state"],
               city: rowUser["city"],
               pincode: rowUser["pincode"]));
           print("List as Whiole \t" + listUser.toString());
@@ -193,11 +201,12 @@ pincode
         setState(() {
           user = listUser[0];
           cntrlPincode.text = user.pincode;
-          cntrlCity.text = user.city;
           cntrlArea.text = user.area;
           cntrlStreet.text = user.street;
           cntrlFlatNo.text = user.flatNo;
           cntrlEmail.text = user.email;
+          state = user.state;
+          city = user.city;
           name = user.username;
           mobile = user.mobile;
 
@@ -378,7 +387,6 @@ pincode
                               ),
                               maxLines: 1,
                               controller: cntrlStreet,
-
                               focusNode: focusState,
                             ),
                             const Padding(padding: EdgeInsets.only(top: 8.0)),
@@ -420,71 +428,83 @@ pincode
                     ],
                   ),
                 ),
-                new Padding(
-                  padding:
-                      const EdgeInsets.only(left: 16.0, top: 16.0, right: 16.0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Icon(
-                        FontAwesomeIcons.home,
-                        color: secondarycolor,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(left: 16.0),
-                      ),
-                      Expanded(
-                        child: new Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            new TextField(
-                              decoration: const InputDecoration(
-                                labelText: 'State:',
-                                hintText: 'State:',
-                              ),
-                              maxLines: 1,
-                              controller: cntrlState,
-                              onChanged: (text) =>
-                                  dialogForState(text, listStates),
-                            ),
-                            const Padding(padding: EdgeInsets.only(top: 8.0)),
-                          ],
+                GestureDetector(
+                  onTap: () => dialogForState(listStates),
+                  child: Container(
+                    margin: EdgeInsets.only(
+                        left: 16.0, top: 16.0, right: 16.0, bottom: 16.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: <Widget>[
+                        Icon(
+                          FontAwesomeIcons.home,
+                          color: secondarycolor,
                         ),
-                      ),
-                    ],
+                        Container(
+                          margin: EdgeInsets.only(left: 16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Container(
+                                  margin: EdgeInsets.only(bottom: 10.0),
+                                  child: Text(
+                                    'State',
+                                    style: TextStyle(
+                                        fontSize: 16.0, color: Colors.grey),
+                                  )),
+                              Container(
+                                child: Text(
+                                  state,
+                                  style: TextStyle(fontSize: 16.0),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                 ),
-                new Padding(
-                  padding:
-                      const EdgeInsets.only(left: 16.0, top: 16.0, right: 16.0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Icon(
-                        FontAwesomeIcons.home,
-                        color: secondarycolor,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(left: 16.0),
-                      ),
-                      Expanded(
-                        child: new Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            new TextField(
-                              decoration: const InputDecoration(
-                                labelText: 'City:',
-                                hintText: 'City:',
-                              ),
-                              maxLines: 1,
-                              controller: cntrlCity,
-                              onChanged: (text) => dialodForCity(text),
-                            ),
-                            const Padding(padding: EdgeInsets.only(top: 8.0)),
-                          ],
+                GestureDetector(
+                  onTap: () {
+                    if (stateSelected) {
+                      dialogForCity();
+                    } else {
+                      s(context, "Please Select State To Filter Cities");
+                    }
+                  },
+                  child: Container(
+                    margin: EdgeInsets.only(left: 16.0, top: 16.0, right: 16.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: <Widget>[
+                        Icon(
+                          FontAwesomeIcons.user,
+                          color: secondarycolor,
                         ),
-                      ),
-                    ],
+                        Container(
+                          margin: EdgeInsets.only(left: 16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Container(
+                                  margin: EdgeInsets.only(bottom: 10.0),
+                                  child: Text(
+                                    'City',
+                                    style: TextStyle(
+                                        fontSize: 16.0, color: Colors.grey),
+                                  )),
+                              Container(
+                                child: Text(
+                                  city,
+                                  style: TextStyle(fontSize: 16.0),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                 ),
                 new Padding(
@@ -546,54 +566,84 @@ pincode
     );
   }
 
-  dialodForCity(String text) {
-    showDialog(
-        context: null,
-        builder: (context) {
-          Column body = new Column(children: [
-            new ListTile(
-              title: TextField(),
-            ),
-            Expanded(
-              child: ListView.builder(
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () {
-                      print("Lsit Tapped");
-             //         addBoyToGroup(widget.listGroup[index]);
-                    },
-                    child: new ListTile(
-                      title: new Text(listCities[index])),
-                  );
-                },
-                itemCount: listCities.length,
-                shrinkWrap: true,
-              ),
-            ),
-          ]);
+  dialogForCity() async {
+    var stateID = mapStatesToId[superState];
+    print("States ${mapStatesToId.toString()} \n StateID $stateID}");
 
-          return AlertDialog(
-            content: body,
-          );
-        });
+    showloader(context);
+    listCities = await getCitiesUtils(stateID);
+
+    removeloader();
+    print("after ge cities ${listCities.toString()}");
+    await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              content: SearchDialogWidget(false, listCities),
+            ));
+    print("Returned $superCity ");
+
+    city = superCity;
+    setState(() {});
   }
 
-  dialogForState(String text, List<String> listStates) {
+  dialogForState(List<String> listValuesString) async {
+    await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              content: SearchDialogWidget(true, listValuesString),
+            ));
 
-    TextEditingController controllerSearch = new TextEditingController();
-    FocusNode focusNodeSearch = new FocusNode();
+    print("Returned State $superState ");
+    state = superState;
+    setState(() {
+      city = "Tap To Select City";
+      stateSelected = true;
+    });
 
-    Column body = new Column(children: [
+    dialogForCity();
+  }
+}
+
+class SearchDialogWidget extends StatefulWidget {
+  List<String> listStrings;
+  bool isStateSearch;
+
+  SearchDialogWidget(this.isStateSearch, this.listStrings);
+
+  @override
+  _SearchDialogWidgetState createState() => _SearchDialogWidgetState();
+}
+
+class _SearchDialogWidgetState extends State<SearchDialogWidget> {
+  TextEditingController controllerSearch = new TextEditingController();
+  FocusNode focusNodeSearch = new FocusNode();
+  List<String> finalList = new List();
+
+  String stringSearch = "";
+
+  @override
+  void initState() {
+    if (widget.isStateSearch) {
+      stringSearch = 'Search State';
+    } else {
+      stringSearch = 'Search City';
+    }
+
+    controllerSearch.addListener(searchListener);
+    focusNodeSearch.addListener(searchListener);
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [
       TextField(
         decoration: new InputDecoration(
-          contentPadding: EdgeInsets.all(1.0),
-          border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0)),
-          hintText: 'Search State',
-          hintStyle: TextStyle(
-            color: Colors.white,
-          ),
-          labelText: 'Search State',
+          contentPadding: EdgeInsets.all(7.0),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(7.0)),
+          hintText: stringSearch,
+          hintStyle: TextStyle(color: Colors.white, fontSize: 18.0),
+          labelText: stringSearch,
           labelStyle: TextStyle(
             color: Colors.black,
           ),
@@ -602,29 +652,52 @@ pincode
         autofocus: true,
         controller: controllerSearch,
         focusNode: focusNodeSearch,
-
       ),
       Expanded(
         child: ListView.builder(
           itemBuilder: (context, index) {
             return GestureDetector(
               onTap: () {
-                superState = listStates[index];
-                print("Lsit Tapped $superState");
+                print(
+                    "Lsit Tapped ${finalList[index]} and \nfinal list ${finalList.toString()}");
+
+                if (widget.isStateSearch) {
+                  superState = finalList[index];
+                } else {
+                  superCity = finalList[index];
+                }
+
                 Navigator.pop(context);
-                cntrlState.text = superState;
+                /** dont assign the selected value to controller before this;
+                 *  makes index value unusable after tapping*/
+                controllerSearch.text = finalList[index];
+                setState(() {});
               },
-              child: new ListTile(
-                  title: new Text(listStates[index])),
+              child: new ListTile(title: new Text(finalList[index])),
             );
           },
-          itemCount: listStates.length,
+          itemCount: finalList.length,
           shrinkWrap: true,
         ),
       ),
     ]);
+  }
 
-    showDialog(context: context,
-    builder: (context) => AlertDialog(content: body,));
+  void searchListener() {
+    if (controllerSearch.text.isEmpty) {
+      finalList = widget.listStrings;
+    } else {
+      List<String> searchList = new List();
+      widget.listStrings.forEach((string) {
+        if (string
+            .toLowerCase()
+            .contains(controllerSearch.text.toLowerCase())) {
+          searchList.add(string);
+        }
+      });
+
+      finalList = searchList;
+    }
+    setState(() {});
   }
 }

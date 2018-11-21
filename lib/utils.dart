@@ -6,19 +6,20 @@ import 'package:m3_billing_nts/customer.dart';
 import 'package:m3_billing_nts/customerWithId.dart';
 import 'package:m3_billing_nts/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 
 import 'user.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 
-import 'package:fluttertoast/fluttertoast.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
 String commonUrl = "http://149.248.0.189:8080/billing/";
 String testingUrl = "http://18.191.190.195/billing/?page=";
 String zeroUrl = "http://johnravi.000webhostapp.com/?page=";
+
 
 String authority = "18.191.190.195";
 String unencodedPath = "/billing";
@@ -38,7 +39,7 @@ showloader(BuildContext context) {
               padding: EdgeInsets.all(8.0),
               width: 50.0,
               height: 50.0,
-              color: Colors.black45,
+//              color: Colors.black45,
               child: CircularProgressIndicator(),
             ),
           ));

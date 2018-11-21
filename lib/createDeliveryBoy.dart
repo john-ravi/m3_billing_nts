@@ -9,7 +9,9 @@ import 'colorspage.dart';
 import 'delivery_boys.dart';
 import 'package:http/http.dart' as http;
 
-String superState, superCity;
+String superState = "", superCity = "";
+List<String> listStates = new List();
+List<String> listCities = new List();
 
 class CreateDeliveryBoy extends StatefulWidget {
   @override
@@ -24,9 +26,19 @@ class CreateDeliveryBoyState extends State<CreateDeliveryBoy> {
   TextEditingController boyName = new TextEditingController();
   TextEditingController address = new TextEditingController();
   TextEditingController mobile = new TextEditingController();
-  String city = "";
-  String state = "";
   TextEditingController pincode = new TextEditingController();
+
+  String city = "";
+  String state = "Tap to Select State";
+  bool stateSelected = false;
+  bool citySelected = false;
+
+  String selectedState = "";
+  String selectedCity = "";
+  var mapStates = new Map();
+  var cities = new List();
+
+  var mapStatesToId;
 
   GlobalKey<AutoCompleteTextFieldState<String>> keyStates = new GlobalKey();
   GlobalKey<AutoCompleteTextFieldState<String>> keyCities = new GlobalKey();
@@ -35,59 +47,21 @@ class CreateDeliveryBoyState extends State<CreateDeliveryBoy> {
   AutoCompleteTextField textFieldStates;
   AutoCompleteTextField textFieldCities;
 
-  Map<String, String> mapStates = new Map();
-
   @override
   void initState() {
-    callGetStates();
+    initEverything();
     super.initState();
+  }
+
+  void initEverything() async {
+    mapStatesToId = await getStates();
+    listStates = mapStatesToId.keys.toList();
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    textFieldStates = new AutoCompleteTextField<String>(
-        decoration: new InputDecoration(
-          contentPadding: EdgeInsets.all(10.0),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
-          hintText: "State",
-        ),
-        key: keyStates,
-        submitOnSuggestionTap: true,
-        clearOnSubmit: false,
-        suggestions: listStates,
-        textInputAction: TextInputAction.go,
-        textChanged: (item) {
-          print("Changed state chars $item");
-          choDialog(item);
-          textFieldStates.key.currentState.textField.controller.text = "John";
-        },
-        textSubmitted: (item) {
-          print("State Submitted");
-          setState(() {
-            state = item;
-          });
-        },
-        itemBuilder: (context, item) {
-          print("Building $item");
-          return new Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Text(item),
-/*              child: GestureDetector(
-                  onTap: () {
-                    print("Auto Tapped TApped");
-                    callGetCities(item);
-                  },
-                  child: Text(item))*/
-          );
-        },
-        itemSorter: (a, b) {
-          print("$a .. $b");
-          return a.compareTo(b);
-        },
-        itemFilter: (item, query) {
-          print("Filter with item $item and q $query");
-          return item.toLowerCase().contains(query.toLowerCase());
-        });
+
 
     textFieldCities = new AutoCompleteTextField<String>(
         decoration: new InputDecoration(
@@ -255,14 +229,57 @@ class CreateDeliveryBoyState extends State<CreateDeliveryBoy> {
             keyboardType: TextInputType.text,
           ),
         ),
-        Container(
-          //  height: 300.0,
-          margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
-          child: textFieldStates,
+        GestureDetector(
+          onTap: () => dialogForState(listStates),
+          child: Container(
+            margin: EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                    margin: EdgeInsets.only(bottom: 10.0),
+                    child: Text(
+                      'State',
+                      style: TextStyle(fontSize: 16.0, color: Colors.grey),
+                    )),
+                Container(
+                  child: Text(
+                    state,
+                    style: TextStyle(fontSize: 16.0),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
-        Container(
-          margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
-          child: textFieldCities,
+        GestureDetector(
+          onTap: () {
+            if (stateSelected) {
+              dialogForCity();
+            } else {
+              s(context, "Please Select State To Filter Cities");
+            }
+          },
+          child: Container(
+            margin: EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                    margin: EdgeInsets.only(bottom: 10.0),
+                    child: Text(
+                      'City',
+                      style: TextStyle(fontSize: 16.0, color: Colors.grey),
+                    )),
+                Container(
+                  child: Text(
+                    city,
+                    style: TextStyle(fontSize: 16.0),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
         Container(
           margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
@@ -330,31 +347,75 @@ class CreateDeliveryBoyState extends State<CreateDeliveryBoy> {
   }
 
   callGetStates() async {
-    Map<String, String> statesMap = await getStates();
-    setState(() {
-      mapStates = statesMap;
-      listStates = mapStates.keys.toList();
-      print(
-          "Steeting state of States after returning ${listStates.toString()}");
-    });
-    textFieldStates.updateSuggestions(listStates);
-    print(textFieldStates.suggestionsAmount);
+    try {
+      var statesMap = await getStates();
+      setState(() {
+        print("Steeting state of States after returning");
+        mapStates = statesMap;
+      });
+    } catch (e) {
+      // print(e);
+    }
   }
 
   void callGetCities(String newState) async {
+    try {
+      showloader(context);
+      print("call get cities \n ${cities.toString()}");
+
+      // cities.clear();
+      var stateId = mapStates[newState];
+      print("Call Get Citites for $newState with Id: $stateId");
+
+      List citiesList = await getCitiesUtils(stateId);
+      removeloader();
+
+      setState(() {
+        print("Steeting state of States after returning");
+        cities = citiesList;
+
+        print("After get cities \n ${cities.toString()}");
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  dialogForCity() async {
+    var stateID = mapStatesToId[superState];
+    print("States ${mapStatesToId.toString()} \n StateID $stateID}");
+
     showloader(context);
+    listCities = await getCitiesUtils(stateID);
 
-    // cities.clear();
-    var stateId = mapStates[newState];
-    print("Call Get Citites for $newState with Id: $stateId");
-
-    citiesList = await getCitiesUtils(stateId);
     removeloader();
+    print("after ge cities ${listCities.toString()}");
+    await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          content: SearchDialogWidget(false, listCities),
+        ));
+    print("Returned $superCity ");
 
+    city = superCity;
+    setState(() {});
+  }
+
+  dialogForState(List<String> listValuesString) async {
+    await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          content: SearchDialogWidget(true, listValuesString),
+        ));
+
+    print("Returned State $superState ");
+    state = superState;
     setState(() {
-      print("After get cities \n ${citiesList.toString()}");
-      textFieldCities.updateSuggestions(citiesList);
+      city = "Tap To Select City";
+      stateSelected = true;
     });
+
+    dialogForCity();
   }
 
   void createDeliveryBoy(BuildContext context) async {
@@ -452,51 +513,102 @@ pincode*/
     }
   }
 
-  void choDialog(String item) {
-    showDialog(
-      context: context,
-      builder: (context) => new AlertDialog(
-            content: StatesDialog(item, listStates),
-          ),
-    );
-  }
 }
 
-class StatesDialog extends StatefulWidget {
-  String searchText;
-  List<String> listStates;
+class SearchDialogWidget extends StatefulWidget {
+  final List<String> listStrings;
+  final bool isStateSearch;
 
-  StatesDialog(this.searchText, this.listStates);
+  SearchDialogWidget(this.isStateSearch, this.listStrings);
 
   @override
-  _StatesDialogStat createState() => _StatesDialogStat();
+  _SearchDialogWidgetState createState() => _SearchDialogWidgetState();
 }
 
-class _StatesDialogStat extends State<AddBoyToGroupDialog> {
+class _SearchDialogWidgetState extends State<SearchDialogWidget> {
+  TextEditingController controllerSearch = new TextEditingController();
+  FocusNode focusNodeSearch = new FocusNode();
+  List<String> finalList = new List();
+
+  String stringSearch = "";
+
+  @override
+  void initState() {
+    if (widget.isStateSearch) {
+      stringSearch = 'Search State';
+    } else {
+      stringSearch = 'Search City';
+    }
+
+    controllerSearch.addListener(searchListener);
+    focusNodeSearch.addListener(searchListener);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    Column body = new Column(children: [
-      new ListTile(
-        title: TextField(),
+    return Column(children: [
+      TextField(
+        decoration: new InputDecoration(
+          contentPadding: EdgeInsets.all(7.0),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(7.0)),
+          hintText: stringSearch,
+          hintStyle: TextStyle(color: Colors.white, fontSize: 18.0),
+          labelText: stringSearch,
+          labelStyle: TextStyle(
+            color: Colors.black,
+          ),
+        ),
+        keyboardType: TextInputType.text,
+        autofocus: true,
+        controller: controllerSearch,
+        focusNode: focusNodeSearch,
       ),
       Expanded(
         child: ListView.builder(
           itemBuilder: (context, index) {
             return GestureDetector(
               onTap: () {
-                print("Lsit Tapped");
-                //     addBoyToGroup(widget.listGroup[index]);
+                print(
+                    "Lsit Tapped ${finalList[index]} and \nfinal list ${finalList.toString()}");
+
+                if (widget.isStateSearch) {
+                  superState = finalList[index];
+                } else {
+                  superCity = finalList[index];
+                }
+
+                Navigator.pop(context);
+                /** dont assign the selected value to controller before this;
+                 *  makes index value unusable after tapping*/
+                controllerSearch.text = finalList[index];
+                setState(() {});
               },
-              child: new ListTile(
-                  title: new Text(widget.listGroup[index].group_name)),
+              child: new ListTile(title: new Text(finalList[index])),
             );
           },
-          itemCount: widget.listGroup.length,
+          itemCount: finalList.length,
           shrinkWrap: true,
         ),
       ),
     ]);
+  }
 
-    return body;
+  void searchListener() {
+    if (controllerSearch.text.isEmpty) {
+      finalList = widget.listStrings;
+    } else {
+      List<String> searchList = new List();
+      widget.listStrings.forEach((string) {
+        if (string
+            .toLowerCase()
+            .contains(controllerSearch.text.toLowerCase())) {
+          searchList.add(string);
+        }
+      });
+
+      finalList = searchList;
+    }
+    setState(() {});
   }
 }

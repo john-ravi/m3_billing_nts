@@ -14,6 +14,10 @@ import 'customer.dart';
 
 import 'appConstants.dart';
 
+String superState = "", superCity = "";
+List<String> listStates = new List();
+List<String> listCities = new List();
+
 class CreateCustomer extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -26,28 +30,37 @@ class CreateCustomerState extends State<CreateCustomer> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
 
-  UserTest selectedUser;
+  String city = "";
+  String state = "Tap to Select State";
+  bool stateSelected = false;
+  bool citySelected = false;
+
   String selectedState = "";
   String selectedCity = "";
   var mapStates = new Map();
   var cities = new List();
 
-  List<String> blankList = new List.filled(1, "");
+  var mapStatesToId;
 
   TextEditingController controllerName = new TextEditingController();
   TextEditingController ctrlMobile = new TextEditingController();
   TextEditingController ctrlMail = new TextEditingController();
   TextEditingController ctrlGST = new TextEditingController();
   TextEditingController ctrlAddress = new TextEditingController();
-  TextEditingController ctrlCity = new TextEditingController();
-  TextEditingController ctrlState = new TextEditingController();
   TextEditingController ctrlPincode = new TextEditingController();
 
   @override
   void initState() {
     super.initState();
 
-    callGetStates();
+    initEverything();
+  }
+
+  void initEverything() async {
+
+    mapStatesToId = await getStates();
+    listStates = mapStatesToId.keys.toList();
+    setState(() {});
   }
 
   @override
@@ -95,7 +108,7 @@ class CreateCustomerState extends State<CreateCustomer> {
   }
 
   Form buildForm(BuildContext context) {
-    var gstReg = "([0]{1}[1-9]{1}|[1-2]{1}[0-9]{1}|[3]{1}[0-7]{1})([a-zA-Z]{5}[0-9]{4}[a-zA-Z]{1}[1-9a-zA-Z]{1}[zZ]{1}[0-9a-zA-Z]{1})";
+//    var gstReg = "([0]{1}[1-9]{1}|[1-2]{1}[0-9]{1}|[3]{1}[0-7]{1})([a-zA-Z]{5}[0-9]{4}[a-zA-Z]{1}[1-9a-zA-Z]{1}[zZ]{1}[0-9a-zA-Z]{1})";
     return Form(
       autovalidate: true,
       key: _formKey,
@@ -196,7 +209,6 @@ class CreateCustomerState extends State<CreateCustomer> {
               inputFormatters: [
                 WhitelistingTextInputFormatter(RegExp("^[0-9A-Za-z0-9]+")),
                 LengthLimitingTextInputFormatter(14),
-
               ],
             ),
           ),
@@ -226,66 +238,55 @@ class CreateCustomerState extends State<CreateCustomer> {
               keyboardType: TextInputType.text,
             ),
           ),
-          Container(
-            margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
-            width: double.infinity,
-            decoration: ShapeDecoration(
-              shape: RoundedRectangleBorder(
-                side: BorderSide(width: 1.0, style: BorderStyle.solid),
-                borderRadius: BorderRadius.all(Radius.circular(5.0)),
-              ),
-            ),
-            child: DropdownButtonHideUnderline(
-              child: Container(
-                margin: EdgeInsets.only(left: 10.0, right: 10.0),
-                child: new DropdownButton<String>(
-                  hint: new Text("Select State"),
-                  value: selectedState == "" ? null : selectedState,
-                  onChanged: (String newValue) {
-                    setState(() {
-                      selectedState = newValue;
-                      selectedCity = "";
-                    });
-                    callGetCities(newValue);
-                  },
-                  items: mapStates.keys.map((state) {
-                    return new DropdownMenuItem<String>(
-                      value: state,
-                      child: Text(state),
-                    );
-                  }).toList(),
-                ),
+          GestureDetector(
+            onTap: () => dialogForState(listStates),
+            child: Container(
+              margin: EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                      margin: EdgeInsets.only(bottom: 10.0),
+                      child: Text(
+                        'State',
+                        style: TextStyle(fontSize: 16.0, color: Colors.grey),
+                      )),
+                  Container(
+                    child: Text(
+                      state,
+                      style: TextStyle(fontSize: 16.0),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-          Container(
-            margin: EdgeInsets.only(top: 10.0, right: 10.0, left: 10.0),
-            width: double.infinity,
-            decoration: ShapeDecoration(
-              shape: RoundedRectangleBorder(
-                side: BorderSide(width: 1.0, style: BorderStyle.solid),
-                borderRadius: BorderRadius.all(Radius.circular(5.0)),
-              ),
-            ),
-            child: DropdownButtonHideUnderline(
-              child: Container(
-                margin: EdgeInsets.only(left: 10.0, right: 10.0),
-                child: new DropdownButton<String>(
-                  hint: new Text("Select City"),
-                  value: selectedCity == "" ? null : selectedCity,
-                  onChanged: (String newValue) {
-                    print("Printing Changed City $newValue");
-                    setState(() {
-                      selectedCity = newValue;
-                    });
-                  },
-                  items: cities.map((city) {
-                    return new DropdownMenuItem<String>(
-                      value: city,
-                      child: Text(city),
-                    );
-                  }).toList(),
-                ),
+          GestureDetector(
+            onTap: () {
+              if (stateSelected) {
+                dialogForCity();
+              } else {
+                s(context, "Please Select State To Filter Cities");
+              }
+            },
+            child: Container(
+              margin: EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                      margin: EdgeInsets.only(bottom: 10.0),
+                      child: Text(
+                        'City',
+                        style: TextStyle(fontSize: 16.0, color: Colors.grey),
+                      )),
+                  Container(
+                    child: Text(
+                      city,
+                      style: TextStyle(fontSize: 16.0),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -328,12 +329,8 @@ class CreateCustomerState extends State<CreateCustomer> {
                   } else if (ctrlMail.text.length > 0 &&
                       !isEmail(ctrlMail.text)) {
                     s(context, "Please enter a valid email id");
-                  }  else if (ctrlAddress.text.length > 35) {
+                  } else if (ctrlAddress.text.length > 35) {
                     s(context, "Address should not cross 35 characters");
-                  } else if (ctrlCity.text.length > 15) {
-                    s(context, "City should not cross 15 characters");
-                  } else if (ctrlState.text.length > 15) {
-                    s(context, "State should not cross 15 characters");
                   } else {
                     checkIfCustomerExists(context);
                   }
@@ -380,8 +377,7 @@ address*/
 
       if (responseBody["response"].toString().compareTo("Mobile_Registered") ==
           0) {
-        print(
-            "Customer Already Exists");
+        print("Customer Already Exists");
 
         removeloader();
         showDialog(
@@ -420,13 +416,15 @@ address*/
       "mobile_number": ctrlMobile.text,
       "email_id": ctrlMail.text,
       "gst_number": ctrlGST.text,
-      "city": selectedCity,
-      "state": selectedState,
+      "state": superState,
+      "city": superCity,
       "pincode": ctrlPincode.text
     });
 
+
+
     print("Printing Create Customer URI \n $uri");
-    final response = await http.get(uri);
+    final response = await http.get(uri, headers: {"Accept": "application/json"});
 
     removeloader();
     if (response.statusCode == 200) {
@@ -446,12 +444,9 @@ address*/
         ctrlMail.clear();
         ctrlGST.clear();
         ctrlAddress.clear();
-        ctrlState.clear();
-        ctrlCity.clear();
         ctrlPincode.clear();
       } else {
-        s(context,
-            "Failed Adding Customer, Please Retry!");
+        s(context, "Failed Adding Customer, Please Retry!");
       }
     } else {
       // If that call was not successful, throw an error.
@@ -496,10 +491,139 @@ address*/
       print(e);
     }
   }
+
+  dialogForCity() async {
+    var stateID = mapStatesToId[superState];
+    print("States ${mapStatesToId.toString()} \n StateID $stateID}");
+
+    showloader(context);
+    listCities = await getCitiesUtils(stateID);
+
+    removeloader();
+    print("after ge cities ${listCities.toString()}");
+    await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              content: SearchDialogWidget(false, listCities),
+            ));
+    print("Returned $superCity ");
+
+    city = superCity;
+    setState(() {});
+  }
+
+  dialogForState(List<String> listValuesString) async {
+    await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              content: SearchDialogWidget(true, listValuesString),
+            ));
+
+    print("Returned State $superState ");
+    state = superState;
+    setState(() {
+      city = "Tap To Select City";
+      stateSelected = true;
+    });
+
+    dialogForCity();
+  }
 }
 
-class UserTest {
-  const UserTest(this.name);
+class SearchDialogWidget extends StatefulWidget {
+  final List<String> listStrings;
+  final bool isStateSearch;
 
-  final String name;
+  SearchDialogWidget(this.isStateSearch, this.listStrings);
+
+  @override
+  _SearchDialogWidgetState createState() => _SearchDialogWidgetState();
+}
+
+class _SearchDialogWidgetState extends State<SearchDialogWidget> {
+  TextEditingController controllerSearch = new TextEditingController();
+  FocusNode focusNodeSearch = new FocusNode();
+  List<String> finalList = new List();
+
+  String stringSearch = "";
+
+  @override
+  void initState() {
+    if (widget.isStateSearch) {
+      stringSearch = 'Search State';
+    } else {
+      stringSearch = 'Search City';
+    }
+
+    controllerSearch.addListener(searchListener);
+    focusNodeSearch.addListener(searchListener);
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [
+      TextField(
+        decoration: new InputDecoration(
+          contentPadding: EdgeInsets.all(7.0),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(7.0)),
+          hintText: stringSearch,
+          hintStyle: TextStyle(color: Colors.white, fontSize: 18.0),
+          labelText: stringSearch,
+          labelStyle: TextStyle(
+            color: Colors.black,
+          ),
+        ),
+        keyboardType: TextInputType.text,
+        autofocus: true,
+        controller: controllerSearch,
+        focusNode: focusNodeSearch,
+      ),
+      Expanded(
+        child: ListView.builder(
+          itemBuilder: (context, index) {
+            return GestureDetector(
+              onTap: () {
+                print(
+                    "Lsit Tapped ${finalList[index]} and \nfinal list ${finalList.toString()}");
+
+                if (widget.isStateSearch) {
+                  superState = finalList[index];
+                } else {
+                  superCity = finalList[index];
+                }
+
+                Navigator.pop(context);
+                /** dont assign the selected value to controller before this;
+                 *  makes index value unusable after tapping*/
+                controllerSearch.text = finalList[index];
+                setState(() {});
+              },
+              child: new ListTile(title: new Text(finalList[index])),
+            );
+          },
+          itemCount: finalList.length,
+          shrinkWrap: true,
+        ),
+      ),
+    ]);
+  }
+
+  void searchListener() {
+    if (controllerSearch.text.isEmpty) {
+      finalList = widget.listStrings;
+    } else {
+      List<String> searchList = new List();
+      widget.listStrings.forEach((string) {
+        if (string
+            .toLowerCase()
+            .contains(controllerSearch.text.toLowerCase())) {
+          searchList.add(string);
+        }
+      });
+
+      finalList = searchList;
+    }
+    setState(() {});
+  }
 }

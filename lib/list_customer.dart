@@ -75,7 +75,7 @@ class ListCustomerState extends State<Customers> {
     if (_isSearching != null) {
       var name = controllerSearch.text;
       for (int i = 0; i < listCustomers.length; i++) {
-        if (listCustomers[i].customer_name.contains(name)) {
+        if (listCustomers[i].customer_name.toLowerCase().contains(name.toLowerCase())) {
           _searchList.add(listCustomers[i]);
         }
       }
@@ -147,10 +147,9 @@ class ListCustomerState extends State<Customers> {
                               color: Colors.black,
                             ),
                           ),
-                          keyboardType: TextInputType.number,
+                          keyboardType: TextInputType.text,
                           inputFormatters: [
-                            WhitelistingTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(10),
+                            WhitelistingTextInputFormatter(RegExp("^[A-Za-z ]+")),
                           ],
                           controller: controllerSearch,
                           focusNode: focusNodeSearch,
