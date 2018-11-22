@@ -172,6 +172,7 @@ class ListCustomerState extends State<Customers> {
       delegate:
           new SliverChildBuilderDelegate((BuildContext context, int index) {
         return GestureDetector(
+
           child: Container(
             margin: EdgeInsets.all(10.0),
             child: Card(

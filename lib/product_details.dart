@@ -4,7 +4,7 @@ import 'package:m3_billing_nts/model_items.dart';
 import 'colorspage.dart';
 
 class ProductDetails extends StatefulWidget {
-  Items item;
+  ModelProductItem item;
 
   ProductDetails({this.item});
 

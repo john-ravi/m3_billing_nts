@@ -21,9 +21,9 @@ class Products extends StatefulWidget {
 }
 
 class ProductState extends State<Products> {
-  List<Items> listItems = new List();
+  List<ModelProductItem> listItems = new List();
 
-  List<Items> finalItems = new List();
+  List<ModelProductItem> finalItems = new List();
 
   @override
   void initState() {
@@ -99,7 +99,7 @@ class ProductState extends State<Products> {
         print("Listing Rows ${rows.toString()}");
 
         rows.forEach((row) {
-          listItems.add(Items.named(
+          listItems.add(ModelProductItem.named(
               id: row["id"],
               item_name: row["item_name"],
               unit_cost: row["unit_cost"],

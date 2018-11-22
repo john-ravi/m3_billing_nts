@@ -1,0 +1,316 @@
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
+
+import 'colorspage.dart';
+import 'main.dart';
+import 'otp.dart';
+import 'user.dart';
+import 'utils.dart';
+
+class RegisterCustomer extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    RegisterState myAppState() => new RegisterState();
+    return myAppState();
+  }
+}
+
+class RegisterState extends State<RegisterCustomer> {
+  TextEditingController businessname = new TextEditingController();
+  TextEditingController mobile = new TextEditingController();
+  TextEditingController email = new TextEditingController();
+  TextEditingController password = new TextEditingController();
+  TextEditingController aadharcard = new TextEditingController();
+
+  TextEditingController username = new TextEditingController();
+  User user;
+
+  bool isEmail(String em) {
+    String p =
+        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+    RegExp regExp = new RegExp(p);
+    return regExp.hasMatch(em);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new MaterialApp(
+        theme: ThemeData(
+            fontFamily: 'Georgia',
+            primaryColor: Colors.black,
+            accentColor: Colors.black,
+            hintColor: Colors.black),
+        home: new Scaffold(body: new Builder(
+          builder: (BuildContext context) {
+            return new Stack(
+              //  fit: StackFit.loose,
+              children: <Widget>[
+                Container(
+                  child: new Image.asset(
+                    'assets/images/bg.png',
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
+                  ),
+                ),
+                Container(
+                  margin:
+                      EdgeInsets.only(right: 10.0, left: 10.0, bottom: 42.0),
+                  child: Card(
+                    elevation: 6.0,
+                    child: buildCenter(context),
+                  ),
+                ),
+              ],
+            );
+          },
+        )));
+  }
+
+  Widget buildCenter(BuildContext context) {
+    return ListView(
+      children: <Widget>[
+        Container(
+          margin: EdgeInsets.only(top: 5.0, bottom: 5.0),
+          alignment: Alignment(0.0, -1.0),
+          child: new Image.asset(
+            'assets/images/logo.png',
+            height: 100.0,
+            fit: BoxFit.cover,
+          ),
+        ),
+
+
+
+        new ListTile(
+          leading: const Icon(
+            Icons.person,
+            color: secondarycolor,
+          ),
+          title: new TextFormField(
+            decoration: new InputDecoration(
+              hintText: 'Please Enter Your Name',
+              hintStyle: TextStyle(),
+              labelText: 'Enter Your Name',
+              labelStyle: TextStyle(),
+            ),
+            keyboardType: TextInputType.text,
+            controller: username,
+            inputFormatters: [
+              WhitelistingTextInputFormatter(RegExp("^[A-Za-z ]+")),
+            ],
+          ),
+        ),
+        new ListTile(
+          leading: const Icon(
+            Icons.phone,
+            color: secondarycolor,
+          ),
+          title: new TextFormField(
+            decoration: new InputDecoration(
+              hintText: 'Please Enter Mobile Number',
+              hintStyle: TextStyle(),
+              labelText: '10 Digits Mobile No Requried',
+              labelStyle: TextStyle(),
+            ),
+            keyboardType: TextInputType.number,
+            controller: mobile,
+            maxLength: 10,
+            inputFormatters: [
+              WhitelistingTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(10),
+            ],
+          ),
+        ),
+        new ListTile(
+          leading: const Icon(
+            Icons.email,
+            color: secondarycolor,
+          ),
+          title: new TextFormField(
+            decoration: new InputDecoration(
+              hintText: 'Please Enter Email',
+              hintStyle: TextStyle(),
+              labelText: 'Enter Your Email Address',
+              labelStyle: TextStyle(),
+            ),
+            keyboardType: TextInputType.emailAddress,
+            controller: email,
+          ),
+        ),
+        new ListTile(
+          leading: const Icon(
+            Icons.lock,
+            color: secondarycolor,
+          ),
+          title: new TextFormField(
+            decoration: new InputDecoration(
+              hintText: 'Create Password (Min 6 & Max 8)',
+              hintStyle: TextStyle(),
+              labelText: 'Enter Your Password',
+              labelStyle: TextStyle(),
+            ),
+            keyboardType: TextInputType.text,
+            obscureText: true,
+            controller: password,
+            maxLength: 8,
+            inputFormatters: [
+              LengthLimitingTextInputFormatter(8),
+            ],
+          ),
+        ),
+        new ListTile(
+          leading: const Icon(
+            Icons.credit_card,
+            color: secondarycolor,
+          ),
+          title: Container(
+            child: new TextFormField(
+              decoration: new InputDecoration(
+                hintText: 'Please Enter Aadhar Card Number',
+                hintStyle: TextStyle(),
+                labelText: 'Enter Your Aadhar Card Number',
+                labelStyle: TextStyle(),
+              ),
+              keyboardType: TextInputType.number,
+              maxLength: 12,
+              controller: aadharcard,
+              inputFormatters: [
+                WhitelistingTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(12),
+              ],
+            ),
+          ),
+        ),
+        Padding(padding: EdgeInsets.only(top: 8.0)),
+        Container(
+          alignment: Alignment.bottomCenter,
+          child: ConstrainedBox(
+            constraints: new BoxConstraints(minWidth: 250.0),
+            child: new RaisedButton(
+              onPressed: () {
+                onPressed(context);
+              },
+              color: primarycolor,
+              shape: new RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(30.0)),
+              child: new Text('REGISTER',
+                  style: new TextStyle(
+                      color: Colors.white,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold)),
+            ),
+          ),
+        ),
+        Container(
+          margin: EdgeInsets.only(top: 10.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                child: Text(
+                  'ALREADY A USER ? ',
+                  style: TextStyle(fontSize: 16.0, color: Colors.black),
+                ),
+              ),
+              InkWell(
+                onTap: () {
+                  Navigator.push(context,
+                      new MaterialPageRoute(builder: (context) => new MyApp()));
+                },
+                child: Container(
+                  child: Text(
+                    'LOGIN',
+                    style: TextStyle(fontSize: 16.0, color: secondarycolor),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+        Container(
+          alignment: Alignment.bottomCenter,
+          margin: EdgeInsets.only(bottom: 24.0, top: 18.0),
+          child: Text.rich(
+            TextSpan(
+              children: const <TextSpan>[
+                TextSpan(
+                    text: 'By clicking REGISTER you are applicable to ',
+                    style: TextStyle(
+                        fontSize: 12.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black)),
+                TextSpan(
+                    text: 'TERMS OF US',
+                    style: TextStyle(
+                        fontSize: 12.0,
+                        fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.underline,
+                        color: Colors.black)),
+              ],
+            ),
+          ),
+        ),
+        Padding(padding: EdgeInsets.only(top: 8.0)),
+      ],
+    );
+  }
+
+  void onPressed(BuildContext context) {
+    print("OnREgisterCLicked");
+    if (businessname.text.isEmpty) {
+      s(context, 'Enter The Business Name');
+    } else if (username.text.isEmpty) {
+      s(context, 'Enter Your Name');
+    } else if (mobile.text.isEmpty) {
+      s(context, 'Enter The Mobile Number');
+    } else if (mobile.text.length != 10) {
+      s(context, 'Please enter 10 digit Mobile Number');
+    } else if (email.text.isEmpty) {
+      s(context, 'Enter The Email Id');
+    } else if (!isEmail(email.text)) {
+      s(context, 'Please Check The Email Id');
+    } else if (password.text.isEmpty) {
+      s(context, 'Password Should be 6-8 characters');
+    } else if (password.text.length < 6) {
+      s(context, 'Password Should be 6-8 characters');
+    } else if (aadharcard.text.length != 12) {
+      s(context, 'Enter The 12 Digit Aadhar Card Number');
+    } else {
+      showloader(context);
+
+      checkIfMobileRegistered(strQueryMobile: 'checkUser&mobile=${mobile.text}')
+          .then((httpResponse) {
+        if (httpResponse != null) {
+          print("printing hhtp body" + httpResponse.body);
+          var numberJsonResponse = json.decode(httpResponse.body);
+          print("Printing response " + numberJsonResponse['response']);
+
+          if (numberJsonResponse['response'].toString() !=
+              'Mobile_Registered') {
+            // user not there
+
+            print("User Not Existing, call create()");
+            user = new User(businessname.text, username.text, mobile.text,
+                email.text, password.text, aadharcard.text);
+
+            removeloader();
+
+            Navigator.push(context,
+                new MaterialPageRoute(builder: (context) => MobileOTP(user)));
+          } else {
+            removeloader();
+
+            s(context, "Mobile Number already registered, Please Login");
+          }
+        } else {
+          print("HTTP REsponse was null");
+          removeloader();
+        }
+      });
+    }
+  }
+}

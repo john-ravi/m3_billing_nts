@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:m3_billing_nts/customer.dart';
 import 'package:m3_billing_nts/customerWithId.dart';
+import 'package:m3_billing_nts/products_for_billing.dart';
 import 'colorspage.dart';
 import 'create_customer.dart';
 import 'home.dart';
@@ -160,7 +161,9 @@ class CreateBillState extends State<CreateBill> {
             setState(() {
               selectedCustomer = finalCustomers[index];
             });
-            alertForCreateBill(context);
+           // alertForCreateBill(context);
+
+            Navigator.push(context, MaterialPageRoute(builder: (context) => ProductsForBilling(selectedCustomer)));
           },
           child: Container(
             margin: EdgeInsets.all(10.0),

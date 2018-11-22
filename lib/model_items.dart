@@ -1,4 +1,4 @@
-class Items {
+class ModelProductItem {
 
 
   /*
@@ -24,7 +24,7 @@ tax
   String tax;
 
 
-  Items.named({this.id, this.item_name, this.unit_cost, this.no_of_units,
+  ModelProductItem.named({this.id, this.item_name, this.unit_cost, this.no_of_units,
       this.start_date, this.end_date, this.tax});
 
 
@@ -34,6 +34,6 @@ tax
   @override
   String toString() {
     // TODO: implement toString
-    return "Name: $item_name \t Mobile: $unit_cost \t ID: $no_of_units" ;
+    return "Name: $item_name \t Cost: $unit_cost \t Quantity: $no_of_units" ;
   }
 }

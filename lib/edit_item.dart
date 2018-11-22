@@ -14,7 +14,7 @@ import 'colorspage.dart';
 import 'utils.dart';
 
 class EditItem extends StatefulWidget {
-  Items item;
+  ModelProductItem item;
   EditItem(this.item);
 
   @override
@@ -29,7 +29,7 @@ class EditItemState extends State<EditItem> {
   String endate = '';
   DateTime dateStart, dateEnd;
   var itemAvailableStartDate;
-  List<Items> listItems = new List();
+  List<ModelProductItem> listItems = new List();
 
   var sharedPreferences;
 
@@ -477,7 +477,7 @@ end_date
 tax
     */
 
-          listItems.add(Items.named(
+          listItems.add(ModelProductItem.named(
               id: rowItem["id"],
               item_name: rowItem["item_name"],
               unit_cost: rowItem["unit_cost"],

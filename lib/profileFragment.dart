@@ -74,10 +74,63 @@ class ProfileFragmentState extends State<ProfileFragment> {
       setState(() {});
     });
 
-    mapStatesToId = await getStates();
+    mapStatesToId = await getStateslocal();
     listStates = mapStatesToId.keys.toList();
     setState(() {});
   }
+
+  Future<Map<String, dynamic>> getStateslocal() async {
+    var uri = Uri.https(authority = "m3bapis.herokuapp.com",
+        unencodedPath = "/api/states/list"
+    );
+
+    d(uri);
+    http.Response registerUserResponse = await http.get(uri);
+
+    if (registerUserResponse.statusCode == 200) {
+      // If the call to the server was successful, parse the JSON
+      var decodedBody = json.decode(registerUserResponse.body);
+        print("decoded body \t" + decodedBody.toString());
+      Map<String, dynamic> mapStateToId = new Map();
+      decodedBody.forEach((row) {
+        print("ROW \t" + row.toString());
+
+        mapStateToId[row["state_name"]] = row["state_id"];
+
+        print("Map as Whiole \t" + mapStateToId.toString());
+      });
+      return mapStateToId;
+    } else {
+      print("Error Fetching States, Check Network: In Utility");
+    }
+
+    return null;
+  }
+
+  Future<List<String>> getCitieslocal(state_id) async {
+    var uri = Uri.https(
+        authority = "m3bapis.herokuapp.com",
+        unencodedPath = "/api/cities/list");
+
+    d(uri);
+    http.Response registerUserResponse = await http.get(uri);
+    List<String> listCities = new List();
+
+    if (registerUserResponse.statusCode == 200) {
+      // If the call to the server was successful, parse the JSON
+      var decodedBody = json.decode(registerUserResponse.body);
+      decodedBody.forEach((rowCityObject) {
+        print("ROW \t" + rowCityObject.toString());
+        listCities.add(rowCityObject["city_name"]);
+        print("Map as Whiole \t" + decodedBody.toString());
+      });
+    } else {
+      print("Error Fetching States, Check Network: In Utility");
+    }
+
+    return listCities;
+  }
+
 
   void updateAddress(BuildContext context) async {
     if (cntrlEmail.text.isNotEmpty && !isEmail(cntrlEmail.text)) {
@@ -149,7 +202,7 @@ pincode
     try {
       registerUserResponse = await http.get(uri);
     } catch (e) {
-      print(e);
+      print("PRINTING ERROR \n $e");
 
       // await Duration()
     }
@@ -435,30 +488,33 @@ pincode
                         left: 16.0, top: 16.0, right: 16.0, bottom: 16.0),
                     child: Row(
                       mainAxisSize: MainAxisSize.max,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
                         Icon(
                           FontAwesomeIcons.home,
                           color: secondarycolor,
                         ),
-                        Container(
-                          margin: EdgeInsets.only(left: 16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Container(
-                                  margin: EdgeInsets.only(bottom: 10.0),
+                        Expanded(
+                          child: Container(
+                            margin: EdgeInsets.only(left: 16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: <Widget>[
+                                Container(
+                                    margin: EdgeInsets.only(bottom: 10.0),
+                                    child: Text(
+                                      'Tap to Select State',
+                                      style: TextStyle(
+                                          fontSize: 16.0, color: Colors.grey),
+                                    )),
+                                Container(
                                   child: Text(
-                                    'State',
-                                    style: TextStyle(
-                                        fontSize: 16.0, color: Colors.grey),
-                                  )),
-                              Container(
-                                child: Text(
-                                  state,
-                                  style: TextStyle(fontSize: 16.0),
+                                    state,
+                                    style: TextStyle(fontSize: 16.0),
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         )
                       ],
@@ -571,7 +627,7 @@ pincode
     print("States ${mapStatesToId.toString()} \n StateID $stateID}");
 
     showloader(context);
-    listCities = await getCitiesUtils(stateID);
+    listCities = await getCitieslocal(stateID);
 
     removeloader();
     print("after ge cities ${listCities.toString()}");
