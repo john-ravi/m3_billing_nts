@@ -244,7 +244,7 @@ class CreateDeliveryBoyState extends State<CreateDeliveryBoy> {
                     )),
                 Container(
                   child: Text(
-                    state,
+                    state ?? "",
                     style: TextStyle(fontSize: 16.0),
                   ),
                 ),
@@ -273,7 +273,7 @@ class CreateDeliveryBoyState extends State<CreateDeliveryBoy> {
                     )),
                 Container(
                   child: Text(
-                    city,
+                    city ?? "",
                     style: TextStyle(fontSize: 16.0),
                   ),
                 ),
@@ -505,7 +505,7 @@ pincode*/
       } else {
         print("Delivery Boy Mobile Not REgisted calling create ");
         createDeliveryBoy(context);
-        s(context, "Creating Customer");
+        s(context, "Creating Delivery Boy");
       }
     } else {
       // If that call was not successful, throw an error.

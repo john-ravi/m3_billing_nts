@@ -102,8 +102,10 @@ Future<http.Response> tryCatchNetwork(String userUrl) async {
     httpResponse = await http.get(userUrl);
   } catch (e) {
     print("Check Network Connection $userUrl");
+
     return httpResponse;
   }
+    print("Response $httpResponse");
 
   return httpResponse;
 }
@@ -121,7 +123,7 @@ void changeUserPassword(String mobile, String password) async {
   http.Response httpChngPaswdRespnse = await http.get(uri);
   var body = json.decode(httpChngPaswdRespnse.body);
   print(body.toString());
-  var bodyResponse = json.decode(body);
+  var bodyResponse = body["response"];
   if (bodyResponse.toString().compareTo("Password_Changed") == 0) {
     print("Passwrd Changed");
   } else {

@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'colorspage.dart';
 import 'home.dart';
 
@@ -18,6 +22,9 @@ class ForgotPassword extends StatefulWidget {
 
 class ForgotPasswordState extends State<ForgotPassword> {
 
+  var phoneNumber;
+  var rawPhoneno;
+
   Future<String> _message = Future<String>.value('');
   String verificationId;
   String testPhoneNumber;
@@ -31,6 +38,8 @@ bool firePhoneVerified = false;
   TextEditingController controllerPassword = new TextEditingController();
   TextEditingController controllerRenterPass = new TextEditingController();
   TextEditingController controllerOTP = new TextEditingController();
+
+
 
   // Create the focus node. We will pass it to the TextField below.
   final FocusNode myFocusNode = FocusNode();
@@ -51,6 +60,9 @@ bool firePhoneVerified = false;
         _message =
             Future<String>.value('signInWithPhoneNumber auto succeeded: $user');
         print("signInWithPhoneNumber auto succeeded: $user" + "\nGOING TO JOME PAGE");
+        s(context, "Auto verified, press Submit");
+
+
       });
 
      // Navigator.push(context, new MaterialPageRoute(builder: (context) => Home()));
@@ -80,45 +92,64 @@ bool firePhoneVerified = false;
       print("OTP Auto Retrieval failed");
     };
 
-    var phoneNumber = "+91" + controllerMobileNo.text;
+    rawPhoneno = controllerMobileNo.text;
+    phoneNumber = "+91" + rawPhoneno;
     await _auth.verifyPhoneNumber(
         phoneNumber: phoneNumber,
-        timeout: const Duration(seconds: 7),
+        timeout: const Duration(seconds: 30),
         verificationCompleted: verificationCompleted,
         verificationFailed: verificationFailed,
         codeSent: codeSent,
         codeAutoRetrievalTimeout: codeAutoRetrievalTimeout);
   }
 
-  Future<String> _testSignInWithPhoneNumber(String smsCode) async {
+  Future<String> _testSignInWithPhoneNumber(String smsCode, BuildContext context) async {
 
-    FirebaseUser currentUser;
+    FirebaseUser user;
 
     if (firePhoneVerified) {
-      currentUser = await _auth.currentUser();
       gotoHome();
     } else {
-      final FirebaseUser user = await _auth.signInWithPhoneNumber(
-        verificationId: verificationId,
-        smsCode: smsCode,
-      );
 
+      try {
+         user = await _auth.signInWithPhoneNumber(
+                verificationId: verificationId,
+                smsCode: smsCode,
+              );
+      } catch (e) {
+        print(e);
+        print(e);
+        s(context, "Please enter Correct otp sent to $phoneNumber");
+
+      }
+
+/*
       currentUser = await _auth.currentUser();
       assert(user.uid == currentUser.uid);
-      if(user.uid == currentUser.uid){
+*/
+      if(user!=null){
 
         print("Going to Home Screen from _signin");
         gotoHome();
       }
-
     }
-    return 'signInWithPhoneNumber succeeded: $currentUser';
+    return '';
   }
 
-  void gotoHome() {
+  void gotoHome() async{
 
 
     changeUserPassword(controllerMobileNo.text, controllerPassword.text);
+    showloader(context);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool("billingLoggedIn", true);
+    print(prefs.getBool("billingLoggedIn") ?? false);
+
+    prefs.setString("billingCurrentUser", rawPhoneno);
+    print(prefs.getString("billingCurrentUser"));
+
+    removeloader();
+
     Navigator.push(
         context,
         new MaterialPageRoute(
@@ -145,10 +176,36 @@ bool firePhoneVerified = false;
         if(controllerMobileNo.text.length != 10){
           s(_scaffoldContext, "Please Check Mobile Number");
         } else {
-          _testVerifyPhoneNumber(context);
+          chackMobileAndSendOTP(_scaffoldContext);
         }
       }
     });    super.didChangeDependencies();
+  }
+
+  void chackMobileAndSendOTP(BuildContext context) async{
+    await checkIfMobileRegistered(strQueryMobile: 'checkUser&mobile=${controllerMobileNo.text}')
+        .then((httpResponse) async{
+      if (httpResponse != null) {
+        print("printing hhtp body" + httpResponse.body);
+        var numberJsonResponse = json.decode(httpResponse.body);
+        print("Printing response " + numberJsonResponse['response']);
+
+        if (numberJsonResponse['response'].toString() !=
+            'Mobile_Registered') {
+          // user not there
+
+          print("User Not Existing, call create()");
+          s(context, "This Mobile is not Registered, Please Check the number");
+
+        } else {
+          print("User is in Records");
+         await _testVerifyPhoneNumber(context);
+        }
+      } else {
+        print("HTTP REsponse was null");
+      }
+    });
+
   }
 
   @override
@@ -190,185 +247,7 @@ bool firePhoneVerified = false;
                          margin: EdgeInsets.only(right: 10.0, left: 10.0),
                          child: new Card(
                            elevation: 6.0,
-                           child: ListView(
-                             children: <Widget>[
-                               Container(
-                                 margin:
-                                 EdgeInsets.only(top: 10.0, bottom: 10.0),
-                                 child: Icon(
-                                   FontAwesomeIcons.commentDots,
-                                   color: Colors.black,
-                                   size: 60.0,
-                                 ),
-                               ),
-                               Container(
-                                 margin: EdgeInsets.only(
-                                     top: 10.0, right: 10.0, left: 10.0),
-                                 child: TextFormField(
-                                   controller: controllerMobileNo,
-                                   focusNode: myFocusNode,
-                                   autofocus: true,
-                                   maxLength: 10,
-                                   decoration: new InputDecoration(
-                                     contentPadding: EdgeInsets.all(10.0),
-                                     border: OutlineInputBorder(
-                                         borderRadius:
-                                         BorderRadius.circular(5.0)),
-                                     hintText: 'Enter mobile number',
-                                     hintStyle: TextStyle(
-                                       color: Colors.white,
-                                     ),
-                                     labelText: 'Mobile Number',
-                                     labelStyle: TextStyle(
-                                       color: Colors.black,
-                                     ),
-                                   ),
-                                   keyboardType: TextInputType.number,
-                                 ),
-                               ),
-                               Container(
-                                 margin: EdgeInsets.only(
-                                     top: 10.0, right: 10.0, left: 10.0),
-                                 child: TextFormField(
-                                   controller: controllerOTP,
-                                   decoration: new InputDecoration(
-                                     contentPadding: EdgeInsets.all(10.0),
-                                     border: OutlineInputBorder(
-                                         borderRadius:
-                                         BorderRadius.circular(5.0)),
-                                     hintText: 'Enter otp',
-                                     hintStyle: TextStyle(
-                                       color: Colors.white,
-                                     ),
-                                     labelText: 'OTP',
-                                     labelStyle: TextStyle(
-                                       color: Colors.black,
-                                     ),
-                                   ),
-                                   keyboardType: TextInputType.number,
-                                 ),
-                               ),
-                               new Container(
-                                 margin: EdgeInsets.only(
-                                     left: 10.0,
-                                     right: 10.0,
-                                     top: 15.0,
-                                     bottom: 15.0),
-                                 child: Row(
-                                   mainAxisAlignment: MainAxisAlignment
-                                       .center,
-                                   children: <Widget>[
-                                     Container(
-                                       margin: EdgeInsets.only(
-                                           right: 10.0),
-                                       child: Icon(
-                                         FontAwesomeIcons.spinner,
-                                         color: Colors.black,
-                                       ),
-                                     ),
-                                     Text(
-                                       'VERIFICATION CODE EXPIRES IN 30 SECONDS',
-                                       style: TextStyle(
-                                         fontSize: 12.0,
-                                       ),
-                                     ),
-                                   ],
-                                 ),
-                               ),
-                               Container(
-                                 margin: EdgeInsets.only(
-                                     top: 10.0, right: 10.0, left: 10.0),
-                                 child: TextFormField(
-                                   controller: controllerPassword,
-                                   decoration: new InputDecoration(
-                                     contentPadding: EdgeInsets.all(10.0),
-                                     border: OutlineInputBorder(
-                                         borderRadius:
-                                         BorderRadius.circular(5.0)),
-                                     hintText: 'Enter Password',
-                                     hintStyle: TextStyle(
-                                       color: Colors.white,
-                                     ),
-                                     labelText: 'Password',
-                                     labelStyle: TextStyle(
-                                       color: Colors.black,
-                                     ),
-                                   ),
-                                   keyboardType: TextInputType.text,
-                                   obscureText: true,
-                                 ),
-                               ),
-                               Container(
-                                 margin: EdgeInsets.only(
-                                     top: 10.0, right: 10.0, left: 10.0),
-                                 child: TextFormField(
-                                   controller: controllerRenterPass,
-                                   decoration: new InputDecoration(
-                                     contentPadding: EdgeInsets.all(10.0),
-                                     border: OutlineInputBorder(
-                                         borderRadius:
-                                         BorderRadius.circular(5.0)),
-                                     hintText: 'Enter Confirm Password',
-                                     hintStyle: TextStyle(
-                                       color: Colors.white,
-                                     ),
-                                     labelText: 'Confirm Password',
-                                     labelStyle: TextStyle(
-                                       color: Colors.black,
-                                     ),
-                                   ),
-                                   keyboardType: TextInputType.text,
-                                   obscureText: true,
-                                 ),
-                               ),
-                               Container(
-                                 margin: EdgeInsets.only(top: 7.0),
-                                 child: Row(
-                                   mainAxisAlignment:
-                                   MainAxisAlignment.spaceAround,
-                                   children: <Widget>[
-                                     Container(
-                                       width: 150.0,
-                                       child: new RaisedButton(
-                                         onPressed: () {
-                                           _testVerifyPhoneNumber(
-                                               context);
-                                         },
-                                         color: primarycolor,
-                                         shape: new RoundedRectangleBorder(
-                                             borderRadius:
-                                             new BorderRadius.circular(
-                                                 30.0)),
-                                         child: new Text('RESEND CODE',
-                                             style: new TextStyle(
-                                               color: Colors.white,
-                                               fontSize: 16.0,
-                                             )),
-                                       ),
-                                     ),
-                                     Container(
-                                       width: 150.0,
-                                       child: new RaisedButton(
-                                         onPressed: () {
-                                           checkBeforeSignIn(context);
-                                         },
-                                         color: primarycolor,
-                                         shape: new RoundedRectangleBorder(
-                                             borderRadius:
-                                             new BorderRadius.circular(
-                                                 30.0)),
-                                         child: new Text('CONFIRM',
-                                             style: new TextStyle(
-                                               color: Colors.white,
-                                               fontSize: 16.0,
-                                             )),
-                                       ),
-                                     ),
-                                   ],
-                                 ),
-                               )
-                             ],
-                           ),
+                           child: buildListView(context),
                          ),
                        )
                      ],
@@ -381,11 +260,202 @@ bool firePhoneVerified = false;
        );
   }
 
+  ListView buildListView(BuildContext context) {
+    return ListView(
+                           children: <Widget>[
+                             Container(
+                               margin:
+                               EdgeInsets.only(top: 10.0, bottom: 10.0),
+                               child: Icon(
+                                 FontAwesomeIcons.commentDots,
+                                 color: Colors.black,
+                                 size: 60.0,
+                               ),
+                             ),
+                             Container(
+                               margin: EdgeInsets.only(
+                                   top: 10.0, right: 10.0, left: 10.0),
+                               child: TextFormField(
+                                 controller: controllerMobileNo,
+                                 focusNode: myFocusNode,
+                                 autofocus: true,
+                                 maxLength: 10,
+                                 decoration: new InputDecoration(
+                                   contentPadding: EdgeInsets.all(10.0),
+                                   border: OutlineInputBorder(
+                                       borderRadius:
+                                       BorderRadius.circular(5.0)),
+                                   hintText: 'Enter mobile number',
+                                   hintStyle: TextStyle(
+                                     color: Colors.white,
+                                   ),
+                                   labelText: 'Mobile Number',
+                                   labelStyle: TextStyle(
+                                     color: Colors.black,
+                                   ),
+                                 ),
+                                 keyboardType: TextInputType.number,
+                                 inputFormatters: [
+                                   WhitelistingTextInputFormatter.digitsOnly,
+                                   LengthLimitingTextInputFormatter(10),
+                                 ],
+                               ),
+                             ),
+                             Container(
+                               margin: EdgeInsets.only(
+                                   top: 10.0, right: 10.0, left: 10.0),
+                               child: TextFormField(
+
+                                 controller: controllerOTP,
+                                 decoration: new InputDecoration(
+                                   contentPadding: EdgeInsets.all(10.0),
+                                   border: OutlineInputBorder(
+                                       borderRadius:
+                                       BorderRadius.circular(5.0)),
+                                   hintText: 'Enter otp',
+                                   hintStyle: TextStyle(
+                                     color: Colors.white,
+                                   ),
+                                   labelText: 'OTP',
+                                   labelStyle: TextStyle(
+                                     color: Colors.black,
+                                   ),
+                                 ),
+                                 keyboardType: TextInputType.number,
+                                 inputFormatters: [
+                                   WhitelistingTextInputFormatter.digitsOnly,
+                                   LengthLimitingTextInputFormatter(6),
+                                 ],
+                               ),
+                             ),
+                             new Container(
+                               margin: EdgeInsets.only(
+                                   left: 10.0,
+                                   right: 10.0,
+                                   top: 15.0,
+                                   bottom: 15.0),
+                               child: Row(
+                                 mainAxisAlignment: MainAxisAlignment
+                                     .center,mainAxisSize: MainAxisSize.max,
+                                 children: <Widget>[
+                                   Container(
+                                     margin: EdgeInsets.only(
+                                         right: 10.0),
+                                     child: Icon(
+                                       FontAwesomeIcons.spinner,
+                                       color: Colors.black,
+                                     ),
+                                   ),
+                                   Text(
+                                     'OTP EXPIRES IN 30 SECONDS',
+                                     style: TextStyle(
+                                       fontSize: 12.0,
+                                     ),
+                                   ),
+                                 ],
+                               ),
+                             ),
+                             Container(
+                               margin: EdgeInsets.only(
+                                   top: 10.0, right: 10.0, left: 10.0),
+                               child: TextFormField(
+                                 controller: controllerPassword,
+                                 decoration: new InputDecoration(
+                                   contentPadding: EdgeInsets.all(10.0),
+                                   border: OutlineInputBorder(
+                                       borderRadius:
+                                       BorderRadius.circular(5.0)),
+                                   hintText: 'Enter Password',
+                                   hintStyle: TextStyle(
+                                     color: Colors.white,
+                                   ),
+                                   labelText: 'Password',
+                                   labelStyle: TextStyle(
+                                     color: Colors.black,
+                                   ),
+                                 ),
+                                 keyboardType: TextInputType.text,
+                                 obscureText: true,
+                               ),
+                             ),
+                             Container(
+                               margin: EdgeInsets.only(
+                                   top: 10.0, right: 10.0, left: 10.0),
+                               child: TextFormField(
+                                 controller: controllerRenterPass,
+                                 decoration: new InputDecoration(
+                                   contentPadding: EdgeInsets.all(10.0),
+                                   border: OutlineInputBorder(
+                                       borderRadius:
+                                       BorderRadius.circular(5.0)),
+                                   hintText: 'Enter Confirm Password',
+                                   hintStyle: TextStyle(
+                                     color: Colors.white,
+                                   ),
+                                   labelText: 'Confirm Password',
+                                   labelStyle: TextStyle(
+                                     color: Colors.black,
+                                   ),
+                                 ),
+                                 keyboardType: TextInputType.text,
+                                 obscureText: true,
+                               ),
+                             ),
+                             Container(
+                               margin: EdgeInsets.only(top: 7.0),
+                               child: Row(
+                                 mainAxisAlignment:
+                                 MainAxisAlignment.spaceAround,
+                                 children: <Widget>[
+                                   Container(
+                                     width: 150.0,
+                                     child: new RaisedButton(
+                                       onPressed: () {
+                                         _testVerifyPhoneNumber(
+                                             context);
+                                       },
+                                       color: primarycolor,
+                                       shape: new RoundedRectangleBorder(
+                                           borderRadius:
+                                           new BorderRadius.circular(
+                                               30.0)),
+                                       child: new Text('RESEND CODE',
+                                           style: new TextStyle(
+                                             color: Colors.white,
+                                             fontSize: 16.0,
+                                           )),
+                                     ),
+                                   ),
+                                   Container(
+                                     width: 150.0,
+                                     child: new RaisedButton(
+                                       onPressed: () {
+                                         checkBeforeSignIn(context);
+                                       },
+                                       color: primarycolor,
+                                       shape: new RoundedRectangleBorder(
+                                           borderRadius:
+                                           new BorderRadius.circular(
+                                               30.0)),
+                                       child: new Text('CONFIRM',
+                                           style: new TextStyle(
+                                             color: Colors.white,
+                                             fontSize: 16.0,
+                                           )),
+                                     ),
+                                   ),
+                                 ],
+                               ),
+                             )
+                           ],
+                         );
+  }
+
   void checkBeforeSignIn(BuildContext context) {
-    if(controllerMobileNo.text.length != 10){
+    if (controllerMobileNo.text.length != 10) {
       s(context, "Please Check Mobile Number");
     }
-    else if(controllerPassword.text.length < 6) {
+    else if (controllerPassword.text.length < 6) {
       s(context, "Password Should have Minimum 6 Characters/Numbers");
     }
     else if (controllerPassword.text
@@ -394,17 +464,18 @@ bool firePhoneVerified = false;
         0) {
       s(context,
           "Passwords Not Match, Please Check");
-    } else if (controllerOTP.text.length == 0) {
-        print(controllerOTP.text);
-        s(context,
-            "Please Check The OTP");
-      } else { /** Goto Home page*/
-        print(_testSignInWithPhoneNumber(
-            controllerOTP.text));
+    } else {
+      /** Goto Home page*/
+      if(firePhoneVerified) {
+
+        gotoHome();
+      } else {
+
+      print(_testSignInWithPhoneNumber(
+          controllerOTP.text, context));
       }
-
-
     }
+  }
   }
 
 

@@ -13,6 +13,7 @@ class ProductAdapter extends StatelessWidget {
         elevation: 6.0,
         margin: EdgeInsets.all(10.0),
         child: Table(
+          border: TableBorder.all(width: 1.0, color: Colors.black54),
           children: [
             TableRow(children: [
               Container(

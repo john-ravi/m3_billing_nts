@@ -72,6 +72,7 @@ class HomeState extends State<Home> {
   }
 
   Future<bool> _onWillPop() {
+    print("Poppoing Home on will popo");
     return showDialog(
           context: context,
           builder: (context) => new AlertDialog(

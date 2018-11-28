@@ -3,7 +3,7 @@ import 'package:m3_billing_nts/model_bills.dart';
 import 'allbilladapter.dart';
 
 class AllFragments extends StatefulWidget {
-  List<Bills> listBills;
+  final List<Bills> listBills;
   AllFragments(this.listBills);
 
 

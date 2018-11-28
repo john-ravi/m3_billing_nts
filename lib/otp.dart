@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'colorspage.dart';
@@ -71,7 +72,7 @@ gotoHome(context);
 
      await _auth.verifyPhoneNumber(
          phoneNumber: "+91" + widget.user.mobile.trim(),
-         timeout: const Duration(seconds: 14),
+         timeout: const Duration(seconds: 30),
          verificationCompleted: verificationCompleted,
          verificationFailed: verificationFailed,
          codeSent: codeSent,
@@ -93,13 +94,24 @@ gotoHome(context);
      }
 
      removeloader();
+/*
      final FirebaseUser currentUser = await _auth.currentUser();
-     assert(user.uid == currentUser.uid);
+     var name = user.uid == currentUser.uid;
+
+     try {
+       assert(name);
+     } catch (e) {
+       print("Error asert $e");
+     }
+*/
 
      otpController.text = '';
 
+     print("Checking uids user that sent sms code \t ${user.uid} and current Auth User Id "
+         " ");
+
      if (user != null) {
-       return user.uid == currentUser.uid;
+       return true;
      } else {
        return false;
      }
@@ -197,6 +209,10 @@ gotoHome(context);
                                 keyboardType: TextInputType.number,
                                 controller: otpController,
                                 maxLength: 6,
+                                inputFormatters: [
+                                  WhitelistingTextInputFormatter.digitsOnly,
+                                  LengthLimitingTextInputFormatter(10),
+                                ],
                               ),
                             ),
                             new Container(
@@ -252,6 +268,7 @@ gotoHome(context);
              child: new RaisedButton(
                onPressed: () {
 
+                 _testVerifyPhoneNumber();
                },
                color: primarycolor,
                shape: new RoundedRectangleBorder(
@@ -291,36 +308,39 @@ gotoHome(context);
    }
 
    void onOtpPressed(BuildContext context) async{
-     if(otpController.text.length < 6){
+     if(otpController.text.length != 6){
        s(context, "Please enter 6 digit OTP");
      } else {
        print("From OnPressed otp is " + otpController.text + " Code");
        bool smsVerified;
        await _testSignInWithPhoneNumber(context, otpController.text.trim()).then((onValue) {
+
          smsVerified = onValue;
 
        });
 
        if (smsVerified) {
 
+         print("Sms is verified");
          s(context, "Registering using ${widget.user.mobile}");
 
-         await createUserInDB(widget.user, context);
 
          gotoHome(context);
        } else {
+         print("Sms not verified");
          removeloader();
          s(context,
              "Please enter 6 digit OTP sent to ${widget.user.mobile
                  .trim()}");
        }
 
-
-
      }
    }
 
    void gotoHome(BuildContext context) async{
+
+     showloader(context);
+     await createUserInDB(widget.user, context);
 
      SharedPreferences prefs = await SharedPreferences.getInstance();
      prefs.setBool("billingLoggedIn", true);
@@ -329,6 +349,7 @@ gotoHome(context);
      prefs.setString("billingCurrentUser", widget.user.mobile.trim());
      print(prefs.getString("billingCurrentUser"));
 
+     removeloader();
      Navigator.push(context, new MaterialPageRoute(builder: (context) => Home()));
    }
 }

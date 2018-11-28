@@ -253,7 +253,7 @@ class CreateCustomerState extends State<CreateCustomer> {
                       )),
                   Container(
                     child: Text(
-                      state,
+                      state ?? "",
                       style: TextStyle(fontSize: 16.0),
                     ),
                   ),
@@ -270,7 +270,7 @@ class CreateCustomerState extends State<CreateCustomer> {
               }
             },
             child: Container(
-              margin: EdgeInsets.all(16.0),
+              margin: EdgeInsets.only(left: 16.0, bottom: 8.0, right: 16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
@@ -282,7 +282,7 @@ class CreateCustomerState extends State<CreateCustomer> {
                       )),
                   Container(
                     child: Text(
-                      city,
+                      city ?? "",
                       style: TextStyle(fontSize: 16.0),
                     ),
                   ),

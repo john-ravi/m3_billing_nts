@@ -284,7 +284,7 @@ class MyAppState extends State<MyApp> {
                 strMobile: mobile.text,
                 password: password.text)
             .then((httpResponse) {
-          print(httpResponse.body);
+          print(httpResponse);
           var numberResponse = json.decode(httpResponse.body);
           print("Login Status " + numberResponse['response']);
 

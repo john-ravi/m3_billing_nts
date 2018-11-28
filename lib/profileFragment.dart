@@ -74,7 +74,7 @@ class ProfileFragmentState extends State<ProfileFragment> {
       setState(() {});
     });
 
-    mapStatesToId = await getStateslocal();
+    mapStatesToId = await getStates();
     listStates = mapStatesToId.keys.toList();
     setState(() {});
   }
@@ -253,15 +253,15 @@ pincode
 
         setState(() {
           user = listUser[0];
-          cntrlPincode.text = user.pincode;
-          cntrlArea.text = user.area;
-          cntrlStreet.text = user.street;
-          cntrlFlatNo.text = user.flatNo;
-          cntrlEmail.text = user.email;
-          state = user.state;
-          city = user.city;
-          name = user.username;
-          mobile = user.mobile;
+          cntrlPincode.text = user.pincode ?? "";
+          cntrlArea.text = user.area ?? "";
+          cntrlStreet.text = user.street ?? "";
+          cntrlFlatNo.text = user.flatNo ?? "";
+          cntrlEmail.text = user.email ?? "";
+          state = user.state ?? "";
+          city = user.city ?? "";
+          name = user.username ?? "";
+          mobile = user.mobile ?? "";
 
           print("My Profile PRINTING $user");
         });
@@ -485,7 +485,7 @@ pincode
                   onTap: () => dialogForState(listStates),
                   child: Container(
                     margin: EdgeInsets.only(
-                        left: 16.0, top: 16.0, right: 16.0, bottom: 16.0),
+                        left: 16.0, top: 16.0, right: 16.0),
                     child: Row(
                       mainAxisSize: MainAxisSize.max,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -509,7 +509,7 @@ pincode
                                     )),
                                 Container(
                                   child: Text(
-                                    state,
+                                    state ?? "",
                                     style: TextStyle(fontSize: 16.0),
                                   ),
                                 ),
@@ -530,7 +530,7 @@ pincode
                     }
                   },
                   child: Container(
-                    margin: EdgeInsets.only(left: 16.0, top: 16.0, right: 16.0),
+                    margin: EdgeInsets.only(left: 16.0, top: 8.0, right: 16.0),
                     child: Row(
                       mainAxisSize: MainAxisSize.max,
                       children: <Widget>[
@@ -552,7 +552,7 @@ pincode
                                   )),
                               Container(
                                 child: Text(
-                                  city,
+                                  city ?? "",
                                   style: TextStyle(fontSize: 16.0),
                                 ),
                               ),
@@ -565,7 +565,7 @@ pincode
                 ),
                 new Padding(
                   padding:
-                      const EdgeInsets.only(left: 16.0, top: 16.0, right: 16.0),
+                      const EdgeInsets.only(left: 16.0, top: 4.0, right: 16.0),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
@@ -627,7 +627,7 @@ pincode
     print("States ${mapStatesToId.toString()} \n StateID $stateID}");
 
     showloader(context);
-    listCities = await getCitieslocal(stateID);
+    listCities = await getCitiesUtils(stateID);
 
     removeloader();
     print("after ge cities ${listCities.toString()}");
@@ -638,7 +638,7 @@ pincode
             ));
     print("Returned $superCity ");
 
-    city = superCity;
+    city = superCity ?? "";
     setState(() {});
   }
 
@@ -650,7 +650,7 @@ pincode
             ));
 
     print("Returned State $superState ");
-    state = superState;
+    state = superState ?? "";
     setState(() {
       city = "Tap To Select City";
       stateSelected = true;
