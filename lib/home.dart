@@ -54,9 +54,23 @@ class HomeState extends State<Home> {
 
   @override
   void initState() {
+    print('init state: $this');
     getUser();
     super.initState();
   }
+
+  @override
+  void dispose() {
+    print('dispose: $this');
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(Home oldWidget) {
+    print('didUpdateWidget: $this');
+    super.didUpdateWidget(oldWidget);
+  }
+
 
   final List<Widget> homechildren = [
     CalenderFragment(),

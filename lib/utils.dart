@@ -275,17 +275,17 @@ Future<Map<String, String>> getStates() async {
     if (decodedBody['response'].toString().compareTo("success") == 0) {
       Map<String, String> mapStateToId = new Map();
 
-      print("decoded body \t" + decodedBody.toString());
+  //    print("decoded body \t" + decodedBody.toString());
       List statesTableList = decodedBody["body"];
 
-      print("List \t" + statesTableList.toString());
+  //    print("List \t" + statesTableList.toString());
 
       statesTableList.forEach((row) {
-        print("ROW \t" + row.toString());
+  //      print("ROW \t" + row.toString());
 
         mapStateToId[row["state_name"]] = row["state_id"];
 
-        print("Map as Whiole \t" + mapStateToId.toString());
+ //       print("Map as Whiole \t" + mapStateToId.toString());
       });
       return mapStateToId;
 //    return Post.fromJson(json.decode(response.body));
@@ -311,15 +311,15 @@ Future<List<String>> getCitiesUtils(state_id) async {
     // If the call to the server was successful, parse the JSON
     var decodedBody = json.decode(registerUserResponse.body);
     if (decodedBody['response'].toString().compareTo("success") == 0) {
-      print("decoded body \t" + decodedBody.toString());
+//      print("decoded body \t" + decodedBody.toString());
       List objectCitiesList = decodedBody["body"];
 
-      print("List \t" + objectCitiesList.toString());
+//      print("List \t" + objectCitiesList.toString());
 
       objectCitiesList.forEach((rowCityObject) {
-        print("ROW \t" + rowCityObject.toString());
+ //       print("ROW \t" + rowCityObject.toString());
         listCities.add(rowCityObject["city_name"]);
-        print("Map as Whiole \t" + objectCitiesList.toString());
+//        print("Map as Whiole \t" + objectCitiesList.toString());
       });
     } else {
       print("Couldn't fetch rows, please check");

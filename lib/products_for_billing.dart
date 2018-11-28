@@ -7,7 +7,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:m3_billing_nts/basket_products_adapter.dart';
 import 'package:m3_billing_nts/customerWithId.dart';
 import 'package:m3_billing_nts/edit_item.dart';
-import 'package:m3_billing_nts/model_items.dart';
+import 'package:m3_billing_nts/model_product_items.dart';
 import 'colorspage.dart';
 import 'home.dart';
 import 'product_details.dart';
@@ -32,16 +32,15 @@ class ProductState extends State<ProductsForBilling> {
   List<ModelProductItem> listItems = new List();
   List<ModelProductItem> finalItems = new List();
 
-  List<String> added = [];
-  String currentText = "";
-  GlobalKey<AutoCompleteTextFieldState<ModelProductItem>> searchTextGlobalkey = new GlobalKey();
+  List<int> listCountRequestedItems = [];
+  GlobalKey<AutoCompleteTextFieldState<ModelProductItem>> searchTextGlobalkey =
+      new GlobalKey();
   List<ModelProductItem> suggestions = new List();
   List<ModelProductItem> basketItems = new List();
 
 
 
   AutoCompleteTextField textField;
-
 
   @override
   void initState() {
@@ -61,25 +60,28 @@ class ProductState extends State<ProductsForBilling> {
         suggestions: suggestions,
         textInputAction: TextInputAction.go,
         textChanged: (item) {
-          currentText = item;
-          print("currwent $currentText");
-          print("list ${suggestions.toString()}");
+          print("text Changed $item");
         },
         textSubmitted: (item) {
-          print("Submitteed");
+          print("Submitteed $item");
           setState(() {
-            currentText = item;
-            added.add(currentText);
-            currentText = "";
+            listCountRequestedItems.add(0);
+
+            ModelProductItem suggestionFromList = suggestions
+                .firstWhere((suggestion) => suggestion.item_name == item);
+
+            int index = suggestions.indexOf(suggestionFromList);
+
+            print("first Suggestion from list $suggestionFromList \t its index $index");
+            basketItems.add(suggestions[index]);
           });
         },
         itemBuilder: (context, item) {
-          var _itemCount = 0;
           return new Padding(
-              padding: EdgeInsets.all(8.0), child: Column(
+              padding: EdgeInsets.all(8.0),
+              child: Column(
                 children: <Widget>[
                   new Text(item.item_name),
-
                 ],
               ));
         },
@@ -92,20 +94,37 @@ class ProductState extends State<ProductsForBilling> {
 
     Column body = new Column(children: [
       new ListTile(
-          title: textField,
-)
+        title: textField,
+      )
     ]);
 
-    body.children.addAll(added.map((item) {
-      var _itemCount = 0;
+    body.children.addAll(basketItems.map((item) {
 
-      return new ListTile(title: new Text(item), subtitle:                   Row(
-        children: <Widget>[
-          _itemCount!=0? new  IconButton(icon: new Icon(Icons.remove),onPressed: ()=>setState(()=>_itemCount--),):new Container(),
-          new Text(_itemCount.toString()),
-          new IconButton(icon: new Icon(Icons.add),onPressed: ()=>setState(()=>_itemCount++))
-        ],
-      ),);
+      int indexOf = basketItems.indexOf(item);
+      print("adding @ $indexOf index of basketItem");
+
+      return new ListTile(
+
+        title: new Text(item.item_name + "\nAvailable: ${item.no_of_units}" ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            listCountRequestedItems[indexOf] != 0
+                ? new IconButton(
+                    icon: new Icon(Icons.remove),
+                    onPressed: () => setState(() => listCountRequestedItems[indexOf]--),
+                  )
+                : new Container(),
+            new Text(listCountRequestedItems[indexOf].toString()),
+            listCountRequestedItems[indexOf] <= item.no_of_units ?
+            new IconButton(
+                icon: new Icon(Icons.add),
+                onPressed: () => setState(() => listCountRequestedItems[indexOf]++))
+                : Container(),
+          ],
+        ),
+      );
     }));
 
     return MaterialApp(
@@ -123,11 +142,9 @@ class ProductState extends State<ProductsForBilling> {
               }),
         ),
         body: body,
-
       ),
     );
   }
-
 
   void callGetProducts() async {
     String authority = "18.191.190.195";
@@ -229,7 +246,6 @@ class ProductState extends State<ProductsForBilling> {
           ),*/
         ],
       ),
-
     );
   }
 }

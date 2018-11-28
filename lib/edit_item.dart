@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:m3_billing_nts/home.dart';
-import 'package:m3_billing_nts/model_items.dart';
+import 'package:m3_billing_nts/model_product_items.dart';
 import 'package:m3_billing_nts/products.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -491,8 +491,8 @@ tax
 
         setState(() {
           cntrlTax.text = widget.item.tax;
-          itemUnitCost.text = widget.item.unit_cost;
-          itemUnits.text = widget.item.no_of_units;
+          itemUnitCost.text = widget.item.unit_cost.toString();
+          itemUnits.text = widget.item.no_of_units.toString();
           itemName.text = widget.item.item_name;
 
 

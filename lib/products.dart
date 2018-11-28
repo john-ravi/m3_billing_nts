@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:m3_billing_nts/edit_item.dart';
-import 'package:m3_billing_nts/model_items.dart';
+import 'package:m3_billing_nts/model_product_items.dart';
 import 'colorspage.dart';
 import 'home.dart';
 import 'product_details.dart';

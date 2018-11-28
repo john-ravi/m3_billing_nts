@@ -19,6 +19,7 @@ void main() {
 }
 
 void runWhat() async{
+
   await initBillingPrefs().then((bool) {
     if(bool) {
       runApp(Home());

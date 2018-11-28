@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:m3_billing_nts/model_items.dart';
+import 'package:m3_billing_nts/model_product_items.dart';
 import 'colorspage.dart';
 
 class ProductDetails extends StatefulWidget {
@@ -82,7 +82,7 @@ class ProductDetailsState extends State<ProductDetails> {
                 Container(
                   margin: EdgeInsets.only(left: 10.0, top: 10.0,bottom: 10.0),
                   child: Text(
-                    widget.item.unit_cost + "Rs",
+                    widget.item.unit_cost.toString() + "Rs",
                     style: TextStyle(fontSize: 16.0),
                   ),
                 ),
@@ -99,7 +99,7 @@ class ProductDetailsState extends State<ProductDetails> {
                 Container(
                   margin: EdgeInsets.only(left: 10.0, top: 10.0,bottom: 10.0),
                   child: Text(
-                    widget.item.no_of_units,
+                    widget.item.no_of_units.toString(),
                     style: TextStyle(fontSize: 16.0),
                   ),
                 ),

@@ -402,7 +402,7 @@ class CreateItemState extends State<CreateItem> {
           "item_name":
           itemName.text,
           "unit_cost": itemUnitCost.text,
-          "no_of_units": itemUnitCost.text,
+          "no_of_units": itemUnits.text,
           "start_date": startdate,
           "end_date": endate,
           "tax": cntrlTax.text == '' ? "0" : cntrlTax.text

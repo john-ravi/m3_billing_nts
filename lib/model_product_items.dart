@@ -17,8 +17,8 @@ tax
 
   String id;
   String item_name;
-  String unit_cost;
-  String no_of_units;
+  double unit_cost;
+  double no_of_units;
   String start_date;
   String end_date;
   String tax;
@@ -33,7 +33,7 @@ tax
 
   @override
   String toString() {
-    // TODO: implement toString
-    return "Name: $item_name \t Cost: $unit_cost \t Quantity: $no_of_units" ;
+
+    return item_name ;
   }
 }

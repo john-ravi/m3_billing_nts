@@ -1,4 +1,4 @@
-import 'model_items.dart';
+import 'model_product_items.dart';
 
 class ModelBasketItem {
   ModelProductItem modelProductItem;

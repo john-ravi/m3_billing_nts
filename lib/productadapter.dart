@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:m3_billing_nts/model_items.dart';
+import 'package:m3_billing_nts/model_product_items.dart';
 
 class ProductAdapter extends StatelessWidget {
   final ModelProductItem item;
