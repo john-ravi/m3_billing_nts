@@ -1,23 +1,24 @@
 class User {
-  String businessName;
-  String mobile;
-  String email;
-  String password;
-  String aadharCard;
-  String username;
+  String businessName = "";
+  String mobile = "";
+  String email = "";
+  String password = "";
+  String aadharCard = "";
+  String username = "";
 
-  String flatNo;
-  String street;
-  String area;
-  String state;
-  String city;
-  String pincode;
+  String flatNo = "";
+  String street = "";
+  String area = "";
+  String state = "";
+  String city = "";
+  String pincode = "";
 
 
 
-  User(this.businessName, this.username, this.mobile, this.email, this.password,
-      this.aadharCard);
+  /*User(this.businessName, this.username, this.mobile, this.email, this.password,
+      this.aadharCard);*/
 
+  User();
 
   User.named({this.businessName, this.mobile, this.email, this.password,
       this.aadharCard, this.username, this.flatNo, this.street, this.area, this.state,

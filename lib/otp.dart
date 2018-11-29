@@ -343,11 +343,18 @@ gotoHome(context);
      await createUserInDB(widget.user, context);
 
      SharedPreferences prefs = await SharedPreferences.getInstance();
-     prefs.setBool("billingLoggedIn", true);
-     print(prefs.getBool("billingLoggedIn") ?? false);
+     prefs.setBool(LOGGED_IN, true);
+     print(prefs.getBool(LOGGED_IN) ?? false);
 
-     prefs.setString("billingCurrentUser", widget.user.mobile.trim());
-     print(prefs.getString("billingCurrentUser"));
+     prefs.setString(CURRENT_USER, widget.user.mobile.trim());
+     prefs.setString(CURRENT_USER_NAME, widget.user.username.trim());
+     prefs.setString(CURRENT_USER_EMAIL, widget.user.email.trim());
+     prefs.setString(CURRENT_USER_FLAT_NO, widget.user.flatNo.trim());
+     prefs.setString(CURRENT_USER_AREA, widget.user.area.trim());
+     prefs.setString(CURRENT_USER_STATE, widget.user.state.trim());
+     prefs.setString(CURRENT_USER_CITY, widget.user.city.trim());
+     prefs.setString(CURRENT_USER_PINCODE, widget.user.pincode.trim());
+     print(prefs.getString(CURRENT_USER));
 
      removeloader();
      Navigator.push(context, new MaterialPageRoute(builder: (context) => Home()));

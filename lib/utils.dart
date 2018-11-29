@@ -30,6 +30,14 @@ OverlayEntry loaderentry;
 
 const String LOGGED_IN = "billingLoggedIn";
 const String CURRENT_USER = "billingCurrentUser";
+const String CURRENT_USER_NAME = "Username";
+const String CURRENT_USER_EMAIL = "CURRENT_USER_EMAIL";
+const String CURRENT_USER_FLAT_NO = "CURRENT_USER_FLAT_NO";
+const String CURRENT_USER_STREET = "CURRENT_USER_STREET";
+const String CURRENT_USER_AREA = "CURRENT_USER_AREA";
+const String CURRENT_USER_STATE = "CURRENT_USER_STATE";
+const String CURRENT_USER_CITY = "CURRENT_USER_CITY";
+const String CURRENT_USER_PINCODE = "CURRENT_USER_PINCODE";
 
 showloader(BuildContext context) {
   OverlayState loaderstate = Overlay.of(context);

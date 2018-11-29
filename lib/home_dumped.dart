@@ -1,48 +1,43 @@
-import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:m3_billing_nts/allbills.dart';
-import 'package:m3_billing_nts/bills_fragment_dumped.dart';
-import 'package:m3_billing_nts/calender_fragment.dart';
-import 'package:m3_billing_nts/colorspage.dart';
-import 'package:m3_billing_nts/create_bills.dart';
-import 'package:m3_billing_nts/create_catergory.dart';
-import 'package:m3_billing_nts/create_item.dart';
-import 'package:m3_billing_nts/delivery_boys.dart';
-import 'package:m3_billing_nts/groups.dart';
-import 'package:m3_billing_nts/help.dart';
-import 'package:m3_billing_nts/list_customer.dart';
-import 'package:m3_billing_nts/main.dart';
-import 'package:m3_billing_nts/notification.dart';
-import 'package:m3_billing_nts/orders.dart';
-import 'package:m3_billing_nts/products.dart';
-import 'package:m3_billing_nts/profile.dart';
-import 'package:m3_billing_nts/profileFragment.dart';
-import 'package:m3_billing_nts/settings.dart';
-import 'package:m3_billing_nts/user.dart';
-import 'package:m3_billing_nts/utils.dart';
-import 'package:m3_billing_nts/vacation.dart';
-import 'package:m3_billing_nts/vacationfragment.dart';
-import 'package:share/share.dart';
+import 'package:m3_billing_nts/bills_modified_fragment.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:share/share.dart';
 
-class Home extends StatelessWidget {
+import 'allbills.dart';
+import 'calender_fragment.dart';
+import 'colorspage.dart';
+import 'create_bills.dart';
+import 'create_catergory.dart';
+import 'create_item.dart';
+import 'delivery_boys.dart';
+import 'groups.dart';
+import 'help.dart';
+import 'list_customer.dart';
+import 'main.dart';
+import 'notification.dart';
+import 'orders.dart';
+import 'products.dart';
+import 'profile.dart';
+import 'profileFragment.dart';
+import 'settings.dart';
+import 'user.dart';
+import 'utils.dart';
+import 'vacation.dart';
+import 'vacationfragment.dart';
+
+
+class HomeDumped extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(fontFamily: 'Georgia'),
-      home: HomePage(),
-    );
+  State<StatefulWidget> createState() {
+    HomeState homeState() => new HomeState();
+    return homeState();
   }
 }
 
-class HomePage extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() => new _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-
+class HomeState extends State<HomeDumped> {
   int homeIndex = 3;
   User user;
   String userMobile;
@@ -56,27 +51,15 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: new AppBar(
-        elevation: 0.0,
-        title: Text('Home Screen'),
-        backgroundColor: secondarycolor,
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        onTap: onTabTapped,
-        currentIndex: homeIndex,
-        items: itemsBottomNavigation(),
-      ),
-      drawer: Drawer(
-        child: buildListViewDrawer(context),
-      ),
-      body: new WillPopScope(
-        onWillPop: _onWillPop,
-        child: homechildren[homeIndex],
-      ),
-    );
+  void dispose() {
+    print('dispose: $this');
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(HomeDumped oldWidget) {
+    print('didUpdateWidget: $this');
+    super.didUpdateWidget(oldWidget);
   }
 
   final List<Widget> homechildren = [
@@ -86,44 +69,45 @@ class _HomePageState extends State<HomePage> {
     ProfileFragment(),
   ];
 
-  List<BottomNavigationBarItem> itemsBottomNavigation() {
-    return [
-      BottomNavigationBarItem(
-          icon: Icon(
-            FontAwesomeIcons.calendar,
-            color: secondarycolor,
-          ),
-          title: Text(
-            'CALENDER',
-            style: TextStyle(color: secondarycolor),
-          )),
-      BottomNavigationBarItem(
-          icon: Icon(
-            FontAwesomeIcons.moneyBill,
-            color: secondarycolor,
-          ),
-          title: Text('BILLS', style: TextStyle(color: secondarycolor))),
-      BottomNavigationBarItem(
-          icon: Icon(
-            FontAwesomeIcons.hotel,
-            color: secondarycolor,
-          ),
-          title: Text('VACATION', style: TextStyle(color: secondarycolor))),
-      BottomNavigationBarItem(
-          icon: Icon(
-            FontAwesomeIcons.user,
-            color: secondarycolor,
-          ),
-          title: Text('PROFILE', style: TextStyle(color: secondarycolor)))
-    ];
-  }
-
-  void getUser() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+  void onTabTapped(int index) {
 
     setState(() {
-      userMobile = prefs.getString(CURRENT_USER);
+      homeIndex = index;
     });
+  }
+
+  Future<bool> _onWillPop(BuildContext context) async{
+    print("Do you want to exit this");
+
+    exit(0);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      theme: ThemeData(fontFamily: 'Georgia'),
+      home: new Scaffold(
+        appBar: new AppBar(
+          elevation: 0.0,
+          title: Text('Home Screen'),
+          backgroundColor: secondarycolor,
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          onTap: onTabTapped,
+          currentIndex: homeIndex,
+          items: itemsBottomNavigation(),
+        ),
+        drawer: Drawer(
+          child: buildListViewDrawer(context),
+        ),
+        body: WillPopScope(
+          child: homechildren[homeIndex],
+          onWillPop: () => _onWillPop(context),
+        ),
+        floatingActionButton: FloatingActionButton(onPressed: callShowDialog, child: Icon(Icons.access_alarm),),
+      ),
+    );
   }
 
   ListView buildListViewDrawer(BuildContext context) {
@@ -351,13 +335,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void onTabTapped(int index) {
-
-    setState(() {
-      homeIndex = index;
-    });
-  }
-
   void logoutBilling(BuildContext context) async {
     showloader(context);
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -372,12 +349,54 @@ class _HomePageState extends State<HomePage> {
         context, new MaterialPageRoute(builder: (context) => new MyApp()));
   }
 
-  Future<bool> _onWillPop() {
-    return showDialog(
+  List<BottomNavigationBarItem> itemsBottomNavigation() {
+    return [
+      BottomNavigationBarItem(
+          icon: Icon(
+            FontAwesomeIcons.calendar,
+            color: secondarycolor,
+          ),
+          title: Text(
+            'CALENDER',
+            style: TextStyle(color: secondarycolor),
+          )),
+      BottomNavigationBarItem(
+          icon: Icon(
+            FontAwesomeIcons.moneyBill,
+            color: secondarycolor,
+          ),
+          title: Text('BILLS', style: TextStyle(color: secondarycolor))),
+      BottomNavigationBarItem(
+          icon: Icon(
+            FontAwesomeIcons.hotel,
+            color: secondarycolor,
+          ),
+          title: Text('VACATION', style: TextStyle(color: secondarycolor))),
+      BottomNavigationBarItem(
+          icon: Icon(
+            FontAwesomeIcons.user,
+            color: secondarycolor,
+          ),
+          title: Text('PROFILE', style: TextStyle(color: secondarycolor)))
+    ];
+  }
+
+  void getUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      userMobile = prefs.getString(CURRENT_USER);
+    });
+  }
+
+  callShowDialog() async{
+
+    print("showing dialog");
+    await showDialog(
       context: context,
-      builder: (context) => new AlertDialog(
-        title: new Text('Are you sure?'),
-        content: new Text('Do you want to exit an App'),
+      builder: (context) =>  new AlertDialog(
+        title: new Text('Do you want to exit this application?'),
+        content: new Text('We hate to see you leave...'),
         actions: <Widget>[
           new FlatButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -389,7 +408,6 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-    ) ??
-        false;
+    );
   }
 }

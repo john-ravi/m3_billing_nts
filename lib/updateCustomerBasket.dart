@@ -4,22 +4,17 @@ import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:m3_billing_nts/basket_products_adapter.dart';
 import 'package:m3_billing_nts/customerWithId.dart';
-import 'package:m3_billing_nts/edit_item.dart';
 import 'package:m3_billing_nts/model_product_items.dart';
 import 'colorspage.dart';
-import 'home.dart';
-import 'product_details.dart';
-import 'productadapter.dart';
 import 'package:http/http.dart' as http;
 
 import 'utils.dart';
 
-class ProductsForBilling extends StatefulWidget {
-  CustomerWithId selectedCustomer;
+class UpdateCustomerBasket extends StatefulWidget {
+  final CustomerWithId selectedCustomer;
 
-  ProductsForBilling(this.selectedCustomer);
+  UpdateCustomerBasket(this.selectedCustomer);
 
   @override
   State<StatefulWidget> createState() {
@@ -28,7 +23,7 @@ class ProductsForBilling extends StatefulWidget {
   }
 }
 
-class ProductState extends State<ProductsForBilling> {
+class ProductState extends State<UpdateCustomerBasket> {
   List<ModelProductItem> listItems = new List();
   List<ModelProductItem> finalItems = new List();
 
@@ -37,8 +32,6 @@ class ProductState extends State<ProductsForBilling> {
       new GlobalKey();
   List<ModelProductItem> suggestions = new List();
   List<ModelProductItem> basketItems = new List();
-
-
 
   AutoCompleteTextField textField;
 
@@ -72,7 +65,8 @@ class ProductState extends State<ProductsForBilling> {
 
             int index = suggestions.indexOf(suggestionFromList);
 
-            print("first Suggestion from list $suggestionFromList \t its index $index");
+            print(
+                "first Suggestion from list $suggestionFromList \t its index $index");
             basketItems.add(suggestions[index]);
           });
         },
@@ -92,20 +86,12 @@ class ProductState extends State<ProductsForBilling> {
           return item.item_name.toLowerCase().startsWith(query.toLowerCase());
         });
 
-    Column body = new Column(children: [
-      new ListTile(
-        title: textField,
-      )
-    ]);
-
-    body.children.addAll(basketItems.map((item) {
-
+    var map = basketItems.map((item) {
       int indexOf = basketItems.indexOf(item);
       print("adding @ $indexOf index of basketItem");
 
       return new ListTile(
-
-        title: new Text(item.item_name + "\nAvailable: ${item.no_of_units}" ),
+        title: new Text(item.item_name + "\nAvailable: ${item.no_of_units}"),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -113,19 +99,53 @@ class ProductState extends State<ProductsForBilling> {
             listCountRequestedItems[indexOf] != 0
                 ? new IconButton(
                     icon: new Icon(Icons.remove),
-                    onPressed: () => setState(() => listCountRequestedItems[indexOf]--),
+                    onPressed: () =>
+                        setState(() => listCountRequestedItems[indexOf]--),
                   )
                 : new Container(),
             new Text(listCountRequestedItems[indexOf].toString()),
-            listCountRequestedItems[indexOf] <= item.no_of_units ?
-            new IconButton(
-                icon: new Icon(Icons.add),
-                onPressed: () => setState(() => listCountRequestedItems[indexOf]++))
+            listCountRequestedItems[indexOf] <= item.no_of_units
+                ? new IconButton(
+                    icon: new Icon(Icons.add),
+                    onPressed: () =>
+                        setState(() => listCountRequestedItems[indexOf]++))
                 : Container(),
           ],
         ),
       );
-    }));
+    });
+
+    var galleries = <Widget>[];
+
+    galleries.add(ListTile(
+      title: textField,
+    ));
+    galleries.add(ListTile(
+      title: Text(
+        "Customer Basket Items",
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: 18.0),
+      ),
+    ));
+    galleries.addAll(map);
+
+    galleries.add(Divider(
+      color: secondarycolor,
+      height: 1.6,
+    ));
+
+    galleries.add(ListTile(
+      title: Text(
+        "My Products",
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: 18.0),
+      ),
+    ));
+
+    galleries.addAll(listItems.map((item) => buildContainer(item)));
+
+    ListView body = new ListView(children: galleries,);
+
 
     return MaterialApp(
       theme: ThemeData(fontFamily: 'Georgia'),
@@ -142,6 +162,109 @@ class ProductState extends State<ProductsForBilling> {
               }),
         ),
         body: body,
+      ),
+    );
+  }
+
+  Container buildContainer(ModelProductItem item) {
+    return Container(
+      margin: EdgeInsets.all(10.0),
+      child: Card(
+        elevation: 6.0,
+        margin: EdgeInsets.all(4.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Table(
+              children: [
+                TableRow(children: [
+                  Container(
+                    margin: EdgeInsets.all(5.0),
+                    child: new Text(
+                      'Product ',
+                      style: TextStyle(
+                        fontSize: 14.0,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.all(5.0),
+                    child: new Text(
+                      item.item_name,
+                      style: TextStyle(
+                        fontSize: 14.0,
+                      ),
+                    ),
+                  ),
+                ]),
+                TableRow(children: [
+                  Container(
+                    margin: EdgeInsets.all(5.0),
+                    child: new Text(
+                      'Unit Cost ',
+                      style: TextStyle(
+                        fontSize: 14.0,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.all(5.0),
+                    child: new Text(
+                      item.unit_cost.toString(),
+                      style: TextStyle(
+                        fontSize: 14.0,
+                      ),
+                    ),
+                  ),
+                ]),
+                TableRow(children: [
+                  Container(
+                    margin: EdgeInsets.all(5.0),
+                    child: new Text(
+                      'Tax ',
+                      style: TextStyle(
+                        fontSize: 14.0,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.all(5.0),
+                    child: new Text(
+                      item.tax,
+                      style: TextStyle(
+                        fontSize: 14.0,
+                      ),
+                    ),
+                  ),
+                ])
+              ],
+            ),
+            InkWell(
+              onTap: () {
+//                int index = listItems.indexOf(item);
+                basketItems.add(item);
+                listCountRequestedItems.add(0);
+                setState(() {
+
+                });
+              },
+              child: Container(
+                alignment: Alignment.centerRight,
+                child: Container(
+                  padding: EdgeInsets.all(5.0),
+                  margin: EdgeInsets.only(bottom: 10.0, top: 5.0, right: 10.0),
+                  decoration: new BoxDecoration(
+                      borderRadius: new BorderRadius.circular(5.0),
+                      border: new Border.all(color: secondarycolor)),
+                  child: Text(
+                    'Add to Basket',
+                    style: TextStyle(fontSize: 14.0, color: secondarycolor),
+                  ),
+                ),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -169,19 +292,20 @@ class ProductState extends State<ProductsForBilling> {
         print("Listing Rows ${rows.toString()}");
 
         rows.forEach((row) {
-          listItems.add(ModelProductItem.named(
-              id: row["id"],
-              item_name: row["item_name"],
-              unit_cost: row["unit_cost"],
-              no_of_units: row["no_of_units"],
-              start_date: row["start_date"],
-              end_date: row["end_date"],
-              tax: row["tax"]));
-
           setState(() {
+            listItems.add(ModelProductItem.named(
+                id: row["id"],
+                item_name: row["item_name"],
+                unit_cost: double.tryParse(row["unit_cost"]) ?? 0.0,
+                no_of_units: double.tryParse(row["no_of_units"]) ?? 0.0,
+                start_date: row["start_date"],
+                end_date: row["end_date"],
+                tax: row["tax"]));
+
             finalItems = listItems;
             suggestions = listItems;
           });
+
           searchTextGlobalkey.currentState.updateSuggestions(suggestions);
         });
       } else {

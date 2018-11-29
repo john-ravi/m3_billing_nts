@@ -25,7 +25,6 @@ class ProfileFragment extends StatefulWidget {
 }
 
 class ProfileFragmentState extends State<ProfileFragment> {
-  String flatNo = "";
   String name = "";
   String mobile = "";
   String city = "";
@@ -37,9 +36,7 @@ class ProfileFragmentState extends State<ProfileFragment> {
   TextEditingController cntrlEmail = new TextEditingController();
   TextEditingController cntrlStreet = new TextEditingController();
   TextEditingController cntrlArea = new TextEditingController();
-  TextEditingController cntrlCity = new TextEditingController();
   TextEditingController cntrlPincode = new TextEditingController();
-  TextEditingController cntrlState = new TextEditingController();
 
   List listJsonArray;
   User user;
@@ -53,14 +50,12 @@ class ProfileFragmentState extends State<ProfileFragment> {
   @override
   void initState() {
     initEverything();
-    focusState.addListener(stateListener);
     //  cntrlState.addListener(stateListener);
     super.initState();
   }
 
   @override
   void dispose() {
-    focusState.removeListener(stateListener);
     super.dispose();
   }
 
@@ -69,6 +64,9 @@ class ProfileFragmentState extends State<ProfileFragment> {
   }
 
   void initEverything() async {
+    focusState.addListener(stateListener);
+    print("added State Foucs listener");
+    await showProfileFromPrefs();
     await getProfile().then((_) {
       print("After Get Profile");
       setState(() {});
@@ -78,59 +76,6 @@ class ProfileFragmentState extends State<ProfileFragment> {
     listStates = mapStatesToId.keys.toList();
     setState(() {});
   }
-
-  Future<Map<String, dynamic>> getStateslocal() async {
-    var uri = Uri.https(authority = "m3bapis.herokuapp.com",
-        unencodedPath = "/api/states/list"
-    );
-
-    d(uri);
-    http.Response registerUserResponse = await http.get(uri);
-
-    if (registerUserResponse.statusCode == 200) {
-      // If the call to the server was successful, parse the JSON
-      var decodedBody = json.decode(registerUserResponse.body);
-        print("decoded body \t" + decodedBody.toString());
-      Map<String, dynamic> mapStateToId = new Map();
-      decodedBody.forEach((row) {
-        print("ROW \t" + row.toString());
-
-        mapStateToId[row["state_name"]] = row["state_id"];
-
-        print("Map as Whiole \t" + mapStateToId.toString());
-      });
-      return mapStateToId;
-    } else {
-      print("Error Fetching States, Check Network: In Utility");
-    }
-
-    return null;
-  }
-
-  Future<List<String>> getCitieslocal(state_id) async {
-    var uri = Uri.https(
-        authority = "m3bapis.herokuapp.com",
-        unencodedPath = "/api/cities/list");
-
-    d(uri);
-    http.Response registerUserResponse = await http.get(uri);
-    List<String> listCities = new List();
-
-    if (registerUserResponse.statusCode == 200) {
-      // If the call to the server was successful, parse the JSON
-      var decodedBody = json.decode(registerUserResponse.body);
-      decodedBody.forEach((rowCityObject) {
-        print("ROW \t" + rowCityObject.toString());
-        listCities.add(rowCityObject["city_name"]);
-        print("Map as Whiole \t" + decodedBody.toString());
-      });
-    } else {
-      print("Error Fetching States, Check Network: In Utility");
-    }
-
-    return listCities;
-  }
-
 
   void updateAddress(BuildContext context) async {
     if (cntrlEmail.text.isNotEmpty && !isEmail(cntrlEmail.text)) {
@@ -171,6 +116,8 @@ pincode
         print("decoded body \t" + decodedBody.toString());
         if (decodedBody['response'].toString().compareTo("success") == 0) {
           s(context, "Successfully Updated ${user.username}");
+
+          await updateProfilePrefs();
           Fluttertoast.showToast(
               msg: "Successfully Updated ${user.username}",
               toastLength: Toast.LENGTH_LONG,
@@ -252,7 +199,7 @@ pincode
         });
 
         setState(() {
-          user = listUser[0];
+          user = listUser[0] ?? new User();
           cntrlPincode.text = user.pincode ?? "";
           cntrlArea.text = user.area ?? "";
           cntrlStreet.text = user.street ?? "";
@@ -310,7 +257,7 @@ pincode
                                 )),
                             Container(
                               child: Text(
-                                name,
+                                name ?? "",
                                 style: TextStyle(fontSize: 16.0),
                               ),
                             ),
@@ -342,7 +289,7 @@ pincode
                                 )),
                             Container(
                               child: Text(
-                                mobile,
+                                mobile ?? "",
                                 style: TextStyle(fontSize: 16.0),
                               ),
                             ),
@@ -484,8 +431,7 @@ pincode
                 GestureDetector(
                   onTap: () => dialogForState(listStates),
                   child: Container(
-                    margin: EdgeInsets.only(
-                        left: 16.0, top: 16.0, right: 16.0),
+                    margin: EdgeInsets.only(left: 16.0, top: 16.0, right: 16.0),
                     child: Row(
                       mainAxisSize: MainAxisSize.max,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -623,11 +569,18 @@ pincode
   }
 
   dialogForCity() async {
+    superCity = "";
+
     var stateID = mapStatesToId[superState];
     print("States ${mapStatesToId.toString()} \n StateID $stateID}");
 
     showloader(context);
-    listCities = await getCitiesUtils(stateID);
+    try {
+      listCities = await getCitiesUtils(stateID);
+    } catch (e) {
+      print(e);
+      removeloader();
+    }
 
     removeloader();
     print("after ge cities ${listCities.toString()}");
@@ -638,7 +591,11 @@ pincode
             ));
     print("Returned $superCity ");
 
-    city = superCity ?? "";
+    if (superCity != "") {
+      city = superCity ?? "";
+    } else {
+      city = "";
+    }
     setState(() {});
   }
 
@@ -651,18 +608,53 @@ pincode
 
     print("Returned State $superState ");
     state = superState ?? "";
-    setState(() {
-      city = "Tap To Select City";
-      stateSelected = true;
-    });
+    if (superState != "") {
+      setState(() {
+        city = "Tap To Select City";
+        stateSelected = true;
+      });
+      dialogForCity();
+    }
+  }
 
-    dialogForCity();
+  showProfileFromPrefs() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    print("Showing from prefs ${prefs.getString(CURRENT_USER)} \n "
+        "prefs: ${prefs.toString()}");
+
+    name = prefs.getString(CURRENT_USER_NAME);
+    mobile = prefs.getString(CURRENT_USER);
+    cntrlEmail.text = prefs.getString(CURRENT_USER_EMAIL);
+    cntrlFlatNo.text = prefs.getString(CURRENT_USER_FLAT_NO);
+    cntrlArea.text = prefs.getString(CURRENT_USER_AREA);
+    state = prefs.getString(CURRENT_USER_STATE);
+    city = prefs.getString(CURRENT_USER_CITY);
+    cntrlPincode.text = prefs.getString(CURRENT_USER_PINCODE);
+
+    setState(() {
+
+    });
+  }
+
+  updateProfilePrefs() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    prefs.setString(CURRENT_USER_NAME, name.trim());
+    prefs.setString(CURRENT_USER_EMAIL, cntrlEmail.text.trim());
+    prefs.setString(CURRENT_USER_FLAT_NO, cntrlFlatNo.text.trim());
+    prefs.setString(CURRENT_USER_AREA, cntrlArea.text.trim());
+    prefs.setString(CURRENT_USER_STATE, state.trim());
+    prefs.setString(CURRENT_USER_CITY, city.trim());
+    prefs.setString(CURRENT_USER_PINCODE, cntrlPincode.text.trim());
+
+    print("Updated Prefs ${prefs.toString()}");
   }
 }
 
 class SearchDialogWidget extends StatefulWidget {
-  List<String> listStrings;
-  bool isStateSearch;
+  final List<String> listStrings;
+  final bool isStateSearch;
 
   SearchDialogWidget(this.isStateSearch, this.listStrings);
 
@@ -723,11 +715,11 @@ class _SearchDialogWidgetState extends State<SearchDialogWidget> {
                   superCity = finalList[index];
                 }
 
-                Navigator.pop(context);
+                setState(() {});
+                Navigator.of(context).pop();
                 /** dont assign the selected value to controller before this;
                  *  makes index value unusable after tapping*/
                 controllerSearch.text = finalList[index];
-                setState(() {});
               },
               child: new ListTile(title: new Text(finalList[index])),
             );

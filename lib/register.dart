@@ -326,8 +326,12 @@ class RegisterState extends State<Register> {
             // user not there
 
             print("User Not Existing, call create()");
-            user = new User(businessname.text, username.text, mobile.text,
-                email.text, password.text, aadharcard.text);
+            user = new User.named(businessName:  businessname.text,
+                username: username.text,
+                mobile: mobile.text,
+                email: email.text,
+                password: password.text,
+                aadharCard:  aadharcard.text);
 
             removeloader();
 
