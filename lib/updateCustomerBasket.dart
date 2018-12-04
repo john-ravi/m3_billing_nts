@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:m3_billing_nts/customerWithId.dart';
+import 'package:m3_billing_nts/model_basket_item.dart';
 import 'package:m3_billing_nts/model_product_items.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'colorspage.dart';
 import 'package:http/http.dart' as http;
 
@@ -24,21 +26,30 @@ class UpdateCustomerBasket extends StatefulWidget {
 }
 
 class ProductState extends State<UpdateCustomerBasket> {
-  List<ModelProductItem> listItems = new List();
-  List<ModelProductItem> finalItems = new List();
+  String authority = "18.191.190.195";
+  String unencodedPath = "/billing";
 
-  List<int> listCountRequestedItems = [];
+  List<ModelProductItem> listSellerItems = new List();
+  List<ModelBasketItem> listBasketItems = new List();
+
   GlobalKey<AutoCompleteTextFieldState<ModelProductItem>> searchTextGlobalkey =
       new GlobalKey();
   List<ModelProductItem> suggestions = new List();
-  List<ModelProductItem> basketItems = new List();
 
   AutoCompleteTextField textField;
 
+  SharedPreferences prefs;
+
   @override
   void initState() {
-    callGetProducts();
+    initEverything();
     super.initState();
+  }
+
+  void initEverything() async {
+    callGetProducts();
+
+    prefs = await SharedPreferences.getInstance();
   }
 
   @override
@@ -58,8 +69,6 @@ class ProductState extends State<UpdateCustomerBasket> {
         textSubmitted: (item) {
           print("Submitteed $item");
           setState(() {
-            listCountRequestedItems.add(0);
-
             ModelProductItem suggestionFromList = suggestions
                 .firstWhere((suggestion) => suggestion.item_name == item);
 
@@ -67,7 +76,7 @@ class ProductState extends State<UpdateCustomerBasket> {
 
             print(
                 "first Suggestion from list $suggestionFromList \t its index $index");
-            basketItems.add(suggestions[index]);
+            addItemsToBAsket(suggestions[index]);
           });
         },
         itemBuilder: (context, item) {
@@ -86,34 +95,7 @@ class ProductState extends State<UpdateCustomerBasket> {
           return item.item_name.toLowerCase().startsWith(query.toLowerCase());
         });
 
-    var map = basketItems.map((item) {
-      int indexOf = basketItems.indexOf(item);
-      print("adding @ $indexOf index of basketItem");
-
-      return new ListTile(
-        title: new Text(item.item_name + "\nAvailable: ${item.no_of_units}"),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            listCountRequestedItems[indexOf] != 0
-                ? new IconButton(
-                    icon: new Icon(Icons.remove),
-                    onPressed: () =>
-                        setState(() => listCountRequestedItems[indexOf]--),
-                  )
-                : new Container(),
-            new Text(listCountRequestedItems[indexOf].toString()),
-            listCountRequestedItems[indexOf] <= item.no_of_units
-                ? new IconButton(
-                    icon: new Icon(Icons.add),
-                    onPressed: () =>
-                        setState(() => listCountRequestedItems[indexOf]++))
-                : Container(),
-          ],
-        ),
-      );
-    });
+    var iterableBasktetItems = buildBasketItemsIterable();
 
     var galleries = <Widget>[];
 
@@ -127,7 +109,7 @@ class ProductState extends State<UpdateCustomerBasket> {
         style: TextStyle(fontSize: 18.0),
       ),
     ));
-    galleries.addAll(map);
+    galleries.addAll(iterableBasktetItems);
 
     galleries.add(Divider(
       color: secondarycolor,
@@ -142,10 +124,11 @@ class ProductState extends State<UpdateCustomerBasket> {
       ),
     ));
 
-    galleries.addAll(listItems.map((item) => buildContainer(item)));
+    galleries.addAll(suggestions.map((item) => buildSellerItemContainer(item)));
 
-    ListView body = new ListView(children: galleries,);
-
+    ListView body = new ListView(
+      children: galleries,
+    );
 
     return MaterialApp(
       theme: ThemeData(fontFamily: 'Georgia'),
@@ -166,7 +149,107 @@ class ProductState extends State<UpdateCustomerBasket> {
     );
   }
 
-  Container buildContainer(ModelProductItem item) {
+  Iterable<ListTile> buildBasketItemsIterable() {
+    return listBasketItems.map((item) {
+      print("Basket Item as PAssed $item");
+      return new ListTile(
+        title: new Text(item.modelProductItem.item_name +
+            "\n" +
+            "Cost: Rs.${item.modelProductItem.unit_cost}"
+            "\n"
+            "Available: ${item.modelProductItem.no_of_units.floor()}"),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            item.purchaseQuantity > 0
+                ? new IconButton(
+                    icon: new Icon(Icons.remove),
+                    onPressed: () {
+                      if (item.purchaseQuantity == 1) {
+                        removeBasketItemUpdateSellerList(item);
+                      } else {
+                        item.purchaseQuantity--;
+                        setState(() {});
+                      }
+                    },
+                  )
+                : retrunEmptyContainerAfterRemovingBasketItem(item),
+            new Text(item.purchaseQuantity.toString()),
+            item.purchaseQuantity < item.modelProductItem.no_of_units
+                ? new IconButton(
+                    icon: new Icon(Icons.add),
+                    onPressed: () => setState(() => item.purchaseQuantity++))
+                : Container(),
+          ],
+        ),
+      );
+    });
+  }
+
+  addBasketItemToCloud(ModelBasketItem basketItem) async {
+    /*
+    *
+id	seller_name	customer_name	master_list_items	is_in_basket	delivery_boy_id	master_start_date_time	master_event_interval	customer_id	seller_id	item_id
+    * */
+
+    var todayAtMorning6 = DateTime.now()
+        .subtract(Duration(hours: DateTime.now().hour))
+        .add(Duration(
+          hours: 6,
+        ));
+
+    var uri = Uri.http(authority, unencodedPath, {
+      "page": "createBasketItem",
+      "seller_name": prefs.getString(CURRENT_USER_NAME),
+      "customer_name": widget.selectedCustomer.customer_name,
+      "master_list_item": basketItem.modelProductItem.item_name,
+      "is_in_basket": "1",
+      "master_start_date_time": todayAtMorning6.toIso8601String(),
+      "master_event_interval": Duration(days: 1).inMilliseconds.toString(),
+      "customer_id": widget.selectedCustomer.id.toString(),
+      "seller_id": prefs.getString(CURRENT_USER_ID),
+      "item_id": basketItem.modelProductItem.id
+    });
+
+    d(uri);
+    http.Response httpResponse = await http.post(uri);
+
+    if(httpResponse.statusCode == 200) {
+      var decode = json.decode(httpResponse.body);
+      print("Decoded body $decode");
+
+
+
+    } else {
+      print("Network Error ${httpResponse.reasonPhrase}");
+    }
+  }
+
+  updateBasketItemToCloud(ModelBasketItem basketItem) {
+
+/*
+    http.Response httpResponse = await http.post(uri);
+
+    if(httpResponse.statusCode == 200) {
+
+    } else {
+      print("Network Error ${httpResponse.reasonPhrase}");
+    }
+*/
+
+  }
+
+  List<ModelBasketItem> getBasketItemsFromCloud() {
+    return null;
+  }
+
+  Container retrunEmptyContainerAfterRemovingBasketItem(ModelBasketItem item) {
+    removeBasketItemUpdateSellerList(item);
+    return new Container();
+  }
+
+  Container buildSellerItemContainer(ModelProductItem item) {
     return Container(
       margin: EdgeInsets.all(10.0),
       child: Card(
@@ -242,11 +325,7 @@ class ProductState extends State<UpdateCustomerBasket> {
             InkWell(
               onTap: () {
 //                int index = listItems.indexOf(item);
-                basketItems.add(item);
-                listCountRequestedItems.add(0);
-                setState(() {
-
-                });
+                addItemsToBAsket(item);
               },
               child: Container(
                 alignment: Alignment.centerRight,
@@ -269,10 +348,21 @@ class ProductState extends State<UpdateCustomerBasket> {
     );
   }
 
-  void callGetProducts() async {
-    String authority = "18.191.190.195";
-    String unencodedPath = "/billing";
+  void addItemsToBAsket(ModelProductItem item) {
+    suggestions.remove(item);
+    listBasketItems.add(
+        ModelBasketItem.named(modelProductItem: item,
+            purchaseQuantity: 1,
+         customer_id: widget.selectedCustomer.id,
+          item_id: int.tryParse(item.id),
+          customer_name: widget.selectedCustomer.customer_name,
+          master_list_item: ""
 
+        ));
+    setState(() {});
+  }
+
+  void callGetProducts() async {
     var uri = Uri.http(authority, unencodedPath, {"page": "getMyItems"});
 
     d(uri);
@@ -293,7 +383,7 @@ class ProductState extends State<UpdateCustomerBasket> {
 
         rows.forEach((row) {
           setState(() {
-            listItems.add(ModelProductItem.named(
+            listSellerItems.add(ModelProductItem.named(
                 id: row["id"],
                 item_name: row["item_name"],
                 unit_cost: double.tryParse(row["unit_cost"]) ?? 0.0,
@@ -302,8 +392,7 @@ class ProductState extends State<UpdateCustomerBasket> {
                 end_date: row["end_date"],
                 tax: row["tax"]));
 
-            finalItems = listItems;
-            suggestions = listItems;
+            suggestions = listSellerItems;
           });
 
           searchTextGlobalkey.currentState.updateSuggestions(suggestions);
@@ -319,57 +408,11 @@ class ProductState extends State<UpdateCustomerBasket> {
     }
   }
 
-  Widget basketProduct(int index) {
-    return new Card(
-      elevation: 6.0,
-      margin: EdgeInsets.all(10.0),
-      child: Column(
-        children: <Widget>[
-          Table(
-            children: [
-              TableRow(children: [
-                Container(
-                  margin: EdgeInsets.all(5.0),
-                  child: new Text(
-                    'Item Name ',
-                    style: TextStyle(fontSize: 14.0),
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.all(5.0),
-                  child: new Text(
-                    ' : ${finalItems[index].item_name}',
-                    style: TextStyle(fontSize: 14.0),
-                  ),
-                ),
-              ]),
-              TableRow(children: [
-                Container(
-                  margin: EdgeInsets.all(5.0),
-                  child: new Text(
-                    'Unit Cost ',
-                    style: TextStyle(fontSize: 14.0),
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.all(5.0),
-                  child: new Text(
-                    ' : ${finalItems[index].unit_cost}',
-                    style: TextStyle(fontSize: 14.0),
-                  ),
-                ),
-              ]),
-            ],
-          ),
-/*          Row(
-            children: <Widget>[
-              _itemCount!=0? new  IconButton(icon: new Icon(Icons.remove),onPressed: ()=>setState(()=>_itemCount--),):new Container(),
-              new Text(_itemCount.toString()),
-              new IconButton(icon: new Icon(Icons.add),onPressed: ()=>setState(()=>_itemCount++))
-            ],
-          ),*/
-        ],
-      ),
-    );
+  void removeBasketItemUpdateSellerList(ModelBasketItem item) {
+    suggestions.add(item.modelProductItem);
+
+    listBasketItems.remove(item);
+
+    setState(() {});
   }
 }

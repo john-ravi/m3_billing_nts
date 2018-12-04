@@ -7,7 +7,7 @@ class CustomerWithId {
   String city = "";
   String state = "";
   String pincode = "";
-  String id = "";
+  int id ;
 
   CustomerWithId(this.customer_name, this.contact_number, this.id);
 

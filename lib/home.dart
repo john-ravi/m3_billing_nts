@@ -81,7 +81,7 @@ class _HomePageState extends State<HomePage> {
 
   final List<Widget> homechildren = [
     CalenderFragment(),
-    BillFragments(),
+    AllBills(),
     VacationFragment(),
     ProfileFragment(),
   ];
@@ -360,14 +360,10 @@ class _HomePageState extends State<HomePage> {
 
   void logoutBilling(BuildContext context) async {
     showloader(context);
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.remove("billingLoggedIn");
-    prefs.remove("billingCurrentUser");
 
-    print(prefs.getBool("billingLoggedIn") ?? false);
-    print(prefs.getString("billingCurrentUser"));
-
+    removeUserInPrefs();
     removeloader();
+    Navigator.pop(context);
     Navigator.push(
         context, new MaterialPageRoute(builder: (context) => new MyApp()));
   }

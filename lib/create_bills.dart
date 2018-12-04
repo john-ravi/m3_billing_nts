@@ -321,7 +321,7 @@ class _AlertBodyPaidStatusState extends State<AlertBodyPaidStatus> {
 
     }else {
       showloader(context);
-      await utilsCreateBill(widget.selectedCustomer.id, amount, paidStatus)
+      await utilsCreateBill(widget.selectedCustomer.id.toString(), amount, paidStatus)
           .then((responseBill) {
         if (responseBill.statusCode == 200) {
           // If the call to the server was successful, parse the JSON

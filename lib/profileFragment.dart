@@ -31,6 +31,7 @@ class ProfileFragmentState extends State<ProfileFragment> {
   String state = "Tap to Select State";
   bool stateSelected = false;
   bool citySelected = false;
+  List<User> listUser = new List();
 
   TextEditingController cntrlFlatNo = new TextEditingController();
   TextEditingController cntrlEmail = new TextEditingController();
@@ -50,7 +51,6 @@ class ProfileFragmentState extends State<ProfileFragment> {
   @override
   void initState() {
     initEverything();
-    //  cntrlState.addListener(stateListener);
     super.initState();
   }
 
@@ -153,7 +153,7 @@ pincode
 
       // await Duration()
     }
-    List<User> listUser = new List();
+    listUser = new List();
 
     if (registerUserResponse.statusCode == 200) {
       // If the call to the server was successful, parse the JSON
@@ -187,6 +187,7 @@ pincode
 
           listUser.add(User.named(
               mobile: rowUser["mobile_number"],
+              id: rowUser["id"],
               email: rowUser["email_id"],
               username: rowUser["user_name"],
               flatNo: rowUser["flat_no"],
@@ -638,15 +639,7 @@ pincode
   }
 
   updateProfilePrefs() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    prefs.setString(CURRENT_USER_NAME, name.trim());
-    prefs.setString(CURRENT_USER_EMAIL, cntrlEmail.text.trim());
-    prefs.setString(CURRENT_USER_FLAT_NO, cntrlFlatNo.text.trim());
-    prefs.setString(CURRENT_USER_AREA, cntrlArea.text.trim());
-    prefs.setString(CURRENT_USER_STATE, state.trim());
-    prefs.setString(CURRENT_USER_CITY, city.trim());
-    prefs.setString(CURRENT_USER_PINCODE, cntrlPincode.text.trim());
+    SharedPreferences prefs = await saveUserInPrefs(user);
 
     print("Updated Prefs ${prefs.toString()}");
   }

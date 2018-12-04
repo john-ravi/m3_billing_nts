@@ -13,13 +13,11 @@ import 'user.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 
-
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
 String commonUrl = "http://149.248.0.189:8080/billing/";
 String testingUrl = "http://18.191.190.195/billing/?page=";
 String zeroUrl = "http://johnravi.000webhostapp.com/?page=";
-
 
 String authority = "18.191.190.195";
 String unencodedPath = "/billing";
@@ -30,6 +28,7 @@ OverlayEntry loaderentry;
 
 const String LOGGED_IN = "billingLoggedIn";
 const String CURRENT_USER = "billingCurrentUser";
+const String CURRENT_USER_ID = "CURRENT_USER_ID";
 const String CURRENT_USER_NAME = "Username";
 const String CURRENT_USER_EMAIL = "CURRENT_USER_EMAIL";
 const String CURRENT_USER_FLAT_NO = "CURRENT_USER_FLAT_NO";
@@ -113,7 +112,7 @@ Future<http.Response> tryCatchNetwork(String userUrl) async {
 
     return httpResponse;
   }
-    print("Response $httpResponse");
+  print("Response $httpResponse");
 
   return httpResponse;
 }
@@ -146,31 +145,40 @@ bool isEmail(String em) {
   return regExp.hasMatch(em);
 }
 
-Future<void> createUserInDB(User user, BuildContext context) async {
+Future<int> createUserInDB(User user, BuildContext context) async {
   print("Create User");
 
-
+  int id;
   /** Creating User in database*/
   await putUserOnDb(user).then((httpResponse) {
-    var bodyJson = json.decode(httpResponse.body);
-    print(bodyJson.toString());
 
-    switch (bodyJson["response"]) {
-      case "UserCreated":
-        {
-          print("Success -- User Created on Database");
+    if(httpResponse.statusCode == 200) {
+      var bodyJson = json.decode(httpResponse.body);
+      print(bodyJson.toString());
 
-          break;
-        }
-      case "FailedUserCreation":
-        {
-          print("Failed Creation of User on Database, trying again");
-          createUserInDB(user, context);
-          break;
-        }
+      switch (bodyJson["response"]) {
+        case "UserCreated":
+          {
+            id = bodyJson["id"];
+           s(context, "Success -- User Created on Database with ID = $id");
+
+            return id;
+          }
+        case "FailedUserCreation":
+          {
+            s(context, "Failed Creation of User on Database, trying again");
+            Future.delayed(Duration(seconds: 7), () => createUserInDB(user, context));
+            break;
+          }
+      }
+    } else {
+      s(context, "Network Failed");
+      Future.delayed(Duration(seconds: 7), () => createUserInDB(user, context));
     }
 
   });
+
+  return id;
 }
 
 Future<http.Response> putUserOnDb(User user) async {
@@ -192,24 +200,23 @@ Future<http.Response> putUserOnDb(User user) async {
 s(BuildContext context, String value) {
   try {
     Scaffold.of(context).showSnackBar(new SnackBar(
-      duration: Duration(seconds: 5),
+        duration: Duration(seconds: 5),
         content: new Text(
-      value,
-      style: TextStyle(fontFamily: 'Georgia'),
-    )));
+          value,
+          style: TextStyle(fontFamily: 'Georgia'),
+        )));
   } on Exception catch (e) {
     print("printing Exception $e");
   }
 }
 
-showToast(String msg){
+showToast(String msg) {
   Fluttertoast.showToast(
       msg: msg,
       toastLength: Toast.LENGTH_LONG,
       gravity: ToastGravity.CENTER,
       timeInSecForIos: 1,
-      textcolor: '#ffffff'
-  );
+      textcolor: '#ffffff');
 }
 
 void showSnack(String string, GlobalKey<ScaffoldState> keyScaffold) {
@@ -231,7 +238,6 @@ Future<List<Bills>> getBills() async {
     // If the call to the server was successful, parse the JSON
     var decodedBody = json.decode(registerUserResponse.body);
     if (decodedBody['response'].toString().compareTo("success") == 0) {
-
       print("decoded body \t" + decodedBody.toString());
       List billsDecoded = decodedBody["body"];
 
@@ -283,17 +289,17 @@ Future<Map<String, String>> getStates() async {
     if (decodedBody['response'].toString().compareTo("success") == 0) {
       Map<String, String> mapStateToId = new Map();
 
-  //    print("decoded body \t" + decodedBody.toString());
+      //    print("decoded body \t" + decodedBody.toString());
       List statesTableList = decodedBody["body"];
 
-  //    print("List \t" + statesTableList.toString());
+      //    print("List \t" + statesTableList.toString());
 
       statesTableList.forEach((row) {
-  //      print("ROW \t" + row.toString());
+        //      print("ROW \t" + row.toString());
 
         mapStateToId[row["state_name"]] = row["state_id"];
 
- //       print("Map as Whiole \t" + mapStateToId.toString());
+        //       print("Map as Whiole \t" + mapStateToId.toString());
       });
       return mapStateToId;
 //    return Post.fromJson(json.decode(response.body));
@@ -325,7 +331,7 @@ Future<List<String>> getCitiesUtils(state_id) async {
 //      print("List \t" + objectCitiesList.toString());
 
       objectCitiesList.forEach((rowCityObject) {
- //       print("ROW \t" + rowCityObject.toString());
+        //       print("ROW \t" + rowCityObject.toString());
         listCities.add(rowCityObject["city_name"]);
 //        print("Map as Whiole \t" + objectCitiesList.toString());
       });
@@ -337,6 +343,56 @@ Future<List<String>> getCitiesUtils(state_id) async {
   }
 
   return listCities;
+}
+
+blankHTTP() async{
+
+/*
+  http.Response httpResponse = await http.post(uri);
+
+  if(httpResponse.statusCode == 200) {
+
+  } else {
+    print("Network Error ${httpResponse.reasonPhrase}");
+  }
+*/
+
+}
+
+Future<SharedPreferences> saveUserInPrefs(User user) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setBool(LOGGED_IN, true);
+  print(prefs.getBool(LOGGED_IN) ?? false);
+
+  try {
+    prefs.setString(CURRENT_USER, user.mobile);
+    prefs.setString(CURRENT_USER_ID, user.id.toString());
+    prefs.setString(CURRENT_USER_NAME, user.username);
+    prefs.setString(CURRENT_USER_EMAIL, user.email);
+    prefs.setString(CURRENT_USER_FLAT_NO, user.flatNo);
+    prefs.setString(CURRENT_USER_AREA, user.area);
+    prefs.setString(CURRENT_USER_STATE, user.state);
+    prefs.setString(CURRENT_USER_CITY, user.city);
+    prefs.setString(CURRENT_USER_PINCODE, user.pincode);
+  } catch (e) {
+    print(e);
+  }
+  return prefs;
+}
+
+ removeUserInPrefs() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setBool(LOGGED_IN, null);
+  prefs.setString(CURRENT_USER, null);
+  prefs.setString(CURRENT_USER_ID, null);
+  prefs.setString(CURRENT_USER_NAME, null);
+  prefs.setString(CURRENT_USER_EMAIL, null);
+  prefs.setString(CURRENT_USER_FLAT_NO, null);
+  prefs.setString(CURRENT_USER_AREA, null);
+  prefs.setString(CURRENT_USER_STATE, null);
+  prefs.setString(CURRENT_USER_CITY, null);
+  prefs.setString(CURRENT_USER_PINCODE, null);
+  return prefs;
 }
 
 Future<List<Customer>> getCustomers() async {
@@ -379,6 +435,7 @@ Future<List<Customer>> getCustomers() async {
 
   return listCustomers;
 }
+
 Future<List<Customer>> dummy() async {
   print("Get Customers Called");
   var uri =
@@ -446,7 +503,7 @@ Future<List<CustomerWithId>> getCustomersWithId() async {
         print("CustomerMap  ${customerMap.toString()}");
 
         listCustomers.add(CustomerWithId(customerMap["customer_name"],
-            customerMap["contact_number"], customerMap["id"]));
+            customerMap["contact_number"], int.tryParse(customerMap["id"])));
 
         //      print("List as Whiole \t" + listCustomers.toString());
       });

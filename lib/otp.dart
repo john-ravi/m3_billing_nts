@@ -44,7 +44,7 @@ class MobileOTPState extends State<MobileOTP> {
          print("signInWithPhoneNumber auto succeeded: $user" + "\nGOING TO JOME PAGE");
        });
 
-gotoHome(context);
+        gotoHome(context);
          };
 
      final PhoneVerificationFailed verificationFailed =
@@ -337,26 +337,30 @@ gotoHome(context);
      }
    }
 
-   void gotoHome(BuildContext context) async{
-
+   void gotoHome(BuildContext context) async {
+     s(context, "OTP Verified - Creating User in DB");
      showloader(context);
-     await createUserInDB(widget.user, context);
+     int id = await createUserInDB(widget.user, context);
+       removeloader();
 
-     SharedPreferences prefs = await SharedPreferences.getInstance();
-     prefs.setBool(LOGGED_IN, true);
-     print(prefs.getBool(LOGGED_IN) ?? false);
+     if(id != null) {
+       User user = User.named(id: id.toString(),
+         mobile: widget.user.mobile.trim(),
+         username: widget.user.username.trim(),
+         email: widget.user.email.trim(),
+       );
 
-     prefs.setString(CURRENT_USER, widget.user.mobile.trim());
-     prefs.setString(CURRENT_USER_NAME, widget.user.username.trim());
-     prefs.setString(CURRENT_USER_EMAIL, widget.user.email.trim());
-     prefs.setString(CURRENT_USER_FLAT_NO, widget.user.flatNo.trim());
-     prefs.setString(CURRENT_USER_AREA, widget.user.area.trim());
-     prefs.setString(CURRENT_USER_STATE, widget.user.state.trim());
-     prefs.setString(CURRENT_USER_CITY, widget.user.city.trim());
-     prefs.setString(CURRENT_USER_PINCODE, widget.user.pincode.trim());
-     print(prefs.getString(CURRENT_USER));
+       SharedPreferences prefs = await saveUserInPrefs(user);
+       print(prefs.getString(CURRENT_USER));
 
-     removeloader();
-     Navigator.push(context, new MaterialPageRoute(builder: (context) => Home()));
+       s(context, "USers created in prefs");
+       Navigator.push(
+           context, new MaterialPageRoute(builder: (context) => Home()));
+
+     } else {
+
+       s(context, "User Id is null");
+     }
    }
+
 }

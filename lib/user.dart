@@ -5,6 +5,7 @@ class User {
   String password = "";
   String aadharCard = "";
   String username = "";
+  String id = "";
 
   String flatNo = "";
   String street = "";
@@ -20,7 +21,7 @@ class User {
 
   User();
 
-  User.named({this.businessName, this.mobile, this.email, this.password,
+  User.named({this.businessName, this.id, this.mobile, this.email, this.password,
       this.aadharCard, this.username, this.flatNo, this.street, this.area, this.state,
       this.city, this.pincode});
 
